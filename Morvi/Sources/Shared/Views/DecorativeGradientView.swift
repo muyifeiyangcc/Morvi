@@ -55,7 +55,7 @@ final class DecorativeGradientView: UIView {
         drawGlow(
             in: context,
             center: CGPoint(x: bounds.maxX, y: 0),
-            radius: bounds.width * 0.4,
+            radius: bounds.width * 0.5,
             color: palette.secondaryGlowColor
         )
     }
