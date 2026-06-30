@@ -35,7 +35,7 @@ final class ReferenceCanvasView: UIView {
 
     private var usesDecorativeBackground: Bool {
         switch page {
-        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail:
+        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home:
             return true
         default:
             return false
@@ -152,6 +152,36 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderHome() {
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 720)
+        ])
+
+        activeLayoutContainer = scrollContent
         addProfileAvatar(
             top: 60,
             left: 20,
@@ -168,6 +198,7 @@ final class ReferenceCanvasView: UIView {
         addButton("Save your feelings", top: 458, filled: true)
         addFeatureCard(title: "Discover", top: 536, left: 20, tint: .forest)
         addFeatureCard(title: "Recot Bot", top: 536, left: 192, tint: .night)
+        activeLayoutContainer = nil
     }
 
     private func renderDiscover() {
@@ -823,7 +854,7 @@ final class ReferenceCanvasView: UIView {
         label.textColor = color
         label.font = usesFredokaText(text)
             ? AppFont.fredoka(size)
-            : AppFont.source(size, weight: weight)
+            : sourceFont(for: text, size: size, weight: weight)
         layoutContainer.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         if centered {
@@ -908,6 +939,17 @@ final class ReferenceCanvasView: UIView {
             || text == "I'm new"
             || text == "Sign in"
             || text == "Log in"
+            || text == "Welcome back"
+            || text == "Save your feelings"
+            || text == "Discover"
+            || text == "Recot Bot"
+    }
+
+    private func sourceFont(for text: String, size: CGFloat, weight: UIFont.Weight) -> UIFont {
+        if text == "Hello, Anna!\nDid everything go\nsmoothly today?" {
+            return UIFont(name: "SourceHanSansSC-Normal", size: size) ?? AppFont.source(size, weight: weight)
+        }
+        return AppFont.source(size, weight: weight)
     }
 
     private func addUnderlinedText(_ text: String, size: CGFloat, top: CGFloat, left: CGFloat, color: UIColor) {
@@ -1583,6 +1625,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addMoodRow(top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         ["🙂", "😀", "😆"].enumerated().forEach { index, face in
             let tile = UIView()
             tile.backgroundColor = UIColor(red: 1, green: 0.91, blue: 0.34, alpha: 0.86)
@@ -1591,11 +1634,11 @@ final class ReferenceCanvasView: UIView {
             tile.layer.shadowOpacity = 0.07
             tile.layer.shadowOffset = CGSize(width: 0, height: 5)
             tile.layer.shadowRadius = 12
-            addSubview(tile)
+            layoutContainer.addSubview(tile)
             tile.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                tile.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20 + CGFloat(index) * 112),
-                tile.topAnchor.constraint(equalTo: topAnchor, constant: top),
+                tile.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20 + CGFloat(index) * 112),
+                tile.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
                 tile.widthAnchor.constraint(equalToConstant: 100),
                 tile.heightAnchor.constraint(equalToConstant: 100)
             ])
@@ -1625,17 +1668,18 @@ final class ReferenceCanvasView: UIView {
         tint: MediaTint = .coast,
         action: MediaAction = .none
     ) {
+        let layoutContainer = activeLayoutContainer ?? self
         let shadowHost = UIView()
         shadowHost.backgroundColor = .clear
         shadowHost.layer.shadowColor = UIColor.black.cgColor
         shadowHost.layer.shadowOpacity = 0.18
         shadowHost.layer.shadowOffset = CGSize(width: 0, height: 5)
         shadowHost.layer.shadowRadius = 12
-        addSubview(shadowHost)
+        layoutContainer.addSubview(shadowHost)
         shadowHost.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            shadowHost.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            shadowHost.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            shadowHost.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            shadowHost.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             shadowHost.widthAnchor.constraint(equalToConstant: width),
             shadowHost.heightAnchor.constraint(equalToConstant: height)
         ])
@@ -1664,7 +1708,7 @@ final class ReferenceCanvasView: UIView {
             let label = UILabel()
             label.text = title
             label.textColor = .white
-            label.font = AppFont.source(24, weight: .black)
+            label.font = usesFredokaText(title) ? AppFont.fredoka(24) : AppFont.source(24, weight: .black)
             block.addSubview(label)
             label.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([

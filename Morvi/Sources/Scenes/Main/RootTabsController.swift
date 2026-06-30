@@ -36,6 +36,7 @@ final class RootTabsController: UIViewController {
             surfaceView.topAnchor.constraint(equalTo: view.topAnchor),
             surfaceView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        installDecorativeBackgroundIfNeeded()
         surfaceView.contentView.addSubview(newCanvasView)
         newCanvasView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -48,6 +49,19 @@ final class RootTabsController: UIViewController {
         installTopLayer()
         installPageAreas()
         installDockView()
+    }
+
+    private func installDecorativeBackgroundIfNeeded() {
+        guard currentPage == .home else { return }
+        let decorativeView = DecorativeGradientView()
+        surfaceView.contentView.addSubview(decorativeView)
+        decorativeView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            decorativeView.leadingAnchor.constraint(equalTo: surfaceView.contentView.leadingAnchor),
+            decorativeView.trailingAnchor.constraint(equalTo: surfaceView.contentView.trailingAnchor),
+            decorativeView.topAnchor.constraint(equalTo: surfaceView.contentView.topAnchor),
+            decorativeView.bottomAnchor.constraint(equalTo: surfaceView.contentView.bottomAnchor)
+        ])
     }
 
     private func installTopLayer() {
