@@ -478,7 +478,9 @@ final class ReferenceCanvasView: UIView {
         label.text = text
         label.numberOfLines = 0
         label.textColor = color
-        label.font = AppFont.source(size, weight: weight)
+        label.font = usesFredokaText(text)
+            ? AppFont.fredoka(size)
+            : AppFont.source(size, weight: weight)
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         if centered {
@@ -498,7 +500,7 @@ final class ReferenceCanvasView: UIView {
     private func addButton(_ text: String, top: CGFloat, left: CGFloat = 20, width: CGFloat = 335, filled: Bool, dark: Bool = false) {
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
-        button.titleLabel?.font = AppFont.source(16, weight: .black)
+        button.titleLabel?.font = usesFredokaText(text) ? AppFont.fredoka(16) : AppFont.source(16, weight: .black)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : (filled ? .clear : .white)
         button.layer.cornerRadius = 24
@@ -528,6 +530,10 @@ final class ReferenceCanvasView: UIView {
             button.widthAnchor.constraint(equalToConstant: width),
             button.heightAnchor.constraint(equalToConstant: 52)
         ])
+    }
+
+    private func usesFredokaText(_ text: String) -> Bool {
+        text.caseInsensitiveCompare("Morvi") == .orderedSame || text == "Login by email" || text == "I'm new"
     }
 
     private func addField(_ placeholder: String, top: CGFloat) {
