@@ -63,8 +63,8 @@ final class FloatingDockView: UIView {
         stackView.alignment = .center
         stackView.distribution = .equalSpacing
         NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 5),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -5),
             stackView.topAnchor.constraint(equalTo: topAnchor, constant: 5.5),
             stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5.5)
         ])
