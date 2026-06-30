@@ -39,7 +39,7 @@ final class ReferenceCanvasView: UIView {
         case .signIn:
             renderSignIn()
         case .signUp:
-            renderForm(title: "Sign up", fields: ["Email", "Password", "Enter the password again"], action: "Sign up", footer: nil)
+            renderSignUp()
         case .resetAccess:
             renderResetAccess()
         case .home:
@@ -294,6 +294,58 @@ final class ReferenceCanvasView: UIView {
         addUnderlinedText("Forgot ?", size: 12, top: 588, left: 303, color: .gray)
         activeLayoutContainer = nil
         addButton("Log in", top: 716, filled: true, usesOneFont: true)
+    }
+
+    private func renderSignUp() {
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 812)
+        ])
+
+        keyboardAwareScrollView = scrollView
+        installKeyboardAvoidance()
+
+        activeLayoutContainer = scrollContent
+        addTopTitle("Sign up")
+        addLogo(top: 168)
+        addText("Morvi", size: 42, weight: .black, top: 308, centered: true)
+        let fields = ["Email", "Password", "Enter the password again"]
+        fields.enumerated().forEach { index, field in
+            let top = CGFloat(388 + index * 108)
+            addText(field, size: 16, weight: .bold, top: top, left: 20)
+            addInputField(
+                "Please enter",
+                top: top + 26,
+                keyboardType: index == 0 ? .emailAddress : .default,
+                isSecureTextEntry: index != 0
+            )
+        }
+        activeLayoutContainer = nil
+        addButton("Sign up", top: 716, filled: true, usesOneFont: true)
     }
 
     private func renderResetAccess() {
