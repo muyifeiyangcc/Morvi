@@ -58,6 +58,7 @@ class BaseSceneController: UIViewController {
     }
 
     private func installTopLayer() {
+        topLayer.showsBackIcon = (navigationController?.viewControllers.count ?? 0) > 1
         surfaceView.contentView.addSubview(topLayer)
         topLayer.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([

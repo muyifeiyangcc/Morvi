@@ -1297,7 +1297,6 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addTopTitle(_ title: String) {
-        addText("‹", size: 44, weight: .regular, top: 68, left: 36)
         addText(title, size: 31, weight: .black, top: 78, left: 96)
     }
 

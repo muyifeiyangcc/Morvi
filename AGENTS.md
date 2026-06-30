@@ -23,9 +23,11 @@
 
 ## Navigation
 
+- In this project, any mention of a navigation bar means the custom navigation bar/top layer, not the system navigation bar.
 - Do not use system navigation bars for visible UI.
-- `UINavigationController` may manage flow stacks only, with its system bar hidden.
+- `UINavigationController` may manage flow stacks only. Keep its system bar hidden and do not use it for page UI.
 - Every page requiring navigation chrome must place a custom top navigation layer at the top of the current controller.
+- Shared navigation controls, including the common left back button, belong in the custom top navigation layer.
 - Login flow and main flow are separate navigation controller flows.
 - The main navigation root is the custom tab root controller.
 - Do not use `UITabBarController` or the system `UITabBar`; the tabbar is custom to avoid secondary page hiding logic.
