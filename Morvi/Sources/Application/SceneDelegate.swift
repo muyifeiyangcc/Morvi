@@ -24,6 +24,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
         #endif
-        return RootTabsController()
+        return EntrySceneController()
     }
 }
