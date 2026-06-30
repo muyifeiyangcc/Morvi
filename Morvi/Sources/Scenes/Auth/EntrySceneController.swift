@@ -18,6 +18,6 @@ final class EntrySceneController: ReferencePageController {
     }
 
     override func makeDecorativeLayer() -> UIView? {
-        DecorativeGradientView(palette: .blue)
+        DecorativeGradientView(palette: .white)
     }
 }

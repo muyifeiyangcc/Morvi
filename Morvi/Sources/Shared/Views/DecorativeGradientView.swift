@@ -2,19 +2,19 @@ import UIKit
 
 final class DecorativeGradientView: UIView {
     enum Palette {
-        case blue
+        case white
 
         var backgroundColor: UIColor {
             switch self {
-            case .blue:
-                return UIColor(red: 0.42, green: 0.67, blue: 1.00, alpha: 1)
+            case .white:
+                return .white
             }
         }
     }
 
     private let palette: Palette
 
-    init(palette: Palette = .blue) {
+    init(palette: Palette = .white) {
         self.palette = palette
         super.init(frame: .zero)
         isUserInteractionEnabled = false
