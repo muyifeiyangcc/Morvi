@@ -50,7 +50,7 @@ final class DecorativeGradientView: UIView {
             )
         else { return }
 
-        let radius = bounds.width * 2 / 3
+        let radius = bounds.width * 4 / 3
         context.drawRadialGradient(
             gradient,
             startCenter: .zero,
