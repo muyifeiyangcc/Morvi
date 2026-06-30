@@ -45,18 +45,17 @@ final class DecorativeGradientView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        let horizontalOffset = bounds.width * 0.1
-        primaryGlowLayer.frame = bounds.offsetBy(dx: horizontalOffset, dy: 0)
-        secondaryGlowLayer.frame = bounds.offsetBy(dx: -horizontalOffset, dy: 0)
+        primaryGlowLayer.frame = bounds
+        secondaryGlowLayer.frame = bounds
     }
 
     private func configureGlowLayers() {
         primaryGlowLayer.glowColor = palette.glowColor
-        primaryGlowLayer.centerUnitPoint = .zero
+        primaryGlowLayer.centerUnitPoint = CGPoint(x: 0.1, y: 0)
         primaryGlowLayer.radiusWidthMultiplier = 0.9
 
         secondaryGlowLayer.glowColor = palette.secondaryGlowColor
-        secondaryGlowLayer.centerUnitPoint = CGPoint(x: 1, y: 0)
+        secondaryGlowLayer.centerUnitPoint = CGPoint(x: 0.9, y: 0)
         secondaryGlowLayer.radiusWidthMultiplier = 0.7
 
         layer.addSublayer(primaryGlowLayer)
