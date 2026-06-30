@@ -2,16 +2,24 @@ import UIKit
 import WebKit
 
 final class ReferenceCanvasView: UIView {
+    private static var agreementConsentAccepted = false
+    private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
+
     private let page: ScenePage
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
-    private var agreementConsentSelected = false
 
     init(page: ScenePage) {
         self.page = page
         super.init(frame: .zero)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAgreementConsentDidChange),
+            name: Self.agreementConsentDidChangeNotification,
+            object: nil
+        )
         clipsToBounds = true
         backgroundColor = usesDecorativeBackground ? .clear : .white
         render()
@@ -1684,7 +1692,6 @@ final class ReferenceCanvasView: UIView {
     private func addAgreementConsentLine(
         top: CGFloat? = nil,
         bottom: CGFloat? = nil,
-        isSelected: Bool = false,
         parent: UIView? = nil
     ) -> UIView {
         let layoutContainer = parent ?? self
@@ -1706,14 +1713,13 @@ final class ReferenceCanvasView: UIView {
         }
         NSLayoutConstraint.activate(constraints)
 
-        agreementConsentSelected = isSelected
         let iconControl = UIControl()
         iconControl.addTarget(self, action: #selector(handleAgreementConsentToggle), for: .touchUpInside)
         iconControl.accessibilityLabel = "Agree with User Agreement and Privacy Policy"
         container.addSubview(iconControl)
         iconControl.translatesAutoresizingMaskIntoConstraints = false
 
-        let iconView = UIImageView(image: UIImage(named: consentIconName(isSelected: agreementConsentSelected)))
+        let iconView = UIImageView(image: UIImage(named: consentIconName(isSelected: Self.agreementConsentAccepted)))
         iconView.contentMode = .scaleAspectFit
         iconControl.addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
@@ -1756,8 +1762,17 @@ final class ReferenceCanvasView: UIView {
     }
 
     @objc private func handleAgreementConsentToggle() {
-        agreementConsentSelected.toggle()
-        agreementConsentIconView?.image = UIImage(named: consentIconName(isSelected: agreementConsentSelected))
+        Self.agreementConsentAccepted.toggle()
+        refreshAgreementConsentIcon()
+        NotificationCenter.default.post(name: Self.agreementConsentDidChangeNotification, object: self)
+    }
+
+    @objc private func handleAgreementConsentDidChange() {
+        refreshAgreementConsentIcon()
+    }
+
+    private func refreshAgreementConsentIcon() {
+        agreementConsentIconView?.image = UIImage(named: consentIconName(isSelected: Self.agreementConsentAccepted))
     }
 
     private func consentIconName(isSelected: Bool) -> String {
