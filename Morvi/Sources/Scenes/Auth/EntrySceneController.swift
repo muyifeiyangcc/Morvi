@@ -16,4 +16,8 @@ final class EntrySceneController: ReferencePageController {
     required init?(coder: NSCoder) {
         nil
     }
+
+    override func makeDecorativeLayer() -> UIView? {
+        DecorativeGradientView(palette: .blue)
+    }
 }

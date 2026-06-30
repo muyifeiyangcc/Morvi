@@ -7,7 +7,7 @@ final class ReferenceCanvasView: UIView {
         self.page = page
         super.init(frame: .zero)
         clipsToBounds = true
-        backgroundColor = .white
+        backgroundColor = page == .entry ? .clear : .white
         render()
     }
 

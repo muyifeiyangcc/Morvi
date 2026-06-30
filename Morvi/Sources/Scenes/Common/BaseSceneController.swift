@@ -29,6 +29,7 @@ class BaseSceneController: UIViewController {
             surfaceView.topAnchor.constraint(equalTo: view.topAnchor),
             surfaceView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        installDecorativeLayerIfNeeded()
         surfaceView.contentView.addSubview(canvasView)
         canvasView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -38,6 +39,22 @@ class BaseSceneController: UIViewController {
             canvasView.bottomAnchor.constraint(equalTo: surfaceView.contentView.bottomAnchor)
         ])
         installTopLayer()
+    }
+
+    func makeDecorativeLayer() -> UIView? {
+        nil
+    }
+
+    private func installDecorativeLayerIfNeeded() {
+        guard let decorativeLayer = makeDecorativeLayer() else { return }
+        surfaceView.contentView.addSubview(decorativeLayer)
+        decorativeLayer.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            decorativeLayer.leadingAnchor.constraint(equalTo: surfaceView.contentView.leadingAnchor),
+            decorativeLayer.trailingAnchor.constraint(equalTo: surfaceView.contentView.trailingAnchor),
+            decorativeLayer.topAnchor.constraint(equalTo: surfaceView.contentView.topAnchor),
+            decorativeLayer.bottomAnchor.constraint(equalTo: surfaceView.contentView.bottomAnchor)
+        ])
     }
 
     private func installTopLayer() {
