@@ -93,7 +93,6 @@ final class RootTabsController: UIViewController {
         switch currentPage {
         case .home:
             installHitAreas([
-                HitArea(frame: CGRect(x: 20, y: 58, width: 68, height: 68)) { [weak self] in self?.show(.personalDetail) },
                 HitArea(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in self?.show(.feelingEditor) },
                 HitArea(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in self?.switchTo(.discover) },
                 HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.show(.assistantDialogue) }
@@ -176,9 +175,6 @@ final class RootTabsController: UIViewController {
     }
 
     @objc private func handleTopLeadingTap() {
-        if currentPage == .home {
-            show(.personalDetail)
-        }
     }
 
     @objc private func handleTopTrailingTap() {
