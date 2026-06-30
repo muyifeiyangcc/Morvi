@@ -152,7 +152,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderHome() {
-        addPortrait(top: 60, left: 20, size: 58, tint: .warm)
+        addProfileAvatar(top: 60, left: 20, size: 58)
         addText("Welcome back", size: 17, weight: .black, top: 68, left: 96)
         addText("Amelia", size: 16, weight: .regular, top: 98, left: 96)
         addText("Hello, Anna!\nDid everything go\nsmoothly today?", size: 30, weight: .regular, top: 146, left: 20)
