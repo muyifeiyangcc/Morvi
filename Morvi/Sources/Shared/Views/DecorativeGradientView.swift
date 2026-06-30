@@ -27,58 +27,38 @@ final class DecorativeGradientView: UIView {
     }
 
     private let palette: Palette
+    private let primaryGlowLayer = RadialGlowLayer()
+    private let secondaryGlowLayer = RadialGlowLayer()
 
     init(palette: Palette = .topLeftGlow) {
         self.palette = palette
         super.init(frame: .zero)
         isUserInteractionEnabled = false
-        backgroundColor = .clear
+        backgroundColor = palette.baseColor
         isOpaque = true
-        contentMode = .redraw
+        configureGlowLayers()
     }
 
     required init?(coder: NSCoder) {
         nil
     }
 
-    override func draw(_ rect: CGRect) {
-        palette.baseColor.setFill()
-        UIRectFill(rect)
-
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-        drawGlow(
-            in: context,
-            center: .zero,
-            radius: bounds.width * 0.9,
-            color: palette.glowColor
-        )
-        drawGlow(
-            in: context,
-            center: CGPoint(x: bounds.maxX, y: 0),
-            radius: bounds.width * 0.5,
-            color: palette.secondaryGlowColor
-        )
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        primaryGlowLayer.frame = bounds
+        secondaryGlowLayer.frame = bounds
     }
 
-    private func drawGlow(in context: CGContext, center: CGPoint, radius: CGFloat, color: UIColor) {
-        guard
-            let gradient = CGGradient(
-                colorsSpace: CGColorSpaceCreateDeviceRGB(),
-                colors: [
-                    color.cgColor,
-                    color.withAlphaComponent(0).cgColor
-                ] as CFArray,
-                locations: [0, 1]
-            )
-        else { return }
+    private func configureGlowLayers() {
+        primaryGlowLayer.glowColor = palette.glowColor
+        primaryGlowLayer.centerUnitPoint = .zero
+        primaryGlowLayer.radiusWidthMultiplier = 0.9
 
-        context.drawRadialGradient(
-            gradient,
-            startCenter: center,
-            startRadius: 0,
-            endCenter: center,
-            endRadius: radius,
-            options: []
-        )
+        secondaryGlowLayer.glowColor = palette.secondaryGlowColor
+        secondaryGlowLayer.centerUnitPoint = CGPoint(x: 1, y: 0)
+        secondaryGlowLayer.radiusWidthMultiplier = 0.5
+
+        layer.addSublayer(primaryGlowLayer)
+        layer.addSublayer(secondaryGlowLayer)
     }
 }
