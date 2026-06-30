@@ -87,11 +87,10 @@ final class ReferenceCanvasView: UIView {
         addText("Morvi", size: 38, weight: .black, top: 307, centered: true)
         addButton("Login by email", top: 417, filled: false)
         addButton("I'm new", top: 486, filled: true)
-        addText("Don't have an account? Sign up", size: 12, weight: .regular, top: 568, centered: true)
+        addEntrySignUpPrompt(top: 568)
         addText("Other login methods", size: 12, weight: .regular, top: 608, centered: true, color: .lightGray)
-        addCircle(text: "", top: 640, left: 168, size: 40)
-        addCheckCircle(top: 741, left: 48)
-        addAgreementLine(top: 744)
+        addAppleLoginCircle(top: 640, left: 168)
+        addAgreementConsentLine(top: 744)
     }
 
     private func renderHome() {
@@ -350,8 +349,7 @@ final class ReferenceCanvasView: UIView {
         addLine(top: 678, left: 213, width: 101, color: .darkGray)
         addPillButton("Cancel", top: 692, left: 48, width: 124, dark: false)
         addPillButton("I agree", top: 692, left: 204, width: 124, dark: true)
-        addCheckCircle(top: 765, left: 48)
-        addAgreementLine(top: 768)
+        addAgreementConsentLine(top: 768)
     }
 
     private func renderFeelingEditor() {
@@ -497,6 +495,31 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
+    private func addEntrySignUpPrompt(top: CGFloat) {
+        let text = "Don't have an account? Sign up"
+        let attributedText = NSMutableAttributedString(
+            string: text,
+            attributes: [
+                .font: AppFont.source(12),
+                .foregroundColor: UIColor.black
+            ]
+        )
+        attributedText.addAttribute(
+            .underlineStyle,
+            value: NSUnderlineStyle.single.rawValue,
+            range: (text as NSString).range(of: "Sign up")
+        )
+
+        let label = UILabel()
+        label.attributedText = attributedText
+        addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: centerXAnchor),
+            label.topAnchor.constraint(equalTo: topAnchor, constant: top)
+        ])
+    }
+
     private func addButton(_ text: String, top: CGFloat, left: CGFloat = 20, width: CGFloat = 335, filled: Bool, dark: Bool = false) {
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
@@ -611,6 +634,34 @@ final class ReferenceCanvasView: UIView {
             view.topAnchor.constraint(equalTo: topAnchor, constant: top),
             view.widthAnchor.constraint(equalToConstant: size),
             view.heightAnchor.constraint(equalToConstant: size)
+        ])
+    }
+
+    private func addAppleLoginCircle(top: CGFloat, left: CGFloat) {
+        let background = UIView()
+        background.backgroundColor = UIColor(white: 0.94, alpha: 1)
+        background.layer.cornerRadius = 20
+        background.layer.masksToBounds = true
+        addSubview(background)
+        background.translatesAutoresizingMaskIntoConstraints = false
+
+        let icon = UILabel()
+        icon.text = ""
+        icon.textAlignment = .center
+        icon.font = AppFont.source(20, weight: .bold)
+        background.addSubview(icon)
+        icon.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            background.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            background.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            background.widthAnchor.constraint(equalToConstant: 40),
+            background.heightAnchor.constraint(equalToConstant: 40),
+
+            icon.centerXAnchor.constraint(equalTo: background.centerXAnchor),
+            icon.centerYAnchor.constraint(equalTo: background.centerYAnchor),
+            icon.widthAnchor.constraint(equalToConstant: 20),
+            icon.heightAnchor.constraint(equalToConstant: 20)
         ])
     }
 
@@ -1211,7 +1262,18 @@ final class ReferenceCanvasView: UIView {
         addText(title, size: 31, weight: .black, top: 78, left: 96)
     }
 
-    private func addAgreementLine(top: CGFloat) {
+    private func addAgreementConsentLine(top: CGFloat) {
+        let circle = UILabel()
+        circle.textAlignment = .center
+        circle.font = AppFont.source(9.52)
+        circle.textColor = .black
+        circle.backgroundColor = .clear
+        circle.layer.cornerRadius = 8.5
+        circle.layer.borderWidth = 1.2
+        circle.layer.borderColor = UIColor.black.cgColor
+        addSubview(circle)
+        circle.translatesAutoresizingMaskIntoConstraints = false
+
         let label = UILabel()
         label.numberOfLines = 1
         let text = "Agree with  User Agreement and Privacy Policy"
@@ -1232,6 +1294,11 @@ final class ReferenceCanvasView: UIView {
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
+            circle.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 48),
+            circle.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+            circle.widthAnchor.constraint(equalToConstant: 17),
+            circle.heightAnchor.constraint(equalToConstant: 17),
+
             label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 70),
             label.topAnchor.constraint(equalTo: topAnchor, constant: top)
         ])
