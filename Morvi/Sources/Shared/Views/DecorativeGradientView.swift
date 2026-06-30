@@ -29,14 +29,16 @@ final class DecorativeGradientView: UIView {
     private let palette: Palette
     private let primaryGlowLayer = RadialGlowLayer()
     private let secondaryGlowLayer = RadialGlowLayer()
+    private let brandTextLogoView = UIImageView(image: UIImage(named: "Morvi"))
 
-    init(palette: Palette = .topLeftGlow) {
+    init(palette: Palette = .topLeftGlow, showsBrandTextLogo: Bool = false) {
         self.palette = palette
         super.init(frame: .zero)
         isUserInteractionEnabled = false
         backgroundColor = palette.baseColor
         isOpaque = true
         configureGlowLayers()
+        configureBrandTextLogo(isVisible: showsBrandTextLogo)
     }
 
     required init?(coder: NSCoder) {
@@ -60,5 +62,18 @@ final class DecorativeGradientView: UIView {
 
         layer.addSublayer(primaryGlowLayer)
         layer.addSublayer(secondaryGlowLayer)
+    }
+
+    private func configureBrandTextLogo(isVisible: Bool) {
+        brandTextLogoView.isHidden = !isVisible
+        brandTextLogoView.contentMode = .scaleAspectFit
+        addSubview(brandTextLogoView)
+        brandTextLogoView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            brandTextLogoView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -10),
+            brandTextLogoView.topAnchor.constraint(equalTo: topAnchor, constant: 20),
+            brandTextLogoView.widthAnchor.constraint(equalToConstant: 297),
+            brandTextLogoView.heightAnchor.constraint(equalToConstant: 128)
+        ])
     }
 }
