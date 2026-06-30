@@ -70,7 +70,8 @@ final class FloatingDockView: UIView {
             }, for: .touchUpInside)
             let iconView = UIImageView(image: UIImage(named: item.imageName))
             iconView.translatesAutoresizingMaskIntoConstraints = false
-            iconView.contentMode = .scaleAspectFit
+            iconView.contentMode = .scaleAspectFill
+            iconView.clipsToBounds = true
             iconView.isUserInteractionEnabled = false
             button.addSubview(iconView)
             let iconWidth = iconView.widthAnchor.constraint(equalToConstant: inactiveIconSide)
