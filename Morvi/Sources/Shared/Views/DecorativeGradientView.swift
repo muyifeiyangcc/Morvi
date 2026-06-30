@@ -45,8 +45,9 @@ final class DecorativeGradientView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        primaryGlowLayer.frame = bounds
-        secondaryGlowLayer.frame = bounds
+        let horizontalOffset = bounds.width * 0.1
+        primaryGlowLayer.frame = bounds.offsetBy(dx: horizontalOffset, dy: 0)
+        secondaryGlowLayer.frame = bounds.offsetBy(dx: -horizontalOffset, dy: 0)
     }
 
     private func configureGlowLayers() {
