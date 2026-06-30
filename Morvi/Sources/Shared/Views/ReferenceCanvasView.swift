@@ -1300,7 +1300,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     @discardableResult
-    private func addAgreementConsentLine(top: CGFloat? = nil, bottom: CGFloat? = nil) -> UIView {
+    private func addAgreementConsentLine(top: CGFloat? = nil, bottom: CGFloat? = nil, isSelected: Bool = false) -> UIView {
         let container = UIView()
         container.backgroundColor = .clear
         addSubview(container)
@@ -1319,16 +1319,10 @@ final class ReferenceCanvasView: UIView {
         }
         NSLayoutConstraint.activate(constraints)
 
-        let circle = UILabel()
-        circle.textAlignment = .center
-        circle.font = AppFont.source(9.52)
-        circle.textColor = .black
-        circle.backgroundColor = .clear
-        circle.layer.cornerRadius = 8.5
-        circle.layer.borderWidth = 1.2
-        circle.layer.borderColor = UIColor.black.cgColor
-        container.addSubview(circle)
-        circle.translatesAutoresizingMaskIntoConstraints = false
+        let iconView = UIImageView(image: UIImage(named: consentIconName(isSelected: isSelected)))
+        iconView.contentMode = .scaleAspectFit
+        container.addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
 
         let label = UILabel()
         label.numberOfLines = 1
@@ -1350,15 +1344,19 @@ final class ReferenceCanvasView: UIView {
         container.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            circle.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 48),
-            circle.centerYAnchor.constraint(equalTo: label.centerYAnchor),
-            circle.widthAnchor.constraint(equalToConstant: 17),
-            circle.heightAnchor.constraint(equalToConstant: 17),
+            iconView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 48),
+            iconView.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 17),
+            iconView.heightAnchor.constraint(equalToConstant: 17),
 
             label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 70),
             label.centerYAnchor.constraint(equalTo: container.centerYAnchor)
         ])
         return container
+    }
+
+    private func consentIconName(isSelected: Bool) -> String {
+        isSelected ? "consent_check_selected" : "consent_circle_empty"
     }
 
     private func addCheckCircle(
