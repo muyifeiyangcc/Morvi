@@ -28,7 +28,7 @@
 - `UINavigationController` may manage flow stacks only. Keep its system bar hidden and do not use it for page UI.
 - Every page requiring navigation chrome must place a custom top navigation layer at the top of the current controller.
 - Shared navigation controls, including the common left back button, belong in the custom top navigation layer.
-- The custom navigation layer should mirror the compact iOS navigation area: total height is `statusBarHeight + 44`, and navigation title/buttons are vertically centered inside the 44pt content area.
+- The custom navigation layer is based on the compact iOS navigation area but taller for this design: total height is `statusBarHeight + 76`, and navigation title/buttons are vertically centered inside the 76pt content area.
 - Login flow and main flow are separate navigation controller flows.
 - The main navigation root is the custom tab root controller.
 - Do not use `UITabBarController` or the system `UITabBar`; the tabbar is custom to avoid secondary page hiding logic.

@@ -67,10 +67,10 @@ final class CustomTopLayerView: UIView {
         titleLabel.text = title
         titleLabel.isHidden = title == nil
         titleLabel.font = usesFredokaTitle ? AppFont.fredoka(31) : AppFont.source(31, weight: .black)
-        navigationCenterYConstraint?.constant = statusBarHeight + 22
+        navigationCenterYConstraint?.constant = statusBarHeight + 38
     }
 
     static func totalHeight(statusBarHeight: CGFloat) -> CGFloat {
-        statusBarHeight + 44
+        statusBarHeight + 76
     }
 }
