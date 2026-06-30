@@ -524,8 +524,8 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             bottomBar.leadingAnchor.constraint(equalTo: leadingAnchor),
             bottomBar.trailingAnchor.constraint(equalTo: trailingAnchor),
-            bottomBar.bottomAnchor.constraint(equalTo: bottomAnchor),
-            bottomBar.heightAnchor.constraint(equalToConstant: 153)
+            bottomBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32),
+            bottomBar.heightAnchor.constraint(equalToConstant: 129)
         ])
 
         let webView = WKWebView(frame: .zero)
@@ -549,8 +549,8 @@ final class ReferenceCanvasView: UIView {
         addLine(top: 19, left: 61, width: 95, color: .darkGray, parent: bottomBar)
         addText("Privacy Policy", size: 16, weight: .regular, top: 0, left: 213, parent: bottomBar)
         addLine(top: 19, left: 213, width: 101, color: .darkGray, parent: bottomBar)
-        addPillButton("Cancel", top: 33, left: 48, width: 124, dark: false, usesOneFont: true, parent: bottomBar)
-        addPillButton("I agree", top: 33, left: 204, width: 124, dark: true, usesOneFont: true, parent: bottomBar)
+        addPillButton("Cancel", top: 33, left: 48, width: 124, dark: false, fontWeight: .medium, parent: bottomBar)
+        addPillButton("I agree", top: 33, left: 204, width: 124, dark: true, fontWeight: .medium, parent: bottomBar)
         addAgreementConsentLine(top: 109, parent: bottomBar)
         bringSubviewToFront(bottomBar)
     }
@@ -1425,12 +1425,13 @@ final class ReferenceCanvasView: UIView {
         width: CGFloat,
         dark: Bool,
         usesOneFont: Bool = false,
+        fontWeight: UIFont.Weight = .regular,
         parent: UIView? = nil
     ) {
         let layoutContainer = parent ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
-        button.titleLabel?.font = usesOneFont ? AppFont.fredoka(18) : AppFont.source(18)
+        button.titleLabel?.font = usesOneFont ? AppFont.fredoka(18) : AppFont.source(18, weight: fontWeight)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .darkGray, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
         button.layer.cornerRadius = 25
