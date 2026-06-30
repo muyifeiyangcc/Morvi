@@ -6,6 +6,7 @@ final class ReferenceCanvasView: UIView {
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var agreementConsentIconView: UIImageView?
+    private weak var progressOverlayView: MorviProgressOverlayView?
     private var agreementConsentSelected = false
 
     init(page: ScenePage) {
@@ -535,7 +536,7 @@ final class ReferenceCanvasView: UIView {
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.scrollView.contentInset.bottom = 16
         webView.scrollView.showsVerticalScrollIndicator = false
-        webView.loadHTMLString(agreementHTML(), baseURL: nil)
+        webView.navigationDelegate = self
         addSubview(webView)
         webView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -553,6 +554,8 @@ final class ReferenceCanvasView: UIView {
         addPillButton("I agree", top: 33, left: 204, width: 124, dark: true, fontWeight: .medium, parent: bottomBar)
         addAgreementConsentLine(top: 109, parent: bottomBar)
         bringSubviewToFront(bottomBar)
+        showProgressOverlay()
+        webView.loadHTMLString(agreementHTML(), baseURL: nil)
     }
 
     private func agreementHTML() -> String {
@@ -623,6 +626,17 @@ final class ReferenceCanvasView: UIView {
         </body>
         </html>
         """
+    }
+
+    private func showProgressOverlay() {
+        let overlay = MorviProgressOverlayView()
+        progressOverlayView = overlay
+        overlay.show(in: self)
+    }
+
+    private func hideProgressOverlay() {
+        progressOverlayView?.dismiss()
+        progressOverlayView = nil
     }
 
     private func renderFeelingEditor() {
@@ -1960,5 +1974,19 @@ final class ReferenceCanvasView: UIView {
     private enum ConversationMode {
         case text
         case voice
+    }
+}
+
+extension ReferenceCanvasView: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        hideProgressOverlay()
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        hideProgressOverlay()
+    }
+
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        hideProgressOverlay()
     }
 }
