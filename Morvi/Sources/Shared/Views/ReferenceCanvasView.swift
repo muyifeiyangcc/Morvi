@@ -3,6 +3,7 @@ import UIKit
 final class ReferenceCanvasView: UIView {
     private let page: ScenePage
     private weak var activeLayoutContainer: UIView?
+    private weak var keyboardAwareScrollView: UIScrollView?
     private weak var agreementConsentIconView: UIImageView?
     private var agreementConsentSelected = false
 
@@ -16,6 +17,10 @@ final class ReferenceCanvasView: UIView {
 
     required init?(coder: NSCoder) {
         nil
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     private var usesDecorativeBackground: Bool {
@@ -246,6 +251,39 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderSignIn() {
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 812)
+        ])
+
+        keyboardAwareScrollView = scrollView
+        installKeyboardAvoidance()
+
+        activeLayoutContainer = scrollContent
         addTopTitle("Sign in")
         addLogo(top: 168)
         addText("Morvi", size: 42, weight: .black, top: 308, centered: true)
@@ -254,6 +292,7 @@ final class ReferenceCanvasView: UIView {
         addText("Password", size: 16, weight: .black, top: 496, left: 20)
         addInputField("Please enter", top: 523, isSecureTextEntry: true)
         addUnderlinedText("Forgot ?", size: 12, top: 588, left: 303, color: .gray)
+        activeLayoutContainer = nil
         addButton("Log in", top: 716, filled: true)
     }
 
@@ -622,6 +661,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addUnderlinedText(_ text: String, size: CGFloat, top: CGFloat, left: CGFloat, color: UIColor) {
+        let layoutContainer = activeLayoutContainer ?? self
         let label = UILabel()
         label.attributedText = NSAttributedString(
             string: text,
@@ -631,11 +671,11 @@ final class ReferenceCanvasView: UIView {
                 .underlineStyle: NSUnderlineStyle.single.rawValue
             ]
         )
-        addSubview(label)
+        layoutContainer.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: top)
+            label.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top)
         ])
     }
 
@@ -688,6 +728,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addFieldContainer(top: CGFloat) -> UIView {
+        let layoutContainer = activeLayoutContainer ?? self
         let field = UIView()
         field.backgroundColor = .clear
         field.layer.cornerRadius = 10
@@ -709,15 +750,60 @@ final class ReferenceCanvasView: UIView {
         border.lineWidth = 1
         border.path = UIBezierPath(roundedRect: CGRect(x: 0.5, y: 0.5, width: 334, height: 53), cornerRadius: 10).cgPath
         field.layer.addSublayer(border)
-        addSubview(field)
+        layoutContainer.addSubview(field)
         field.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            field.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            field.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            field.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
+            field.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
+            field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             field.heightAnchor.constraint(equalToConstant: 54)
         ])
         return field
+    }
+
+    private func installKeyboardAvoidance() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleKeyboardFrameChange),
+            name: UIResponder.keyboardWillChangeFrameNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleKeyboardFrameChange),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+
+    @objc private func handleKeyboardFrameChange(_ notification: Notification) {
+        guard let scrollView = keyboardAwareScrollView else { return }
+        let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) ?? .zero
+        let keyboardFrameInView = convert(keyboardFrame, from: nil)
+        let overlap = max(0, bounds.maxY - keyboardFrameInView.minY)
+        let bottomInset = overlap > 0 ? overlap + 20 : 0
+        scrollView.contentInset.bottom = bottomInset
+        scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+
+        guard
+            overlap > 0,
+            let activeInput = firstResponder(in: scrollView)
+        else { return }
+
+        let targetRect = activeInput.convert(activeInput.bounds.insetBy(dx: 0, dy: -18), to: scrollView)
+        scrollView.scrollRectToVisible(targetRect, animated: true)
+    }
+
+    private func firstResponder(in view: UIView) -> UIView? {
+        if view.isFirstResponder {
+            return view
+        }
+        for subview in view.subviews {
+            if let responder = firstResponder(in: subview) {
+                return responder
+            }
+        }
+        return nil
     }
 
     private func addLogo(top: CGFloat) {

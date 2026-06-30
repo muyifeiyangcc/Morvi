@@ -24,6 +24,8 @@
 - Pages with real input controls must dismiss the keyboard when tapping blank space without blocking buttons, links, or the input control itself.
 - When recreating styled input fields, keep the visual container responsible for gradients, borders, shadows, and rounded corners, then place the real input control inside it with transparent background so the fidelity is preserved.
 - Blank-space keyboard dismissal should use a non-intercepting gesture (`cancelsTouchesInView = false`) and explicitly avoid handling touches from `UIControl`, text input views, navigation controls, buttons, and links.
+- For small-screen input pages, wrap the main content in a `UIScrollView`, listen to keyboard frame changes, adjust the scroll view bottom inset, and scroll the active input into view.
+- If a page has a fixed bottom button with its own visual background, scroll content may pass underneath that button; keep the button above the scroll view so it remains visually stable and tappable.
 
 ## Navigation
 
