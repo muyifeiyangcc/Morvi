@@ -39,6 +39,7 @@ class BaseSceneController: UIViewController {
             canvasView.bottomAnchor.constraint(equalTo: surfaceView.contentView.bottomAnchor)
         ])
         installTopLayer()
+        installKeyboardDismissGesture()
     }
 
     func makeDecorativeLayer() -> UIView? {
@@ -113,8 +114,34 @@ class BaseSceneController: UIViewController {
         navigationTitleText() == "Sign in"
     }
 
+    private func installKeyboardDismissGesture() {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardFromBlankArea))
+        gesture.cancelsTouchesInView = false
+        gesture.delegate = self
+        view.addGestureRecognizer(gesture)
+    }
+
+    @objc private func dismissKeyboardFromBlankArea() {
+        view.endEditing(true)
+    }
+
     @objc private func returnToPreviousScene() {
         guard let stack = navigationController?.viewControllers, stack.count > 1 else { return }
         navigationController?.popViewController(animated: true)
+    }
+}
+
+extension BaseSceneController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view is UIControl {
+            return false
+        }
+        if touch.view is UITextView {
+            return false
+        }
+        if touch.view?.isDescendant(of: topLayer) == true {
+            return false
+        }
+        return true
     }
 }

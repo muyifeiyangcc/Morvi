@@ -250,9 +250,9 @@ final class ReferenceCanvasView: UIView {
         addLogo(top: 168)
         addText("Morvi", size: 42, weight: .black, top: 308, centered: true)
         addText("Email", size: 16, weight: .black, top: 388, left: 20)
-        addField("Please enter", top: 413)
+        addInputField("Please enter", top: 413, keyboardType: .emailAddress)
         addText("Password", size: 16, weight: .black, top: 496, left: 20)
-        addField("Please enter", top: 523)
+        addInputField("Please enter", top: 523, isSecureTextEntry: true)
         addUnderlinedText("Forgot ?", size: 12, top: 588, left: 303, color: .gray)
         addButton("Log in", top: 716, filled: true)
     }
@@ -640,6 +640,54 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addField(_ placeholder: String, top: CGFloat) {
+        let field = addFieldContainer(top: top)
+        let label = UILabel()
+        label.text = placeholder
+        label.textColor = .gray
+        label.font = AppFont.source(15)
+        field.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
+            label.centerYAnchor.constraint(equalTo: field.centerYAnchor)
+        ])
+    }
+
+    private func addInputField(
+        _ placeholder: String,
+        top: CGFloat,
+        keyboardType: UIKeyboardType = .default,
+        isSecureTextEntry: Bool = false
+    ) {
+        let field = addFieldContainer(top: top)
+        let textField = UITextField()
+        textField.borderStyle = .none
+        textField.backgroundColor = .clear
+        textField.textColor = .black
+        textField.tintColor = .black
+        textField.font = AppFont.source(15)
+        textField.keyboardType = keyboardType
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.isSecureTextEntry = isSecureTextEntry
+        textField.attributedPlaceholder = NSAttributedString(
+            string: placeholder,
+            attributes: [
+                .font: AppFont.source(15),
+                .foregroundColor: UIColor.gray
+            ]
+        )
+        field.addSubview(textField)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            textField.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
+            textField.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -16),
+            textField.topAnchor.constraint(equalTo: field.topAnchor),
+            textField.bottomAnchor.constraint(equalTo: field.bottomAnchor)
+        ])
+    }
+
+    private func addFieldContainer(top: CGFloat) -> UIView {
         let field = UIView()
         field.backgroundColor = .clear
         field.layer.cornerRadius = 10
@@ -669,17 +717,7 @@ final class ReferenceCanvasView: UIView {
             field.topAnchor.constraint(equalTo: topAnchor, constant: top),
             field.heightAnchor.constraint(equalToConstant: 54)
         ])
-
-        let label = UILabel()
-        label.text = placeholder
-        label.textColor = .gray
-        label.font = AppFont.source(15)
-        field.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
-            label.centerYAnchor.constraint(equalTo: field.centerYAnchor)
-        ])
+        return field
     }
 
     private func addLogo(top: CGFloat) {

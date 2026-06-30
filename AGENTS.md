@@ -20,6 +20,10 @@
 - Draw gradients with `CAGradientLayer` or equivalent UIKit/CoreAnimation layers; do not flatten gradients into background screenshots.
 - Recreate shadows, borders, rounded corners, blur/glass effects, and overlays with UIKit/CoreAnimation.
 - Launch screen must use `LaunchScreen.storyboard` with a constrained full-screen image view that ignores safe area.
+- Any UI that visually appears as an input field must use a real input control such as `UITextField` or `UITextView`, not a static label-only mock.
+- Pages with real input controls must dismiss the keyboard when tapping blank space without blocking buttons, links, or the input control itself.
+- When recreating styled input fields, keep the visual container responsible for gradients, borders, shadows, and rounded corners, then place the real input control inside it with transparent background so the fidelity is preserved.
+- Blank-space keyboard dismissal should use a non-intercepting gesture (`cancelsTouchesInView = false`) and explicitly avoid handling touches from `UIControl`, text input views, navigation controls, buttons, and links.
 
 ## Navigation
 
