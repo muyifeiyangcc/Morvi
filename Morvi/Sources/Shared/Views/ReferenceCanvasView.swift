@@ -152,7 +152,14 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderHome() {
-        addProfileAvatar(top: 60, left: 20, size: 58)
+        addProfileAvatar(
+            top: 60,
+            left: 20,
+            size: 58,
+            backgroundColor: UIColor(white: 0.8, alpha: 1),
+            showsBorder: false,
+            showsShadow: false
+        )
         addText("Welcome back", size: 17, weight: .black, top: 68, left: 96)
         addText("Amelia", size: 16, weight: .regular, top: 98, left: 96)
         addText("Hello, Anna!\nDid everything go\nsmoothly today?", size: 30, weight: .regular, top: 146, left: 20)
@@ -1067,19 +1074,26 @@ final class ReferenceCanvasView: UIView {
         addPortrait(top: top, left: left, size: 58, tint: .warm)
     }
 
-    private func addProfileAvatar(top: CGFloat, left: CGFloat, size: CGFloat) {
+    private func addProfileAvatar(
+        top: CGFloat,
+        left: CGFloat,
+        size: CGFloat,
+        backgroundColor: UIColor = UIColor(white: 0.94, alpha: 1),
+        showsBorder: Bool = true,
+        showsShadow: Bool = true
+    ) {
         let layoutContainer = activeLayoutContainer ?? self
         let imageView = UIImageView(image: UIImage(named: "profile_avatar"))
         imageView.contentMode = .scaleAspectFill
-        imageView.backgroundColor = UIColor(white: 0.94, alpha: 1)
+        imageView.backgroundColor = backgroundColor
         imageView.layer.cornerRadius = size / 2
         imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 2
-        imageView.layer.borderColor = UIColor.white.cgColor
+        imageView.layer.borderWidth = showsBorder ? 2 : 0
+        imageView.layer.borderColor = showsBorder ? UIColor.white.cgColor : UIColor.clear.cgColor
 
         let shadowHost = UIView()
         shadowHost.layer.shadowColor = UIColor.black.cgColor
-        shadowHost.layer.shadowOpacity = 0.18
+        shadowHost.layer.shadowOpacity = showsShadow ? 0.18 : 0
         shadowHost.layer.shadowOffset = CGSize(width: 0, height: 2)
         shadowHost.layer.shadowRadius = 5
         layoutContainer.addSubview(shadowHost)
