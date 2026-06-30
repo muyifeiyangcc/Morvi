@@ -574,32 +574,15 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addLogo(top: CGFloat) {
-        let box = UIView()
-        box.backgroundColor = UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1)
-        box.layer.cornerRadius = 28
-        addSubview(box)
-        box.translatesAutoresizingMaskIntoConstraints = false
+        let imageView = UIImageView(image: UIImage(named: "LOGO"))
+        imageView.contentMode = .scaleAspectFit
+        addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            box.centerXAnchor.constraint(equalTo: centerXAnchor),
-            box.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            box.widthAnchor.constraint(equalToConstant: 120),
-            box.heightAnchor.constraint(equalToConstant: 120)
-        ])
-        let face = UILabel()
-        face.text = "▌ <\n⌣"
-        face.numberOfLines = 2
-        face.textAlignment = .center
-        face.font = AppFont.source(38, weight: .black)
-        face.backgroundColor = UIColor(red: 0.80, green: 1, blue: 0.34, alpha: 1)
-        face.layer.cornerRadius = 24
-        face.layer.masksToBounds = true
-        box.addSubview(face)
-        face.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            face.centerXAnchor.constraint(equalTo: box.centerXAnchor),
-            face.centerYAnchor.constraint(equalTo: box.centerYAnchor),
-            face.widthAnchor.constraint(equalToConstant: 82),
-            face.heightAnchor.constraint(equalToConstant: 82)
+            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            imageView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            imageView.widthAnchor.constraint(equalToConstant: 120),
+            imageView.heightAnchor.constraint(equalToConstant: 120)
         ])
     }
 
