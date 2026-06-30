@@ -1,4 +1,5 @@
 import UIKit
+import WebKit
 
 final class ReferenceCanvasView: UIView {
     private let page: ScenePage
@@ -516,37 +517,112 @@ final class ReferenceCanvasView: UIView {
 
     private func renderAgreement() {
         addTopTitle("EULA")
-        let body = """
-        This End User License Agreement (EULA)
-        governs your use of the Morvi Application
-        (the "App"). By downloading, accessing or
-        using the App, you agree to be bound by this
-        Agreement. If you do not agree, you may not
-        use the App.
-        1. Qualifications
-        By using the App, you confirm that you are
-        at least 18 years of age. You agree to provide
-        true and accurate age information. If you are
-        under 18, you are prohibited from using the
-        App.
-        2. User Generated Content
-        This App allows users to post, share and
-        view street dance-related video content
-        (including supporting text and pictures).
-        By posting content ("User Content") on the
-        App, you agree to the following:
-        2.1 Prohibited Content
-        You may not post offensive, harmful,
-        inappropriate or illegal content, including...
+        let bottomBar = UIView()
+        bottomBar.backgroundColor = .clear
+        addSubview(bottomBar)
+        bottomBar.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            bottomBar.leadingAnchor.constraint(equalTo: leadingAnchor),
+            bottomBar.trailingAnchor.constraint(equalTo: trailingAnchor),
+            bottomBar.bottomAnchor.constraint(equalTo: bottomAnchor),
+            bottomBar.heightAnchor.constraint(equalToConstant: 153)
+        ])
+
+        let webView = WKWebView(frame: .zero)
+        webView.backgroundColor = .clear
+        webView.isOpaque = false
+        webView.scrollView.backgroundColor = .clear
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
+        webView.scrollView.contentInset.bottom = 16
+        webView.scrollView.showsVerticalScrollIndicator = false
+        webView.loadHTMLString(agreementHTML(), baseURL: nil)
+        addSubview(webView)
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            webView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            webView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            webView.topAnchor.constraint(equalTo: topAnchor, constant: 146),
+            webView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor)
+        ])
+
+        addText("Terms of Use", size: 16, weight: .regular, top: 0, left: 61, parent: bottomBar)
+        addLine(top: 19, left: 61, width: 95, color: .darkGray, parent: bottomBar)
+        addText("Privacy Policy", size: 16, weight: .regular, top: 0, left: 213, parent: bottomBar)
+        addLine(top: 19, left: 213, width: 101, color: .darkGray, parent: bottomBar)
+        addPillButton("Cancel", top: 33, left: 48, width: 124, dark: false, usesOneFont: true, parent: bottomBar)
+        addPillButton("I agree", top: 33, left: 204, width: 124, dark: true, usesOneFont: true, parent: bottomBar)
+        addAgreementConsentLine(top: 109, parent: bottomBar)
+        bringSubviewToFront(bottomBar)
+    }
+
+    private func agreementHTML() -> String {
         """
-        addText(body, size: 16, weight: .regular, top: 146, left: 20, color: .darkGray)
-        addText("Terms of Use", size: 16, weight: .regular, top: 659, left: 61)
-        addLine(top: 678, left: 61, width: 95, color: .darkGray)
-        addText("Privacy Policy", size: 16, weight: .regular, top: 659, left: 213)
-        addLine(top: 678, left: 213, width: 101, color: .darkGray)
-        addPillButton("Cancel", top: 692, left: 48, width: 124, dark: false, usesOneFont: true)
-        addPillButton("I agree", top: 692, left: 204, width: 124, dark: true, usesOneFont: true)
-        addAgreementConsentLine(top: 768)
+        <!doctype html>
+        <html>
+        <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: #5E5E5E;
+            font-family: "SourceHanSansSC-Regular", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 16px;
+            line-height: 1.42;
+            -webkit-text-size-adjust: 100%;
+        }
+        p {
+            margin: 0;
+        }
+        .section {
+            margin-top: 0;
+        }
+        ul {
+            margin: 0;
+            padding-left: 16px;
+        }
+        li {
+            margin: 0;
+        }
+        </style>
+        </head>
+        <body>
+        <p>This End User License Agreement (EULA) governs your use of the Morvi Application (the "App"). By downloading, accessing or using the App, you agree to be bound by this Agreement. If you do not agree, you may not use the App.</p>
+        <p class="section">1. Qualifications</p>
+        <p>By using the App, you confirm that you are at least 18 years of age. You agree to provide true and accurate age information. If you are under 18, you are prohibited from using the App.</p>
+        <p class="section">2. User Generated Content</p>
+        <p>This App allows users to post, share and view street dance-related video content (including supporting text and pictures).</p>
+        <p>By posting content ("User Content") on the App, you agree to the following:</p>
+        <p class="section">2.1 Prohibited Content</p>
+        <p>You may not post offensive, harmful, inappropriate or illegal content, including but not limited to:</p>
+        <ul>
+        <li>Hate speech, abuse, harassment, threats or personal attacks;</li>
+        <li>Pornographic, explicit or vulgar content;</li>
+        <li>Content promoting violence, discrimination, illegal activities or infringing others’ rights;</li>
+        <li>Content irrelevant to street dance, violating public order and good customs, or used for unauthorized advertising;</li>
+        <li>False or misleading information.</li>
+        </ul>
+        <p class="section">2.2 Content Licensing</p>
+        <p>You retain ownership of your User Content, but by posting it, you grant Funksy a non-exclusive, royalty-free license to use, distribute, display and promote such content within the App and its related services.</p>
+        <p class="section">3. Reporting and Response Mechanism</p>
+        <p>3.1 Your Responsibilities</p>
+        <p>If you find content violating this EULA, report it immediately via the App’s reporting mechanism.</p>
+        <p>3.2 Our Response</p>
+        <p>We will review reported content within 24 hours and take appropriate measures (e.g., removing content, warning or banning users). Repeated violations may result in permanent account suspension.</p>
+        <p class="section">4. Privacy Policy</p>
+        <p>By using the App, you acknowledge having read and agreed to our [Privacy Policy], which details how we collect, use and protect your personal information.</p>
+        <p class="section">5. Termination</p>
+        <p>We may terminate or suspend your access to the App at any time, with or without notice. You may stop using the App and delete your account at any time.</p>
+        <p class="section">6. Modification of the Agreement</p>
+        <p>We may amend this Agreement at any time. Changes will be announced in the App; your continued use constitutes acceptance of revised terms.</p>
+        <p class="section">7. Disclaimer</p>
+        <p>The App is provided "AS IS" without any warranties. We do not guarantee it will be uninterrupted, error-free or secure, nor the accuracy of its content.</p>
+        <p class="section">8. Limitation of Liability</p>
+        <p>To the fullest extent permitted by law, we are not liable for any damages arising from your use of the App or its content.</p>
+        </body>
+        </html>
+        """
     }
 
     private func renderFeelingEditor() {
@@ -668,8 +744,17 @@ final class ReferenceCanvasView: UIView {
         addPillButton(confirm, top: portrait ? 499 : 437, left: 204, width: 112, dark: true, usesOneFont: true)
     }
 
-    private func addText(_ text: String, size: CGFloat, weight: UIFont.Weight, top: CGFloat, left: CGFloat? = nil, centered: Bool = false, color: UIColor = .black) {
-        let layoutContainer = activeLayoutContainer ?? self
+    private func addText(
+        _ text: String,
+        size: CGFloat,
+        weight: UIFont.Weight,
+        top: CGFloat,
+        left: CGFloat? = nil,
+        centered: Bool = false,
+        color: UIColor = .black,
+        parent: UIView? = nil
+    ) {
+        let layoutContainer = parent ?? activeLayoutContainer ?? self
         let label = UILabel()
         label.text = text
         label.numberOfLines = 0
@@ -1174,14 +1259,15 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addLine(top: CGFloat, left: CGFloat, width: CGFloat, color: UIColor) {
+    private func addLine(top: CGFloat, left: CGFloat, width: CGFloat, color: UIColor, parent: UIView? = nil) {
+        let layoutContainer = parent ?? self
         let line = UIView()
         line.backgroundColor = color
-        addSubview(line)
+        layoutContainer.addSubview(line)
         line.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            line.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            line.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            line.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            line.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             line.widthAnchor.constraint(equalToConstant: width),
             line.heightAnchor.constraint(equalToConstant: 2)
         ])
@@ -1332,7 +1418,16 @@ final class ReferenceCanvasView: UIView {
         addCircle(text: "", top: top + 20, left: 40, size: 9, color: .gray)
     }
 
-    private func addPillButton(_ text: String, top: CGFloat, left: CGFloat, width: CGFloat, dark: Bool, usesOneFont: Bool = false) {
+    private func addPillButton(
+        _ text: String,
+        top: CGFloat,
+        left: CGFloat,
+        width: CGFloat,
+        dark: Bool,
+        usesOneFont: Bool = false,
+        parent: UIView? = nil
+    ) {
+        let layoutContainer = parent ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
         button.titleLabel?.font = usesOneFont ? AppFont.fredoka(18) : AppFont.source(18)
@@ -1345,11 +1440,11 @@ final class ReferenceCanvasView: UIView {
         button.layer.shadowOpacity = dark ? 0 : 0.08
         button.layer.shadowOffset = CGSize(width: 0, height: 4)
         button.layer.shadowRadius = 10
-        addSubview(button)
+        layoutContainer.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            button.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            button.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            button.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             button.widthAnchor.constraint(equalToConstant: width),
             button.heightAnchor.constraint(equalToConstant: 50)
         ])
@@ -1571,22 +1666,28 @@ final class ReferenceCanvasView: UIView {
     }
 
     @discardableResult
-    private func addAgreementConsentLine(top: CGFloat? = nil, bottom: CGFloat? = nil, isSelected: Bool = false) -> UIView {
+    private func addAgreementConsentLine(
+        top: CGFloat? = nil,
+        bottom: CGFloat? = nil,
+        isSelected: Bool = false,
+        parent: UIView? = nil
+    ) -> UIView {
+        let layoutContainer = parent ?? self
         let container = UIView()
         container.backgroundColor = .clear
-        addSubview(container)
+        layoutContainer.addSubview(container)
         container.translatesAutoresizingMaskIntoConstraints = false
 
         var constraints = [
-            container.leadingAnchor.constraint(equalTo: leadingAnchor),
-            container.trailingAnchor.constraint(equalTo: trailingAnchor),
+            container.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor),
             container.heightAnchor.constraint(equalToConstant: 20)
         ]
         if let top {
-            constraints.append(container.topAnchor.constraint(equalTo: topAnchor, constant: top))
+            constraints.append(container.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
         }
         if let bottom {
-            constraints.append(container.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -bottom))
+            constraints.append(container.bottomAnchor.constraint(equalTo: layoutContainer.bottomAnchor, constant: -bottom))
         }
         NSLayoutConstraint.activate(constraints)
 
