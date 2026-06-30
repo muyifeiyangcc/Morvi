@@ -541,8 +541,8 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             webView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             webView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            webView.topAnchor.constraint(equalTo: topAnchor, constant: 146),
-            webView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor)
+            webView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
+            webView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor, constant: -10)
         ])
 
         addText("Terms of Use", size: 16, weight: .regular, top: 0, left: 61, parent: bottomBar)
