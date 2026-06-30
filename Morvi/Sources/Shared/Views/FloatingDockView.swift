@@ -15,6 +15,15 @@ final class FloatingDockView: UIView {
             case .persona: "tab_persona"
             }
         }
+
+        var selectedImageName: String {
+            switch self {
+            case .home: "tab_home_selected"
+            case .discover: "tab_discover_selected"
+            case .dialogue: "tab_dialogue_selected"
+            case .persona: "tab_persona_selected"
+            }
+        }
     }
 
     var selectedItem: Item = .home {
@@ -25,6 +34,7 @@ final class FloatingDockView: UIView {
 
     private let stackView = UIStackView()
     private var itemButtons: [Item: UIButton] = [:]
+    private var itemIconViews: [Item: UIImageView] = [:]
     private var iconWidthConstraints: [Item: NSLayoutConstraint] = [:]
     private var iconHeightConstraints: [Item: NSLayoutConstraint] = [:]
     private let itemSide: CGFloat = 65
@@ -85,6 +95,7 @@ final class FloatingDockView: UIView {
                 iconHeight
             ])
             itemButtons[item] = button
+            itemIconViews[item] = iconView
             iconWidthConstraints[item] = iconWidth
             iconHeightConstraints[item] = iconHeight
             stackView.addArrangedSubview(button)
@@ -102,6 +113,7 @@ final class FloatingDockView: UIView {
             let iconSide = isSelected ? itemSide : inactiveIconSide
             iconWidthConstraints[item]?.constant = iconSide
             iconHeightConstraints[item]?.constant = iconSide
+            itemIconViews[item]?.image = UIImage(named: isSelected ? item.selectedImageName : item.imageName)
         }
     }
 }
