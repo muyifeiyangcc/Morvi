@@ -133,8 +133,8 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = scrollContent
         addLogo(top: 168)
         addText("Morvi", size: 38, weight: .black, top: 307, centered: true)
-        addButton("Login by email", top: 417, filled: false)
-        addButton("I'm new", top: 486, filled: true)
+        addButton("Login by email", top: 417, filled: false, usesOneFont: true)
+        addButton("I'm new", top: 486, filled: true, usesOneFont: true)
         addEntrySignUpPrompt(top: 568)
         addText("Other login methods", size: 12, weight: .regular, top: 608, centered: true, color: .lightGray)
         addAppleLoginCircle(top: 640, left: 168)
@@ -293,7 +293,7 @@ final class ReferenceCanvasView: UIView {
         addInputField("Please enter", top: 523, isSecureTextEntry: true)
         addUnderlinedText("Forgot ?", size: 12, top: 588, left: 303, color: .gray)
         activeLayoutContainer = nil
-        addButton("Log in", top: 716, filled: true)
+        addButton("Log in", top: 716, filled: true, usesOneFont: true)
     }
 
     private func renderForm(title: String, fields: [String], action: String, footer: String?) {
@@ -318,7 +318,7 @@ final class ReferenceCanvasView: UIView {
             addText(footer, size: 12, weight: .regular, top: max(570, top - 20), left: 302, color: .gray)
         }
         if !action.isEmpty {
-            addButton(action, top: 716, filled: true)
+            addButton(action, top: 716, filled: true, usesOneFont: true)
         }
     }
 
@@ -361,7 +361,7 @@ final class ReferenceCanvasView: UIView {
         addText("Description:", size: 17, weight: .regular, top: 455, left: 20)
         addLargeField("Say something", top: 481)
         addUploadBox(top: 596)
-        addButton("Upload", top: 732, filled: true)
+        addButton("Upload", top: 732, filled: true, usesOneFont: true)
     }
 
     private func renderList(title: String, sections: [[String]]) {
@@ -394,7 +394,7 @@ final class ReferenceCanvasView: UIView {
             addText(items[index].0, size: 17, weight: .black, top: top, left: 20)
             addField(items[index].1, top: top + 27)
         }
-        addButton("Sign up", top: 716, filled: true)
+        addButton("Sign up", top: 716, filled: true, usesOneFont: true)
     }
 
     private func renderRestrictedList() {
@@ -441,8 +441,8 @@ final class ReferenceCanvasView: UIView {
         addLine(top: 678, left: 61, width: 95, color: .darkGray)
         addText("Privacy Policy", size: 16, weight: .regular, top: 659, left: 213)
         addLine(top: 678, left: 213, width: 101, color: .darkGray)
-        addPillButton("Cancel", top: 692, left: 48, width: 124, dark: false)
-        addPillButton("I agree", top: 692, left: 204, width: 124, dark: true)
+        addPillButton("Cancel", top: 692, left: 48, width: 124, dark: false, usesOneFont: true)
+        addPillButton("I agree", top: 692, left: 204, width: 124, dark: true, usesOneFont: true)
         addAgreementConsentLine(top: 768)
     }
 
@@ -458,7 +458,7 @@ final class ReferenceCanvasView: UIView {
         card.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
         addCircle(text: "😃", top: 458, left: 235, size: 100, color: UIColor(red: 1, green: 0.91, blue: 0.34, alpha: 1))
         addLargeField("Input here...", top: 573, height: 122)
-        addButton("Upload", top: 732, filled: true)
+        addButton("Upload", top: 732, filled: true, usesOneFont: true)
     }
 
     private func renderWeeklyFeeling() {
@@ -495,7 +495,7 @@ final class ReferenceCanvasView: UIView {
         addCircle(text: "⊙", top: 552, left: 213, size: 20, color: UIColor(red: 0.76, green: 1, blue: 0.20, alpha: 1))
         addText("Username:", size: 16, weight: .regular, top: 626, left: 20)
         addField("Enter username", top: 654)
-        addButton("Upload", top: 732, filled: true)
+        addButton("Upload", top: 732, filled: true, usesOneFont: true)
     }
 
     private func renderRepliesPanel() {
@@ -531,7 +531,7 @@ final class ReferenceCanvasView: UIView {
             addSmallField(rows[index], top: top, left: 20, width: 335)
             addCheckBox(top: top + 13, left: 314, checked: index == 5)
         }
-        addButton("Upload", top: 732, filled: true)
+        addButton("Upload", top: 732, filled: true, usesOneFont: true)
     }
 
     private func renderRestrictPanel() {
@@ -561,8 +561,8 @@ final class ReferenceCanvasView: UIView {
         }
         let textTop: CGFloat = portrait ? 410 : (title == nil ? 348 : 385)
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
-        addPillButton("Cancel", top: portrait ? 499 : 437, left: 66, width: 112, dark: !portrait)
-        addPillButton(confirm, top: portrait ? 499 : 437, left: 204, width: 112, dark: true)
+        addPillButton("Cancel", top: portrait ? 499 : 437, left: 66, width: 112, dark: !portrait, usesOneFont: true)
+        addPillButton(confirm, top: portrait ? 499 : 437, left: 204, width: 112, dark: true, usesOneFont: true)
     }
 
     private func addText(_ text: String, size: CGFloat, weight: UIFont.Weight, top: CGFloat, left: CGFloat? = nil, centered: Bool = false, color: UIColor = .black) {
@@ -616,11 +616,11 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addButton(_ text: String, top: CGFloat, left: CGFloat = 20, width: CGFloat = 335, filled: Bool, dark: Bool = false) {
+    private func addButton(_ text: String, top: CGFloat, left: CGFloat = 20, width: CGFloat = 335, filled: Bool, dark: Bool = false, usesOneFont: Bool = false) {
         let layoutContainer = activeLayoutContainer ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
-        button.titleLabel?.font = usesFredokaText(text) ? AppFont.fredoka(16) : AppFont.source(16, weight: .black)
+        button.titleLabel?.font = usesOneFont || usesFredokaText(text) ? AppFont.fredoka(16) : AppFont.source(16, weight: .black)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : (filled ? .clear : .white)
         button.layer.cornerRadius = 24
@@ -1229,10 +1229,10 @@ final class ReferenceCanvasView: UIView {
         addCircle(text: "", top: top + 20, left: 40, size: 9, color: .gray)
     }
 
-    private func addPillButton(_ text: String, top: CGFloat, left: CGFloat, width: CGFloat, dark: Bool) {
+    private func addPillButton(_ text: String, top: CGFloat, left: CGFloat, width: CGFloat, dark: Bool, usesOneFont: Bool = false) {
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
-        button.titleLabel?.font = AppFont.source(18)
+        button.titleLabel?.font = usesOneFont ? AppFont.fredoka(18) : AppFont.source(18)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .darkGray, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
         button.layer.cornerRadius = 25
