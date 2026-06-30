@@ -95,7 +95,7 @@ enum RouteFactory {
             }
         case .personalDetail:
             return ReferencePageController(page: .personalDetail) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 716, width: 335, height: 56)) { scene.push(.profileEditor) }]
+                [HitArea(frame: CGRect(x: 20, y: 716, width: 335, height: 56)) { scene.enterMainFlow() }]
             }
         default:
             return ReferencePageController(page: page)

@@ -493,9 +493,41 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersonalDetail() {
-        addText("‹", size: 44, weight: .regular, top: 68, left: 36)
-        addPortrait(top: 147, left: 145, size: 84, tint: .warm)
-        addCircle(text: "✓", top: 219, left: 216, size: 21, color: UIColor(red: 0.74, green: 1, blue: 0.20, alpha: 1))
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 700)
+        ])
+
+        keyboardAwareScrollView = scrollView
+        installKeyboardAvoidance()
+
+        activeLayoutContainer = scrollContent
+        addProfileAvatar(top: 147, left: 145, size: 84)
+        addCircle(text: "✎", top: 219, left: 216, size: 21, color: UIColor(red: 0.74, green: 1, blue: 0.20, alpha: 1), textColor: .white)
         let items = [
             ("Email", "Please enter"),
             ("Gender", "Female"),
@@ -505,8 +537,9 @@ final class ReferenceCanvasView: UIView {
         for index in items.indices {
             let top = CGFloat(274 + index * 109)
             addText(items[index].0, size: 17, weight: .black, top: top, left: 20)
-            addField(items[index].1, top: top + 27)
+            addInputField(items[index].1, top: top + 27, keyboardType: index == 0 ? .emailAddress : .default)
         }
+        activeLayoutContainer = nil
         addButton("Sign up", top: 716, filled: true, usesOneFont: true)
     }
 
@@ -1034,19 +1067,55 @@ final class ReferenceCanvasView: UIView {
         addPortrait(top: top, left: left, size: 58, tint: .warm)
     }
 
-    private func addCircle(text: String, top: CGFloat, left: CGFloat, size: CGFloat, color: UIColor = UIColor(white: 0.94, alpha: 1)) {
+    private func addProfileAvatar(top: CGFloat, left: CGFloat, size: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let imageView = UIImageView(image: UIImage(named: "profile_avatar"))
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = UIColor(white: 0.94, alpha: 1)
+        imageView.layer.cornerRadius = size / 2
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 2
+        imageView.layer.borderColor = UIColor.white.cgColor
+
+        let shadowHost = UIView()
+        shadowHost.layer.shadowColor = UIColor.black.cgColor
+        shadowHost.layer.shadowOpacity = 0.18
+        shadowHost.layer.shadowOffset = CGSize(width: 0, height: 2)
+        shadowHost.layer.shadowRadius = 5
+        layoutContainer.addSubview(shadowHost)
+        shadowHost.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            shadowHost.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            shadowHost.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            shadowHost.widthAnchor.constraint(equalToConstant: size),
+            shadowHost.heightAnchor.constraint(equalToConstant: size)
+        ])
+
+        shadowHost.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: shadowHost.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: shadowHost.trailingAnchor),
+            imageView.topAnchor.constraint(equalTo: shadowHost.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
+        ])
+    }
+
+    private func addCircle(text: String, top: CGFloat, left: CGFloat, size: CGFloat, color: UIColor = UIColor(white: 0.94, alpha: 1), textColor: UIColor = .black) {
+        let layoutContainer = activeLayoutContainer ?? self
         let view = UILabel()
         view.text = text
         view.textAlignment = .center
         view.font = AppFont.source(size * 0.44, weight: .bold)
+        view.textColor = textColor
         view.backgroundColor = color
         view.layer.cornerRadius = size / 2
         view.layer.masksToBounds = true
-        addSubview(view)
+        layoutContainer.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            view.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            view.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            view.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             view.widthAnchor.constraint(equalToConstant: size),
             view.heightAnchor.constraint(equalToConstant: size)
         ])
