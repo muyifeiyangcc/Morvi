@@ -17,6 +17,13 @@ final class DecorativeGradientView: UIView {
                 return UIColor(red: 226 / 255, green: 255 / 255, blue: 120 / 255, alpha: 1)
             }
         }
+
+        var secondaryGlowColor: UIColor {
+            switch self {
+            case .topLeftGlow:
+                return UIColor(red: 222 / 255, green: 251 / 255, blue: 255 / 255, alpha: 1)
+            }
+        }
     }
 
     private let palette: Palette
@@ -38,24 +45,38 @@ final class DecorativeGradientView: UIView {
         palette.baseColor.setFill()
         UIRectFill(rect)
 
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        drawGlow(
+            in: context,
+            center: .zero,
+            radius: bounds.width * 0.9,
+            color: palette.glowColor
+        )
+        drawGlow(
+            in: context,
+            center: CGPoint(x: bounds.maxX, y: 0),
+            radius: bounds.width * 0.4,
+            color: palette.secondaryGlowColor
+        )
+    }
+
+    private func drawGlow(in context: CGContext, center: CGPoint, radius: CGFloat, color: UIColor) {
         guard
-            let context = UIGraphicsGetCurrentContext(),
             let gradient = CGGradient(
                 colorsSpace: CGColorSpaceCreateDeviceRGB(),
                 colors: [
-                    palette.glowColor.cgColor,
-                    palette.glowColor.withAlphaComponent(0).cgColor
+                    color.cgColor,
+                    color.withAlphaComponent(0).cgColor
                 ] as CFArray,
                 locations: [0, 1]
             )
         else { return }
 
-        let radius = bounds.width * 0.9
         context.drawRadialGradient(
             gradient,
-            startCenter: .zero,
+            startCenter: center,
             startRadius: 0,
-            endCenter: .zero,
+            endCenter: center,
             endRadius: radius,
             options: []
         )
