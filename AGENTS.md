@@ -42,6 +42,13 @@
 - Do not collapse many unrelated classes into one large catch-all file when adding new functionality.
 - Keep page-specific logic close to its scene/controller or route.
 
+## CodeGraph
+
+- CodeGraph is enabled for this project.
+- When `.codegraph/` exists locally, use CodeGraph before `rg`, `find`, or direct file reads for code understanding and symbol/location questions.
+- Use `codegraph sync` after code edits if the next task needs fresh CodeGraph results.
+- Keep `.codegraph/` out of Git; it is a local machine index.
+
 ## Naming Restrictions
 
 Custom code identifiers must not use these English words or obvious variants:

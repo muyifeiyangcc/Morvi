@@ -32,5 +32,8 @@ Carthage/Build/
 .env
 .env.*
 
+# Local CodeGraph index
+.codegraph/
+
 # External UI references must stay outside the app bundle.
 Morvi-UI/
