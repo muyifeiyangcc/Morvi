@@ -193,11 +193,18 @@ final class ReferenceCanvasView: UIView {
         addText("Welcome back", size: 17, weight: .black, top: 68, left: 96)
         addText("Amelia", size: 16, weight: .regular, top: 98, left: 96)
         addText("Hello, Anna!\nDid everything go\nsmoothly today?", size: 30, weight: .regular, top: 146, left: 20)
-        addText("Choose your mood today", size: 22, weight: .bold, top: 303, left: 20)
+        addText("Choose your mood today", size: 20, weight: .bold, top: 303, left: 20)
         addMoodRow(top: 340)
-        addButton("Save your feelings", top: 458, filled: true)
-        addFeatureCard(title: "Discover", top: 536, left: 20, tint: .forest)
-        addFeatureCard(title: "Recot Bot", top: 536, left: 192, tint: .night)
+        addButton(
+            "Save your feelings",
+            top: 458,
+            filled: true,
+            cornerRadius: 12,
+            shadowOffset: CGSize(width: 0, height: 5),
+            shadowRadius: 5
+        )
+        addFeatureCard(title: "Discover", top: 536, left: 20, tint: .forest, imageName: "home_discover")
+        addFeatureCard(title: "Recot Bot", top: 536, left: 192, tint: .night, imageName: "home_recot_bot")
         activeLayoutContainer = nil
     }
 
@@ -897,20 +904,31 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addButton(_ text: String, top: CGFloat, left: CGFloat = 20, width: CGFloat = 335, filled: Bool, dark: Bool = false, usesOneFont: Bool = false) {
+    private func addButton(
+        _ text: String,
+        top: CGFloat,
+        left: CGFloat = 20,
+        width: CGFloat = 335,
+        filled: Bool,
+        dark: Bool = false,
+        usesOneFont: Bool = false,
+        cornerRadius: CGFloat = 24,
+        shadowOffset: CGSize = CGSize(width: 0, height: 4),
+        shadowRadius: CGFloat = 9
+    ) {
         let layoutContainer = activeLayoutContainer ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
         button.titleLabel?.font = usesOneFont || usesFredokaText(text) ? AppFont.fredoka(16) : AppFont.source(16, weight: .black)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : (filled ? .clear : .white)
-        button.layer.cornerRadius = 24
+        button.layer.cornerRadius = cornerRadius
         button.layer.borderWidth = filled || dark ? 0 : 1
         button.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = filled ? 0.14 : 0.06
-        button.layer.shadowOffset = CGSize(width: 0, height: 4)
-        button.layer.shadowRadius = 9
+        button.layer.shadowOffset = shadowOffset
+        button.layer.shadowRadius = shadowRadius
         if filled {
             let gradient = CAGradientLayer()
             gradient.colors = [
@@ -920,7 +938,7 @@ final class ReferenceCanvasView: UIView {
             gradient.startPoint = CGPoint(x: 0, y: 0.5)
             gradient.endPoint = CGPoint(x: 1, y: 0.5)
             gradient.frame = CGRect(x: 0, y: 0, width: width, height: 52)
-            gradient.cornerRadius = 24
+            gradient.cornerRadius = cornerRadius
             button.layer.insertSublayer(gradient, at: 0)
         }
         layoutContainer.addSubview(button)
@@ -1655,8 +1673,8 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
-    private func addFeatureCard(title: String, top: CGFloat, left: CGFloat, tint: MediaTint) {
-        addMediaBlock(top: top, left: left, width: 164, height: 144, title: title, tint: tint, action: .arrow)
+    private func addFeatureCard(title: String, top: CGFloat, left: CGFloat, tint: MediaTint, imageName: String? = nil) {
+        addMediaBlock(top: top, left: left, width: 164, height: 144, title: title, tint: tint, action: .arrow, imageName: imageName)
     }
 
     private func addMediaBlock(
@@ -1666,7 +1684,8 @@ final class ReferenceCanvasView: UIView {
         height: CGFloat,
         title: String,
         tint: MediaTint = .coast,
-        action: MediaAction = .none
+        action: MediaAction = .none,
+        imageName: String? = nil
     ) {
         let layoutContainer = activeLayoutContainer ?? self
         let shadowHost = UIView()
@@ -1687,15 +1706,6 @@ final class ReferenceCanvasView: UIView {
         block.backgroundColor = tint.baseColor
         block.layer.cornerRadius = 14
         block.layer.masksToBounds = true
-        let gradient = CAGradientLayer()
-        gradient.colors = [
-            tint.topColor.cgColor,
-            tint.bottomColor.cgColor
-        ]
-        gradient.startPoint = CGPoint(x: 0, y: 0)
-        gradient.endPoint = CGPoint(x: 1, y: 1)
-        gradient.frame = CGRect(x: 0, y: 0, width: width, height: height)
-        block.layer.insertSublayer(gradient, at: 0)
         shadowHost.addSubview(block)
         block.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -1704,6 +1714,29 @@ final class ReferenceCanvasView: UIView {
             block.topAnchor.constraint(equalTo: shadowHost.topAnchor),
             block.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
         ])
+        if let imageName {
+            let imageView = UIImageView(image: UIImage(named: imageName))
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            block.addSubview(imageView)
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                imageView.leadingAnchor.constraint(equalTo: block.leadingAnchor),
+                imageView.trailingAnchor.constraint(equalTo: block.trailingAnchor),
+                imageView.topAnchor.constraint(equalTo: block.topAnchor),
+                imageView.bottomAnchor.constraint(equalTo: block.bottomAnchor)
+            ])
+        } else {
+            let gradient = CAGradientLayer()
+            gradient.colors = [
+                tint.topColor.cgColor,
+                tint.bottomColor.cgColor
+            ]
+            gradient.startPoint = CGPoint(x: 0, y: 0)
+            gradient.endPoint = CGPoint(x: 1, y: 1)
+            gradient.frame = CGRect(x: 0, y: 0, width: width, height: height)
+            block.layer.insertSublayer(gradient, at: 0)
+        }
         if !title.isEmpty {
             let label = UILabel()
             label.text = title
@@ -1716,15 +1749,31 @@ final class ReferenceCanvasView: UIView {
                 label.topAnchor.constraint(equalTo: block.topAnchor, constant: 18)
             ])
         }
-        addMediaAccent(in: block, tint: tint)
+        if imageName == nil {
+            addMediaAccent(in: block, tint: tint)
+        }
         switch action {
         case .arrow:
-            addSymbolCircle("→", in: block, right: 14, bottom: 14)
+            addCardArrowIcon(in: block, right: 14, bottom: 14)
         case .play:
             addSymbolCircle("▶", in: block, right: width / 2 - 22, bottom: height / 2 - 22)
         case .none:
             break
         }
+    }
+
+    private func addCardArrowIcon(in view: UIView, right: CGFloat, bottom: CGFloat) {
+        let iconView = UIImageView(image: UIImage(named: "home_card_arrow"))
+        iconView.contentMode = .scaleAspectFill
+        iconView.clipsToBounds = true
+        view.addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            iconView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -right),
+            iconView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -bottom),
+            iconView.widthAnchor.constraint(equalToConstant: 46),
+            iconView.heightAnchor.constraint(equalToConstant: 46)
+        ])
     }
 
     private func addStoryStrip() {
