@@ -86,6 +86,9 @@ final class ReferenceCanvasView: UIView {
     private func renderEntry() {
         let consentLine = addAgreementConsentLine(bottom: 51)
         let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
         scrollView.backgroundColor = .clear
