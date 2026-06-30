@@ -3,6 +3,8 @@ import UIKit
 final class ReferenceCanvasView: UIView {
     private let page: ScenePage
     private weak var activeLayoutContainer: UIView?
+    private weak var agreementConsentIconView: UIImageView?
+    private var agreementConsentSelected = false
 
     init(page: ScenePage) {
         self.page = page
@@ -1319,10 +1321,18 @@ final class ReferenceCanvasView: UIView {
         }
         NSLayoutConstraint.activate(constraints)
 
-        let iconView = UIImageView(image: UIImage(named: consentIconName(isSelected: isSelected)))
+        agreementConsentSelected = isSelected
+        let iconControl = UIControl()
+        iconControl.addTarget(self, action: #selector(handleAgreementConsentToggle), for: .touchUpInside)
+        iconControl.accessibilityLabel = "Agree with User Agreement and Privacy Policy"
+        container.addSubview(iconControl)
+        iconControl.translatesAutoresizingMaskIntoConstraints = false
+
+        let iconView = UIImageView(image: UIImage(named: consentIconName(isSelected: agreementConsentSelected)))
         iconView.contentMode = .scaleAspectFit
-        container.addSubview(iconView)
+        iconControl.addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
+        agreementConsentIconView = iconView
 
         let label = UILabel()
         label.numberOfLines = 1
@@ -1344,8 +1354,13 @@ final class ReferenceCanvasView: UIView {
         container.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            iconView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 48),
-            iconView.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+            iconControl.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 36.5),
+            iconControl.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+            iconControl.widthAnchor.constraint(equalToConstant: 40),
+            iconControl.heightAnchor.constraint(equalToConstant: 40),
+
+            iconView.centerXAnchor.constraint(equalTo: iconControl.centerXAnchor),
+            iconView.centerYAnchor.constraint(equalTo: iconControl.centerYAnchor),
             iconView.widthAnchor.constraint(equalToConstant: 17),
             iconView.heightAnchor.constraint(equalToConstant: 17),
 
@@ -1353,6 +1368,11 @@ final class ReferenceCanvasView: UIView {
             label.centerYAnchor.constraint(equalTo: container.centerYAnchor)
         ])
         return container
+    }
+
+    @objc private func handleAgreementConsentToggle() {
+        agreementConsentSelected.toggle()
+        agreementConsentIconView?.image = UIImage(named: consentIconName(isSelected: agreementConsentSelected))
     }
 
     private func consentIconName(isSelected: Bool) -> String {
