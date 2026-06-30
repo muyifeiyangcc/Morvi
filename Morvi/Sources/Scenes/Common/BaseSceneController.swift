@@ -62,7 +62,6 @@ class BaseSceneController: UIViewController {
         let statusBarHeight = normalizedStatusBarHeight()
         topLayer.configure(
             title: navigationTitleText(),
-            usesFredokaTitle: usesFredokaNavigationTitle(),
             statusBarHeight: statusBarHeight,
             showsBackIcon: page != .entry
         )
@@ -108,10 +107,6 @@ class BaseSceneController: UIViewController {
         default:
             return nil
         }
-    }
-
-    private func usesFredokaNavigationTitle() -> Bool {
-        navigationTitleText() == "Sign in"
     }
 
     private func installKeyboardDismissGesture() {

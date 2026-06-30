@@ -62,14 +62,13 @@ final class CustomTopLayerView: UIView {
 
     func configure(
         title: String?,
-        usesFredokaTitle: Bool,
         statusBarHeight: CGFloat,
         showsBackIcon: Bool
     ) {
         self.showsBackIcon = showsBackIcon
         titleLabel.text = title
         titleLabel.isHidden = title == nil
-        titleLabel.font = usesFredokaTitle ? AppFont.fredoka(31) : AppFont.source(31, weight: .black)
+        titleLabel.font = AppFont.fredoka(31)
         navigationCenterYConstraint?.constant = statusBarHeight + 38
     }
 

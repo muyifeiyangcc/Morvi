@@ -55,7 +55,6 @@ final class RootTabsController: UIViewController {
         let statusBarHeight = normalizedStatusBarHeight()
         topLayer.configure(
             title: navigationTitleText(),
-            usesFredokaTitle: false,
             statusBarHeight: statusBarHeight,
             showsBackIcon: false
         )
