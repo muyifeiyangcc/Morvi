@@ -25,6 +25,10 @@ final class FloatingDockView: UIView {
 
     private let stackView = UIStackView()
     private var itemButtons: [Item: UIButton] = [:]
+    private var iconWidthConstraints: [Item: NSLayoutConstraint] = [:]
+    private var iconHeightConstraints: [Item: NSLayoutConstraint] = [:]
+    private let itemSide: CGFloat = 65
+    private let inactiveIconSide: CGFloat = 45
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -51,26 +55,37 @@ final class FloatingDockView: UIView {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
+            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 5.5),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5.5)
         ])
 
         Item.allCases.forEach { item in
             let button = UIButton(type: .custom)
             button.translatesAutoresizingMaskIntoConstraints = false
-            button.setImage(UIImage(named: item.imageName), for: .normal)
-            button.imageView?.contentMode = .scaleAspectFit
-            button.layer.cornerRadius = 29
+            button.layer.cornerRadius = itemSide / 2
             button.layer.masksToBounds = true
             button.addAction(UIAction { [weak self] _ in
                 self?.selectedItem = item
                 self?.didSelect?(item)
             }, for: .touchUpInside)
+            let iconView = UIImageView(image: UIImage(named: item.imageName))
+            iconView.translatesAutoresizingMaskIntoConstraints = false
+            iconView.contentMode = .scaleAspectFit
+            iconView.isUserInteractionEnabled = false
+            button.addSubview(iconView)
+            let iconWidth = iconView.widthAnchor.constraint(equalToConstant: inactiveIconSide)
+            let iconHeight = iconView.heightAnchor.constraint(equalToConstant: inactiveIconSide)
             NSLayoutConstraint.activate([
-                button.widthAnchor.constraint(equalToConstant: 58),
-                button.heightAnchor.constraint(equalToConstant: 58)
+                button.widthAnchor.constraint(equalToConstant: itemSide),
+                button.heightAnchor.constraint(equalToConstant: itemSide),
+                iconView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+                iconView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+                iconWidth,
+                iconHeight
             ])
             itemButtons[item] = button
+            iconWidthConstraints[item] = iconWidth
+            iconHeightConstraints[item] = iconHeight
             stackView.addArrangedSubview(button)
         }
         refreshSelection()
@@ -83,6 +98,9 @@ final class FloatingDockView: UIView {
             button.alpha = isSelected ? 1 : 0.9
             button.layer.borderWidth = isSelected ? 3 : 0
             button.layer.borderColor = isSelected ? UIColor.black.cgColor : UIColor.clear.cgColor
+            let iconSide = isSelected ? itemSide : inactiveIconSide
+            iconWidthConstraints[item]?.constant = iconSide
+            iconHeightConstraints[item]?.constant = iconSide
         }
     }
 }
