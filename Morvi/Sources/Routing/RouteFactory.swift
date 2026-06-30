@@ -16,13 +16,13 @@ enum RouteFactory {
         case .signIn:
             return AuthSceneController(page: .signIn) { scene in
                 [
-                    HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.push(.personalDetail) },
+                    HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.enterMainFlow() },
                     HitArea(frame: CGRect(x: 290, y: 570, width: 70, height: 44)) { scene.push(.resetAccess) }
                 ]
             }
         case .signUp:
             return AuthSceneController(page: .signUp) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.enterMainFlow() }]
+                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.push(.personalDetail) }]
             }
         case .resetAccess:
             return AuthSceneController(page: .resetAccess) { scene in
