@@ -21,6 +21,9 @@ final class CustomTopLayerView: UIView {
         backIconView.isUserInteractionEnabled = false
         titleLabel.textColor = .black
         titleLabel.numberOfLines = 1
+        titleLabel.adjustsFontSizeToFitWidth = true
+        titleLabel.minimumScaleFactor = 0.55
+        titleLabel.lineBreakMode = .byClipping
         addSubview(backIconView)
         addSubview(titleLabel)
         addSubview(backArea)
