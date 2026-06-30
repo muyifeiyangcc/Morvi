@@ -1,0 +1,468 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		100000000000000000000101 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* AppDelegate.swift */; };
+		100000000000000000000102 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* SceneDelegate.swift */; };
+		100000000000000000000103 /* FlowShellController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000003 /* FlowShellController.swift */; };
+		100000000000000000000104 /* RouteFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000004 /* RouteFactory.swift */; };
+		100000000000000000000105 /* ScenePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* ScenePage.swift */; };
+		100000000000000000000106 /* EntrySceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* EntrySceneController.swift */; };
+		100000000000000000000107 /* BaseSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* BaseSceneController.swift */; };
+		100000000000000000000108 /* ReferencePageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* ReferencePageController.swift */; };
+		100000000000000000000109 /* RootTabsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* RootTabsController.swift */; };
+		100000000000000000000110 /* ClearTapButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000010 /* ClearTapButton.swift */; };
+		100000000000000000000111 /* HitArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000011 /* HitArea.swift */; };
+		100000000000000000000112 /* UIViewControllerHitAreas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000012 /* UIViewControllerHitAreas.swift */; };
+		100000000000000000000113 /* CustomTopLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000013 /* CustomTopLayerView.swift */; };
+		100000000000000000000114 /* ReferenceCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000014 /* ReferenceCanvasView.swift */; };
+		100000000000000000000115 /* FloatingDockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* FloatingDockView.swift */; };
+		100000000000000000000116 /* DesignSurfaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000016 /* DesignSurfaceView.swift */; };
+		100000000000000000000201 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000021 /* Assets.xcassets */; };
+		100000000000000000000202 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		100000000000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		100000000000000000000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		100000000000000000000003 /* FlowShellController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowShellController.swift; sourceTree = "<group>"; };
+		100000000000000000000004 /* RouteFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteFactory.swift; sourceTree = "<group>"; };
+		100000000000000000000005 /* ScenePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePage.swift; sourceTree = "<group>"; };
+		100000000000000000000006 /* EntrySceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntrySceneController.swift; sourceTree = "<group>"; };
+		100000000000000000000007 /* BaseSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSceneController.swift; sourceTree = "<group>"; };
+		100000000000000000000008 /* ReferencePageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferencePageController.swift; sourceTree = "<group>"; };
+		100000000000000000000009 /* RootTabsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsController.swift; sourceTree = "<group>"; };
+		100000000000000000000010 /* ClearTapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearTapButton.swift; sourceTree = "<group>"; };
+		100000000000000000000011 /* HitArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HitArea.swift; sourceTree = "<group>"; };
+		100000000000000000000012 /* UIViewControllerHitAreas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerHitAreas.swift; sourceTree = "<group>"; };
+		100000000000000000000013 /* CustomTopLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTopLayerView.swift; sourceTree = "<group>"; };
+		100000000000000000000014 /* ReferenceCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceCanvasView.swift; sourceTree = "<group>"; };
+		100000000000000000000015 /* FloatingDockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingDockView.swift; sourceTree = "<group>"; };
+		100000000000000000000016 /* DesignSurfaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSurfaceView.swift; sourceTree = "<group>"; };
+		100000000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		100000000000000000000022 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		100000000000000000000023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		100000000000000000000024 /* Morvi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Morvi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		100000000000000000000301 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		100000000000000000000401 = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000402 /* Morvi */,
+				100000000000000000000499 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		100000000000000000000402 /* Morvi */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000403 /* Sources */,
+				100000000000000000000021 /* Assets.xcassets */,
+				100000000000000000000022 /* LaunchScreen.storyboard */,
+				100000000000000000000023 /* Info.plist */,
+			);
+			path = Morvi;
+			sourceTree = "<group>";
+		};
+		100000000000000000000403 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000404 /* Application */,
+				100000000000000000000405 /* Navigation */,
+				100000000000000000000406 /* Routing */,
+				100000000000000000000407 /* Scenes */,
+				100000000000000000000411 /* Shared */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		100000000000000000000404 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000001 /* AppDelegate.swift */,
+				100000000000000000000002 /* SceneDelegate.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		100000000000000000000405 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000003 /* FlowShellController.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		100000000000000000000406 /* Routing */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000004 /* RouteFactory.swift */,
+				100000000000000000000005 /* ScenePage.swift */,
+			);
+			path = Routing;
+			sourceTree = "<group>";
+		};
+		100000000000000000000407 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000408 /* Auth */,
+				100000000000000000000409 /* Common */,
+				100000000000000000000410 /* Main */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		100000000000000000000408 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000006 /* EntrySceneController.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		100000000000000000000409 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000007 /* BaseSceneController.swift */,
+				100000000000000000000008 /* ReferencePageController.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		100000000000000000000410 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000009 /* RootTabsController.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		100000000000000000000411 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000412 /* Interaction */,
+				100000000000000000000413 /* Views */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		100000000000000000000412 /* Interaction */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000010 /* ClearTapButton.swift */,
+				100000000000000000000011 /* HitArea.swift */,
+				100000000000000000000012 /* UIViewControllerHitAreas.swift */,
+			);
+			path = Interaction;
+			sourceTree = "<group>";
+		};
+		100000000000000000000413 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000013 /* CustomTopLayerView.swift */,
+				100000000000000000000014 /* ReferenceCanvasView.swift */,
+				100000000000000000000015 /* FloatingDockView.swift */,
+				100000000000000000000016 /* DesignSurfaceView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		100000000000000000000499 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000024 /* Morvi.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		100000000000000000000501 /* Morvi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 100000000000000000000701 /* Build configuration list for PBXNativeTarget "Morvi" */;
+			buildPhases = (
+				100000000000000000000601 /* Sources */,
+				100000000000000000000301 /* Frameworks */,
+				100000000000000000000602 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Morvi;
+			productName = Morvi;
+			productReference = 100000000000000000000024 /* Morvi.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		100000000000000000000502 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					100000000000000000000501 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = 100000000000000000000702 /* Build configuration list for PBXProject "Morvi" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 100000000000000000000401;
+			productRefGroup = 100000000000000000000499 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				100000000000000000000501 /* Morvi */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		100000000000000000000602 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000201 /* Assets.xcassets in Resources */,
+				100000000000000000000202 /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		100000000000000000000601 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100000000000000000000101 /* AppDelegate.swift in Sources */,
+				100000000000000000000102 /* SceneDelegate.swift in Sources */,
+				100000000000000000000103 /* FlowShellController.swift in Sources */,
+				100000000000000000000104 /* RouteFactory.swift in Sources */,
+				100000000000000000000105 /* ScenePage.swift in Sources */,
+				100000000000000000000106 /* EntrySceneController.swift in Sources */,
+				100000000000000000000107 /* BaseSceneController.swift in Sources */,
+				100000000000000000000108 /* ReferencePageController.swift in Sources */,
+				100000000000000000000109 /* RootTabsController.swift in Sources */,
+				100000000000000000000110 /* ClearTapButton.swift in Sources */,
+				100000000000000000000111 /* HitArea.swift in Sources */,
+				100000000000000000000112 /* UIViewControllerHitAreas.swift in Sources */,
+				100000000000000000000113 /* CustomTopLayerView.swift in Sources */,
+				100000000000000000000114 /* ReferenceCanvasView.swift in Sources */,
+				100000000000000000000115 /* FloatingDockView.swift in Sources */,
+				100000000000000000000116 /* DesignSurfaceView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		100000000000000000000801 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		100000000000000000000802 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		100000000000000000000803 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Morvi/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.local.Morvi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		100000000000000000000804 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Morvi/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.local.Morvi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		100000000000000000000701 /* Build configuration list for PBXNativeTarget "Morvi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100000000000000000000803 /* Debug */,
+				100000000000000000000804 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		100000000000000000000702 /* Build configuration list for PBXProject "Morvi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100000000000000000000801 /* Debug */,
+				100000000000000000000802 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 100000000000000000000502 /* Project object */;
+}
