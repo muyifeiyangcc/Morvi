@@ -23,7 +23,7 @@ final class ReferenceCanvasView: UIView {
         case .entry:
             renderEntry()
         case .signIn:
-            renderForm(title: "Sign in", fields: ["Email", "Password"], action: "Log in", footer: "Forgot ?")
+            renderSignIn()
         case .signUp:
             renderForm(title: "Sign up", fields: ["Email", "Password", "Enter the password again"], action: "Sign up", footer: nil)
         case .resetAccess:
@@ -234,6 +234,18 @@ final class ReferenceCanvasView: UIView {
         addMediaBlock(top: 599, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play)
         addMediaBlock(top: 599, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play)
         addMediaBlock(top: 775, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play)
+    }
+
+    private func renderSignIn() {
+        addTopTitle("Sign in")
+        addLogo(top: 168)
+        addText("Morvi", size: 42, weight: .black, top: 308, centered: true)
+        addText("Email", size: 16, weight: .black, top: 388, left: 20)
+        addField("Please enter", top: 413)
+        addText("Password", size: 16, weight: .black, top: 496, left: 20)
+        addField("Please enter", top: 523)
+        addUnderlinedText("Forgot ?", size: 12, top: 588, left: 303, color: .gray)
+        addButton("Log in", top: 716, filled: true)
     }
 
     private func renderForm(title: String, fields: [String], action: String, footer: String?) {
@@ -593,7 +605,29 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func usesFredokaText(_ text: String) -> Bool {
-        text.caseInsensitiveCompare("Morvi") == .orderedSame || text == "Login by email" || text == "I'm new"
+        text.caseInsensitiveCompare("Morvi") == .orderedSame
+            || text == "Login by email"
+            || text == "I'm new"
+            || text == "Sign in"
+            || text == "Log in"
+    }
+
+    private func addUnderlinedText(_ text: String, size: CGFloat, top: CGFloat, left: CGFloat, color: UIColor) {
+        let label = UILabel()
+        label.attributedText = NSAttributedString(
+            string: text,
+            attributes: [
+                .font: AppFont.source(size),
+                .foregroundColor: color,
+                .underlineStyle: NSUnderlineStyle.single.rawValue
+            ]
+        )
+        addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            label.topAnchor.constraint(equalTo: topAnchor, constant: top)
+        ])
     }
 
     private func addField(_ placeholder: String, top: CGFloat) {
