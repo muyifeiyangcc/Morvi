@@ -527,7 +527,7 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = scrollContent
         addProfileAvatar(top: 147, left: 145, size: 84)
-        addAvatarEditBadge(top: 207, left: 204)
+        addAvatarEditBadge(top: 210, left: 207)
         let items = [
             ("Email", "Please enter"),
             ("Gender", "Female"),
