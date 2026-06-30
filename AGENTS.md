@@ -14,6 +14,8 @@
 - Never copy full-page UI screenshots or effect images into the project bundle.
 - Page copy must match the reference images exactly. Do not invent, rewrite, translate, correct, or expand visible page text.
 - Icons provided for the tabbar must live in `Assets.xcassets` and be referenced from asset names.
+- Before changing code, inspect `Assets.xcassets` for Chinese image resource names.
+- Image resource names in `Assets.xcassets` must be English. If a Chinese name appears, rename it semantically according to the icon or image purpose and update references.
 - If an icon is unavailable, create a temporary drawn placeholder and keep the code path easy to replace with an asset.
 - Draw gradients with `CAGradientLayer` or equivalent UIKit/CoreAnimation layers; do not flatten gradients into background screenshots.
 - Recreate shadows, borders, rounded corners, blur/glass effects, and overlays with UIKit/CoreAnimation.
@@ -69,3 +71,9 @@ rg -n "UITabBarController|UITabBar|UINavigationBar|Morvi-UI|contentsOfFile|path\
 ```
 
 Only the launch image and provided icon assets should appear in bundled image results.
+
+## Git Workflow
+
+- After every project change, create a local Git commit before handing work back.
+- Do not push to the remote repository unless the requester explicitly asks for a remote push.
+- Keep local commits focused and describe the completed change clearly.
