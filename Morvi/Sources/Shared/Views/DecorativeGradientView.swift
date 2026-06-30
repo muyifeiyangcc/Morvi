@@ -56,7 +56,7 @@ final class DecorativeGradientView: UIView {
 
         secondaryGlowLayer.glowColor = palette.secondaryGlowColor
         secondaryGlowLayer.centerUnitPoint = CGPoint(x: 1, y: 0)
-        secondaryGlowLayer.radiusWidthMultiplier = 0.5
+        secondaryGlowLayer.radiusWidthMultiplier = 0.7
 
         layer.addSublayer(primaryGlowLayer)
         layer.addSublayer(secondaryGlowLayer)
