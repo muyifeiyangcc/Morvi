@@ -527,7 +527,7 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = scrollContent
         addProfileAvatar(top: 147, left: 145, size: 84)
-        addCircle(text: "✎", top: 219, left: 216, size: 21, color: UIColor(red: 0.74, green: 1, blue: 0.20, alpha: 1), textColor: .white)
+        addAvatarEditBadge(top: 217, left: 214)
         let items = [
             ("Email", "Please enter"),
             ("Gender", "Female"),
@@ -1098,6 +1098,20 @@ final class ReferenceCanvasView: UIView {
             imageView.trailingAnchor.constraint(equalTo: shadowHost.trailingAnchor),
             imageView.topAnchor.constraint(equalTo: shadowHost.topAnchor),
             imageView.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
+        ])
+    }
+
+    private func addAvatarEditBadge(top: CGFloat, left: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let iconView = UIImageView(image: UIImage(named: "avatar_edit_badge"))
+        iconView.contentMode = .scaleAspectFit
+        layoutContainer.addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            iconView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            iconView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            iconView.widthAnchor.constraint(equalToConstant: 24),
+            iconView.heightAnchor.constraint(equalToConstant: 24)
         ])
     }
 
