@@ -2,6 +2,7 @@ import UIKit
 
 final class ReferenceCanvasView: UIView {
     private let page: ScenePage
+    private weak var activeLayoutContainer: UIView?
 
     init(page: ScenePage) {
         self.page = page
@@ -83,6 +84,34 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderEntry() {
+        let consentLine = addAgreementConsentLine(bottom: 51)
+        let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: consentLine.topAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 700)
+        ])
+
+        activeLayoutContainer = scrollContent
         addLogo(top: 168)
         addText("Morvi", size: 38, weight: .black, top: 307, centered: true)
         addButton("Login by email", top: 417, filled: false)
@@ -90,7 +119,7 @@ final class ReferenceCanvasView: UIView {
         addEntrySignUpPrompt(top: 568)
         addText("Other login methods", size: 12, weight: .regular, top: 608, centered: true, color: .lightGray)
         addAppleLoginCircle(top: 640, left: 168)
-        addAgreementConsentLine(top: 744)
+        activeLayoutContainer = nil
     }
 
     private func renderHome() {
@@ -472,6 +501,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addText(_ text: String, size: CGFloat, weight: UIFont.Weight, top: CGFloat, left: CGFloat? = nil, centered: Bool = false, color: UIColor = .black) {
+        let layoutContainer = activeLayoutContainer ?? self
         let label = UILabel()
         label.text = text
         label.numberOfLines = 0
@@ -479,23 +509,24 @@ final class ReferenceCanvasView: UIView {
         label.font = usesFredokaText(text)
             ? AppFont.fredoka(size)
             : AppFont.source(size, weight: weight)
-        addSubview(label)
+        layoutContainer.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         if centered {
             NSLayoutConstraint.activate([
-                label.centerXAnchor.constraint(equalTo: centerXAnchor),
-                label.topAnchor.constraint(equalTo: topAnchor, constant: top)
+                label.centerXAnchor.constraint(equalTo: layoutContainer.centerXAnchor),
+                label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top)
             ])
         } else {
             NSLayoutConstraint.activate([
-                label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left ?? 20),
-                label.topAnchor.constraint(equalTo: topAnchor, constant: top),
-                label.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -20)
+                label.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left ?? 20),
+                label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+                label.trailingAnchor.constraint(lessThanOrEqualTo: layoutContainer.trailingAnchor, constant: -20)
             ])
         }
     }
 
     private func addEntrySignUpPrompt(top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let text = "Don't have an account? Sign up"
         let attributedText = NSMutableAttributedString(
             string: text,
@@ -512,15 +543,16 @@ final class ReferenceCanvasView: UIView {
 
         let label = UILabel()
         label.attributedText = attributedText
-        addSubview(label)
+        layoutContainer.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: centerXAnchor),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: top)
+            label.centerXAnchor.constraint(equalTo: layoutContainer.centerXAnchor),
+            label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top)
         ])
     }
 
     private func addButton(_ text: String, top: CGFloat, left: CGFloat = 20, width: CGFloat = 335, filled: Bool, dark: Bool = false) {
+        let layoutContainer = activeLayoutContainer ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
         button.titleLabel?.font = usesFredokaText(text) ? AppFont.fredoka(16) : AppFont.source(16, weight: .black)
@@ -545,11 +577,11 @@ final class ReferenceCanvasView: UIView {
             gradient.cornerRadius = 24
             button.layer.insertSublayer(gradient, at: 0)
         }
-        addSubview(button)
+        layoutContainer.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            button.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            button.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            button.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             button.widthAnchor.constraint(equalToConstant: width),
             button.heightAnchor.constraint(equalToConstant: 52)
         ])
@@ -603,13 +635,14 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addLogo(top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let imageView = UIImageView(image: UIImage(named: "LOGO"))
         imageView.contentMode = .scaleAspectFit
-        addSubview(imageView)
+        layoutContainer.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            imageView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            imageView.centerXAnchor.constraint(equalTo: layoutContainer.centerXAnchor),
+            imageView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             imageView.widthAnchor.constraint(equalToConstant: 120),
             imageView.heightAnchor.constraint(equalToConstant: 120)
         ])
@@ -638,11 +671,12 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addAppleLoginCircle(top: CGFloat, left: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let background = UIView()
         background.backgroundColor = UIColor(white: 0.94, alpha: 1)
         background.layer.cornerRadius = 20
         background.layer.masksToBounds = true
-        addSubview(background)
+        layoutContainer.addSubview(background)
         background.translatesAutoresizingMaskIntoConstraints = false
 
         let icon = UILabel()
@@ -653,8 +687,8 @@ final class ReferenceCanvasView: UIView {
         icon.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            background.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            background.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            background.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            background.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             background.widthAnchor.constraint(equalToConstant: 40),
             background.heightAnchor.constraint(equalToConstant: 40),
 
@@ -1262,7 +1296,26 @@ final class ReferenceCanvasView: UIView {
         addText(title, size: 31, weight: .black, top: 78, left: 96)
     }
 
-    private func addAgreementConsentLine(top: CGFloat) {
+    @discardableResult
+    private func addAgreementConsentLine(top: CGFloat? = nil, bottom: CGFloat? = nil) -> UIView {
+        let container = UIView()
+        container.backgroundColor = .clear
+        addSubview(container)
+        container.translatesAutoresizingMaskIntoConstraints = false
+
+        var constraints = [
+            container.leadingAnchor.constraint(equalTo: leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: trailingAnchor),
+            container.heightAnchor.constraint(equalToConstant: 20)
+        ]
+        if let top {
+            constraints.append(container.topAnchor.constraint(equalTo: topAnchor, constant: top))
+        }
+        if let bottom {
+            constraints.append(container.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -bottom))
+        }
+        NSLayoutConstraint.activate(constraints)
+
         let circle = UILabel()
         circle.textAlignment = .center
         circle.font = AppFont.source(9.52)
@@ -1271,7 +1324,7 @@ final class ReferenceCanvasView: UIView {
         circle.layer.cornerRadius = 8.5
         circle.layer.borderWidth = 1.2
         circle.layer.borderColor = UIColor.black.cgColor
-        addSubview(circle)
+        container.addSubview(circle)
         circle.translatesAutoresizingMaskIntoConstraints = false
 
         let label = UILabel()
@@ -1291,17 +1344,18 @@ final class ReferenceCanvasView: UIView {
         value.addAttribute(.foregroundColor, value: UIColor.darkGray, range: first)
         value.addAttribute(.foregroundColor, value: UIColor.darkGray, range: second)
         label.attributedText = value
-        addSubview(label)
+        container.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            circle.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 48),
+            circle.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 48),
             circle.centerYAnchor.constraint(equalTo: label.centerYAnchor),
             circle.widthAnchor.constraint(equalToConstant: 17),
             circle.heightAnchor.constraint(equalToConstant: 17),
 
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 70),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: top)
+            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 70),
+            label.centerYAnchor.constraint(equalTo: container.centerYAnchor)
         ])
+        return container
     }
 
     private func addCheckCircle(
