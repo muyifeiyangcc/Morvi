@@ -52,16 +52,42 @@ final class RootTabsController: UIViewController {
 
     private func installTopLayer() {
         let topLayer = CustomTopLayerView()
+        let statusBarHeight = normalizedStatusBarHeight()
+        topLayer.configure(
+            title: navigationTitleText(),
+            usesFredokaTitle: false,
+            statusBarHeight: statusBarHeight,
+            showsBackIcon: false
+        )
         surfaceView.contentView.addSubview(topLayer)
         topLayer.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             topLayer.leadingAnchor.constraint(equalTo: surfaceView.contentView.leadingAnchor),
             topLayer.trailingAnchor.constraint(equalTo: surfaceView.contentView.trailingAnchor),
             topLayer.topAnchor.constraint(equalTo: surfaceView.contentView.topAnchor),
-            topLayer.heightAnchor.constraint(equalToConstant: 140)
+            topLayer.heightAnchor.constraint(equalToConstant: CustomTopLayerView.totalHeight(statusBarHeight: statusBarHeight))
         ])
         topLayer.backArea.addTarget(self, action: #selector(handleTopLeadingTap), for: .touchUpInside)
         topLayer.trailingArea.addTarget(self, action: #selector(handleTopTrailingTap), for: .touchUpInside)
+    }
+
+    private func normalizedStatusBarHeight() -> CGFloat {
+        let rawHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? view.safeAreaInsets.top
+        if rawHeight > 0 {
+            return rawHeight > 24 ? 44 : 20
+        }
+        return UIScreen.main.bounds.height >= 812 ? 44 : 20
+    }
+
+    private func navigationTitleText() -> String? {
+        switch currentPage {
+        case .discover:
+            return "Discover"
+        case .dialogueList:
+            return "Chat"
+        default:
+            return nil
+        }
     }
 
     private func installPageAreas() {

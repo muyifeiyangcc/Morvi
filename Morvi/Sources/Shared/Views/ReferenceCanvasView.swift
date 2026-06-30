@@ -1331,7 +1331,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addTopTitle(_ title: String) {
-        addText(title, size: 31, weight: .black, top: 78, left: 96)
+        // Navigation titles are rendered by CustomTopLayerView.
     }
 
     @discardableResult
