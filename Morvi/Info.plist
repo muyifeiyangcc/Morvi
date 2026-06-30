@@ -39,6 +39,17 @@
 	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SourceHanSansSC-ExtraLight.otf</string>
+		<string>SourceHanSansSC-Light.otf</string>
+		<string>SourceHanSansSC-Normal.otf</string>
+		<string>SourceHanSansSC-Regular.otf</string>
+		<string>SourceHanSansSC-Medium.otf</string>
+		<string>SourceHanSansSC-Bold.otf</string>
+		<string>SourceHanSansSC-Heavy.otf</string>
+		<string>FredokaOne-Regular.ttf</string>
+	</array>
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>

@@ -478,7 +478,7 @@ final class ReferenceCanvasView: UIView {
         label.text = text
         label.numberOfLines = 0
         label.textColor = color
-        label.font = .systemFont(ofSize: size, weight: weight)
+        label.font = AppFont.source(size, weight: weight)
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         if centered {
@@ -498,7 +498,7 @@ final class ReferenceCanvasView: UIView {
     private func addButton(_ text: String, top: CGFloat, left: CGFloat = 20, width: CGFloat = 335, filled: Bool, dark: Bool = false) {
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .black)
+        button.titleLabel?.font = AppFont.source(16, weight: .black)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : (filled ? .clear : .white)
         button.layer.cornerRadius = 24
@@ -564,7 +564,7 @@ final class ReferenceCanvasView: UIView {
         let label = UILabel()
         label.text = placeholder
         label.textColor = .gray
-        label.font = .systemFont(ofSize: 15)
+        label.font = AppFont.source(15)
         field.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -589,7 +589,7 @@ final class ReferenceCanvasView: UIView {
         face.text = "▌ <\n⌣"
         face.numberOfLines = 2
         face.textAlignment = .center
-        face.font = .systemFont(ofSize: 38, weight: .black)
+        face.font = AppFont.source(38, weight: .black)
         face.backgroundColor = UIColor(red: 0.80, green: 1, blue: 0.34, alpha: 1)
         face.layer.cornerRadius = 24
         face.layer.masksToBounds = true
@@ -611,7 +611,7 @@ final class ReferenceCanvasView: UIView {
         let view = UILabel()
         view.text = text
         view.textAlignment = .center
-        view.font = .systemFont(ofSize: size * 0.44, weight: .bold)
+        view.font = AppFont.source(size * 0.44, weight: .bold)
         view.backgroundColor = color
         view.layer.cornerRadius = size / 2
         view.layer.masksToBounds = true
@@ -691,7 +691,7 @@ final class ReferenceCanvasView: UIView {
         let label = UILabel()
         label.text = text
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: text == "•••" ? 22 : 44, weight: .regular)
+        label.font = AppFont.source(text == "•••" ? 22 : 44)
         label.backgroundColor = .white
         label.layer.cornerRadius = 30
         label.layer.masksToBounds = true
@@ -714,7 +714,7 @@ final class ReferenceCanvasView: UIView {
         label.text = text
         label.textAlignment = .center
         label.textColor = .darkGray
-        label.font = .systemFont(ofSize: 14)
+        label.font = AppFont.source(14)
         label.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
         label.layer.cornerRadius = 10
         label.layer.borderWidth = 1
@@ -734,7 +734,7 @@ final class ReferenceCanvasView: UIView {
         let field = UILabel()
         field.text = text
         field.textColor = .darkGray
-        field.font = .systemFont(ofSize: 14)
+        field.font = AppFont.source(14)
         field.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
         field.layer.cornerRadius = 10
         field.layer.borderWidth = 1
@@ -766,13 +766,13 @@ final class ReferenceCanvasView: UIView {
         ])
         let prompt = UILabel()
         prompt.text = text
-        prompt.font = .systemFont(ofSize: 13)
+        prompt.font = AppFont.source(13)
         prompt.textColor = .darkGray
         bar.addSubview(prompt)
         prompt.translatesAutoresizingMaskIntoConstraints = false
         let action = UILabel()
         action.text = trailing
-        action.font = .systemFont(ofSize: 26, weight: .black)
+        action.font = AppFont.source(26, weight: .black)
         action.textColor = .gray
         bar.addSubview(action)
         action.translatesAutoresizingMaskIntoConstraints = false
@@ -801,7 +801,7 @@ final class ReferenceCanvasView: UIView {
         let icon = UILabel()
         icon.text = "⇧"
         icon.textAlignment = .center
-        icon.font = .systemFont(ofSize: 32, weight: .regular)
+        icon.font = AppFont.source(32)
         icon.textColor = .gray
         box.addSubview(icon)
         icon.translatesAutoresizingMaskIntoConstraints = false
@@ -842,7 +842,7 @@ final class ReferenceCanvasView: UIView {
         let gem = UILabel()
         gem.text = "◆"
         gem.textAlignment = .center
-        gem.font = .systemFont(ofSize: size, weight: .black)
+        gem.font = AppFont.source(size, weight: .black)
         gem.textColor = UIColor(red: 0.04, green: 0.82, blue: 0.12, alpha: 1)
         gem.layer.shadowColor = UIColor.green.cgColor
         gem.layer.shadowOpacity = 0.28
@@ -927,7 +927,7 @@ final class ReferenceCanvasView: UIView {
         let box = UILabel()
         box.text = checked ? "✓" : ""
         box.textAlignment = .center
-        box.font = .systemFont(ofSize: 16, weight: .black)
+        box.font = AppFont.source(16, weight: .black)
         box.textColor = .black
         box.backgroundColor = checked ? UIColor(red: 0.56, green: 1, blue: 0.20, alpha: 1) : UIColor(red: 0.86, green: 0.92, blue: 0.74, alpha: 1)
         box.layer.cornerRadius = 6
@@ -959,7 +959,7 @@ final class ReferenceCanvasView: UIView {
         let label = UILabel()
         label.text = symbol
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 48, weight: .black)
+        label.font = AppFont.source(48, weight: .black)
         label.textColor = .gray
         tile.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -972,7 +972,7 @@ final class ReferenceCanvasView: UIView {
     private func addRing(top: CGFloat) {
         let ring = UILabel()
         ring.text = "◌"
-        ring.font = .systemFont(ofSize: 38, weight: .regular)
+        ring.font = AppFont.source(38)
         ring.textColor = .white
         addSubview(ring)
         ring.translatesAutoresizingMaskIntoConstraints = false
@@ -986,7 +986,7 @@ final class ReferenceCanvasView: UIView {
     private func addPillButton(_ text: String, top: CGFloat, left: CGFloat, width: CGFloat, dark: Bool) {
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .regular)
+        button.titleLabel?.font = AppFont.source(18)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .darkGray, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
         button.layer.cornerRadius = 25
@@ -1038,7 +1038,7 @@ final class ReferenceCanvasView: UIView {
             let faceView = UILabel()
             faceView.text = face
             faceView.textAlignment = .center
-            faceView.font = .systemFont(ofSize: 54)
+            faceView.font = AppFont.source(54)
             tile.addSubview(faceView)
             faceView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
@@ -1100,7 +1100,7 @@ final class ReferenceCanvasView: UIView {
             let label = UILabel()
             label.text = title
             label.textColor = .white
-            label.font = .systemFont(ofSize: 24, weight: .black)
+            label.font = AppFont.source(24, weight: .black)
             block.addSubview(label)
             label.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
@@ -1143,7 +1143,7 @@ final class ReferenceCanvasView: UIView {
             let label = UILabel()
             label.text = item
             label.textAlignment = .center
-            label.font = .systemFont(ofSize: 12)
+            label.font = AppFont.source(12)
             label.backgroundColor = UIColor(white: 1, alpha: 0.75)
             label.layer.cornerRadius = 5
             label.layer.masksToBounds = true
@@ -1201,7 +1201,7 @@ final class ReferenceCanvasView: UIView {
         let label = UILabel()
         label.text = text
         label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 16)
+        label.font = AppFont.source(16)
         label.backgroundColor = outgoing ? UIColor(red: 0.92, green: 1, blue: 0.78, alpha: 1) : UIColor(red: 0.96, green: 0.99, blue: 1, alpha: 1)
         label.layer.cornerRadius = 6
         label.layer.borderWidth = 1
@@ -1229,7 +1229,7 @@ final class ReferenceCanvasView: UIView {
         let value = NSMutableAttributedString(
             string: text,
             attributes: [
-                .font: UIFont.systemFont(ofSize: 12),
+                .font: AppFont.source(12),
                 .foregroundColor: UIColor.gray
             ]
         )
@@ -1258,7 +1258,7 @@ final class ReferenceCanvasView: UIView {
         let view = UILabel()
         view.text = text
         view.textAlignment = .center
-        view.font = .systemFont(ofSize: size * 0.56, weight: .regular)
+        view.font = AppFont.source(size * 0.56)
         view.textColor = color
         view.backgroundColor = .clear
         view.layer.cornerRadius = size / 2
@@ -1351,7 +1351,7 @@ final class ReferenceCanvasView: UIView {
         label.text = symbol
         label.textAlignment = .center
         label.textColor = .white
-        label.font = .systemFont(ofSize: 24, weight: .black)
+        label.font = AppFont.source(24, weight: .black)
         label.backgroundColor = UIColor.white.withAlphaComponent(0.72)
         label.textColor = .white
         label.layer.cornerRadius = 22
@@ -1370,7 +1370,7 @@ final class ReferenceCanvasView: UIView {
         let label = UILabel()
         label.text = symbol
         label.textAlignment = .center
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.font = AppFont.source(18, weight: .bold)
         label.textColor = dark ? .black : UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1)
         label.backgroundColor = dark ? .white : UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1)
         label.layer.cornerRadius = 14
