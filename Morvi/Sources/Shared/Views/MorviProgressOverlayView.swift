@@ -1,14 +1,14 @@
 import UIKit
 
 final class MorviProgressOverlayView: UIView {
-    private let cardView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialLight))
+    private let cardView = UIVisualEffectView(effect: nil)
     private let faceView = UIView()
     private let ringLayer = CAShapeLayer()
     private let smileLayer = CAShapeLayer()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = UIColor.white.withAlphaComponent(0.30)
+        backgroundColor = .clear
         isUserInteractionEnabled = true
         configureCard()
         configureFace()
@@ -49,9 +49,9 @@ final class MorviProgressOverlayView: UIView {
         cardView.layer.cornerRadius = 34
         cardView.layer.cornerCurve = .continuous
         cardView.layer.masksToBounds = true
-        cardView.backgroundColor = UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 0.88)
+        cardView.backgroundColor = .clear
         cardView.layer.shadowColor = UIColor.black.cgColor
-        cardView.layer.shadowOpacity = 0.18
+        cardView.layer.shadowOpacity = 0
         cardView.layer.shadowOffset = CGSize(width: 0, height: 10)
         cardView.layer.shadowRadius = 24
         addSubview(cardView)
@@ -97,7 +97,7 @@ final class MorviProgressOverlayView: UIView {
         wink.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             wink.leadingAnchor.constraint(equalTo: faceView.leadingAnchor, constant: 29),
-            wink.topAnchor.constraint(equalTo: faceView.topAnchor, constant: 9)
+            wink.topAnchor.constraint(equalTo: faceView.topAnchor, constant: 4)
         ])
 
         smileLayer.strokeColor = UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1).cgColor
