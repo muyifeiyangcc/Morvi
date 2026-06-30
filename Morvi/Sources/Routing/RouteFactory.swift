@@ -94,7 +94,7 @@ enum RouteFactory {
                 [HitArea(frame: CGRect(x: 20, y: 716, width: 335, height: 56)) { scene.navigationController?.popViewController(animated: true) }]
             }
         case .personalDetail:
-            return ReferencePageController(page: .personalDetail) { scene in
+            return AuthSceneController(page: .personalDetail) { scene in
                 [HitArea(frame: CGRect(x: 20, y: 716, width: 335, height: 56)) { scene.enterMainFlow() }]
             }
         default:
