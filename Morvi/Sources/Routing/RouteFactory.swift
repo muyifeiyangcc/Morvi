@@ -14,20 +14,22 @@ enum RouteFactory {
         case .persona:
             return RootTabsController(initialPage: .persona)
         case .signIn:
-            return ReferencePageController(page: .signIn) { scene in
+            return AuthSceneController(page: .signIn) { scene in
                 [
                     HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.enterMainFlow() },
                     HitArea(frame: CGRect(x: 290, y: 570, width: 70, height: 44)) { scene.push(.resetAccess) }
                 ]
             }
         case .signUp:
-            return ReferencePageController(page: .signUp) { scene in
+            return AuthSceneController(page: .signUp) { scene in
                 [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.enterMainFlow() }]
             }
         case .resetAccess:
-            return ReferencePageController(page: .resetAccess) { scene in
+            return AuthSceneController(page: .resetAccess) { scene in
                 [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.push(.signIn) }]
             }
+        case .agreement:
+            return AuthSceneController(page: .agreement)
         case .settings:
             return ReferencePageController(page: .settings) { scene in
                 [

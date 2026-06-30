@@ -10,12 +10,21 @@ final class ReferenceCanvasView: UIView {
         self.page = page
         super.init(frame: .zero)
         clipsToBounds = true
-        backgroundColor = page == .entry ? .clear : .white
+        backgroundColor = usesDecorativeBackground ? .clear : .white
         render()
     }
 
     required init?(coder: NSCoder) {
         nil
+    }
+
+    private var usesDecorativeBackground: Bool {
+        switch page {
+        case .entry, .signIn, .signUp, .resetAccess, .agreement:
+            return true
+        default:
+            return false
+        }
     }
 
     private func render() {
