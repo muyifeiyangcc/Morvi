@@ -827,7 +827,12 @@ final class ReferenceCanvasView: UIView {
     private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool) {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
         let panelTop: CGFloat = portrait ? 245 : 307
-        let panelHeight: CGFloat = portrait ? 340 : 216
+        let titleTop = panelTop + 39
+        let titleHeight = title == nil ? 0 : sourceFont(for: title ?? "", size: 31, weight: .black).lineHeight
+        let textTop: CGFloat = portrait ? 410 : (title == nil ? panelTop + 39 : titleTop + titleHeight + 24)
+        let textHeight = CGFloat(text.components(separatedBy: "\n").count) * sourceFont(for: text, size: 17, weight: .regular).lineHeight
+        let buttonTop: CGFloat = portrait ? 499 : textTop + textHeight + 24
+        let panelHeight: CGFloat = portrait ? 340 : buttonTop + 50 + 36 - panelTop
         let panel = addPanel(top: panelTop, left: 30, width: 322, height: panelHeight, alpha: 1)
         panel.backgroundColor = .clear
         panel.layer.borderWidth = 0
@@ -848,12 +853,11 @@ final class ReferenceCanvasView: UIView {
             addPortrait(top: 286, left: 150, size: 76, tint: .warm)
         }
         if let title {
-            addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : 316, centered: !portrait)
+            addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : titleTop, centered: !portrait)
         }
-        let textTop: CGFloat = portrait ? 410 : (title == nil ? 348 : 385)
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
-        addPillButton("Cancel", top: portrait ? 499 : 437, left: 66, width: 112, dark: !portrait, usesOneFont: true)
-        addPillButton(confirm, top: portrait ? 499 : 437, left: 204, width: 112, dark: true, usesOneFont: true)
+        addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: !portrait, usesOneFont: true)
+        addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, usesOneFont: true)
     }
 
     private func popupBackgroundImage() -> UIImage? {
