@@ -635,9 +635,9 @@ final class ReferenceCanvasView: UIView {
         } else {
             addSmallField(nil, imageName: "theme_add_icon", top: 126, left: 20, width: 78)
         }
-        addText("Description:", size: 17, weight: .regular, top: 189, left: 20)
-        addLargeField("Say something", top: 220)
-        addUploadBox(top: 335) { [weak self] in
+        addText("Description:", size: 17, weight: .regular, top: 190, left: 20)
+        addLargeField("Say something", top: 222)
+        addUploadBox(top: 337) { [weak self] in
             guard !filled else { return }
             self?.didRequestOverlayPage?(.uploadFilled)
         }
