@@ -941,7 +941,7 @@ final class ReferenceCanvasView: UIView {
         let textSize = (text as NSString).size(withAttributes: [.font: font])
         let width = ceil(textSize.width) + horizontalPadding * 2
         let height = ceil(font.lineHeight) + topPadding + bottomPadding
-        let shadowDrop: CGFloat = 5
+        let shadowDrop: CGFloat = 3
         let left = avatarLeft + avatarSize / 2 - width / 2
         let top = avatarTop + avatarSize - height / 2
 
