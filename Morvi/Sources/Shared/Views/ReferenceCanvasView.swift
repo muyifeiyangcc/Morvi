@@ -97,7 +97,7 @@ final class ReferenceCanvasView: UIView {
         case .agreement:
             renderAgreement()
         case .accessGate:
-            renderConfirmCard(title: "Log in", text: "To ensure the normal operation\nof the function, please log in to\nyour account first.", confirm: "Log in", portrait: false)
+            renderConfirmCard(title: "Log in", text: "To ensure the normal operation\nof the function, please log in to\nyour account first.", confirm: "Log in", portrait: false, showsWordmark: true)
         case .spendConfirm:
             renderConfirmCard(title: nil, text: "Are you sure you want to spend\n200 diamonds to unlock the AI\nfunction?", confirm: "Sure", portrait: false)
         case .creditShortage:
@@ -824,7 +824,7 @@ final class ReferenceCanvasView: UIView {
         addOptionTile(symbol: "⊘", top: 644, left: 198)
     }
 
-    private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool) {
+    private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool, showsWordmark: Bool = false) {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
         let panelTop: CGFloat = portrait ? 245 : 307
         let titleTop = panelTop + 39
@@ -847,7 +847,9 @@ final class ReferenceCanvasView: UIView {
             backgroundImageView.topAnchor.constraint(equalTo: panel.topAnchor),
             backgroundImageView.bottomAnchor.constraint(equalTo: panel.bottomAnchor)
         ])
-        addText("MORVI", size: 64, weight: .black, top: portrait ? 304 : 306, left: 76, color: UIColor.white.withAlphaComponent(0.22))
+        if showsWordmark {
+            addPopupWordmark(to: panel)
+        }
         if portrait {
             addPortrait(top: 286, left: 150, size: 76, tint: .warm)
         }
@@ -862,6 +864,19 @@ final class ReferenceCanvasView: UIView {
 
     @objc private func closePopupOverlay() {
         removeFromSuperview()
+    }
+
+    private func addPopupWordmark(to panel: UIView) {
+        let imageView = UIImageView(image: UIImage(named: "popup_wordmark"))
+        imageView.contentMode = .scaleAspectFit
+        panel.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
+            imageView.topAnchor.constraint(equalTo: panel.topAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 237),
+            imageView.heightAnchor.constraint(equalToConstant: 88)
+        ])
     }
 
     private func popupBackgroundImage() -> UIImage? {
