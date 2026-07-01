@@ -209,6 +209,27 @@ final class RootTabsController: UIViewController {
             overlayView.topAnchor.constraint(equalTo: view.topAnchor),
             overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        if page == .feelingEditor {
+            installFeelingEditorDismissArea(on: overlayView)
+        }
+    }
+
+    private func installFeelingEditorDismissArea(on overlayView: UIView) {
+        let dismissArea = UIButton(type: .custom)
+        dismissArea.backgroundColor = .clear
+        dismissArea.addTarget(self, action: #selector(dismissActiveOverlay), for: .touchUpInside)
+        overlayView.addSubview(dismissArea)
+        dismissArea.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            dismissArea.leadingAnchor.constraint(equalTo: overlayView.leadingAnchor),
+            dismissArea.trailingAnchor.constraint(equalTo: overlayView.trailingAnchor),
+            dismissArea.topAnchor.constraint(equalTo: overlayView.topAnchor),
+            dismissArea.heightAnchor.constraint(equalToConstant: 371)
+        ])
+    }
+
+    @objc private func dismissActiveOverlay() {
+        view.viewWithTag(9102)?.removeFromSuperview()
     }
 
     @objc private func handleTopLeadingTap() {

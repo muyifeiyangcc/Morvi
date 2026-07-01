@@ -729,11 +729,20 @@ final class ReferenceCanvasView: UIView {
 
     private func renderFeelingEditor() {
         backgroundColor = UIColor.black.withAlphaComponent(0.58)
-        let sheet = addPanel(top: 371, left: 0, width: 375, height: 441, alpha: 1)
+        let sheet = UIView()
         sheet.backgroundColor = .white
         sheet.layer.cornerRadius = 20
+        sheet.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        addSubview(sheet)
+        sheet.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
+            sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
+            sheet.topAnchor.constraint(equalTo: topAnchor, constant: 371),
+            sheet.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
         addGrabber(top: 361)
-        addText("Today's feelings", size: 31, weight: .black, top: 405, left: 20)
+        addText("Today's feelings", size: 31, weight: .black, top: 405, left: 20, usesOneFont: true)
         let card = addPanel(top: 499, left: 20, width: 335, height: 213, alpha: 1)
         card.backgroundColor = .white
         card.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
@@ -1157,6 +1166,7 @@ final class ReferenceCanvasView: UIView {
             || text == "Save your feelings"
             || text == "Discover"
             || text == "Recot Bot"
+            || text == "Upload"
     }
 
     private func sourceFont(for text: String, size: CGFloat, weight: UIFont.Weight) -> UIFont {
@@ -1540,10 +1550,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addLargeField(_ text: String, top: CGFloat, height: CGFloat = 98) {
-        let field = UILabel()
-        field.text = text
-        field.textColor = .darkGray
-        field.font = AppFont.source(14)
+        let field = UIView()
         field.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
         field.layer.cornerRadius = 10
         field.layer.borderWidth = 1
@@ -1556,6 +1563,22 @@ final class ReferenceCanvasView: UIView {
             field.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             field.topAnchor.constraint(equalTo: topAnchor, constant: top),
             field.heightAnchor.constraint(equalToConstant: height)
+        ])
+
+        let inputView = UITextView()
+        inputView.text = text
+        inputView.textColor = .darkGray
+        inputView.font = AppFont.source(14)
+        inputView.backgroundColor = .clear
+        inputView.textContainerInset = .zero
+        inputView.textContainer.lineFragmentPadding = 0
+        field.addSubview(inputView)
+        inputView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            inputView.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
+            inputView.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -16),
+            inputView.topAnchor.constraint(equalTo: field.topAnchor, constant: 12),
+            inputView.bottomAnchor.constraint(equalTo: field.bottomAnchor, constant: -12)
         ])
     }
 
