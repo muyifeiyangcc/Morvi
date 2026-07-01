@@ -859,11 +859,31 @@ final class ReferenceCanvasView: UIView {
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
         let cancelButton = addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: false, fontWeight: .medium)
         cancelButton.addTarget(self, action: #selector(closePopupOverlay), for: .touchUpInside)
-        addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, fontWeight: .medium)
+        let confirmButton = addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, fontWeight: .medium)
+        if page == .accessGate {
+            confirmButton.addTarget(self, action: #selector(openSignInFromPopup), for: .touchUpInside)
+        }
     }
 
     @objc private func closePopupOverlay() {
         removeFromSuperview()
+    }
+
+    @objc private func openSignInFromPopup() {
+        let controller = owningController()
+        removeFromSuperview()
+        controller?.navigationController?.setViewControllers([RouteFactory.controller(for: .signIn)], animated: true)
+    }
+
+    private func owningController() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let current = responder {
+            if let controller = current as? UIViewController {
+                return controller
+            }
+            responder = current.next
+        }
+        return nil
     }
 
     private func addPopupWordmark(to panel: UIView) {
