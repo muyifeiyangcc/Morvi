@@ -798,9 +798,9 @@ final class ReferenceCanvasView: UIView {
         addMoodPreview(
             topAnchor: card.topAnchor,
             topOffset: -41,
-            trailing: 20,
+            trailing: 40,
             size: 100,
-            parent: card
+            parent: sheet
         )
         let feelingInput = addLargeField(
             "Input here...",
