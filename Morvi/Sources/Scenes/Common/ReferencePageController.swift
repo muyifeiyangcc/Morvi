@@ -1,15 +1,26 @@
 import UIKit
 
 class ReferencePageController: BaseSceneController {
+    private let page: ScenePage
     private let areasBuilder: ((ReferencePageController) -> [HitArea])?
 
     init(page: ScenePage, areas: ((ReferencePageController) -> [HitArea])? = nil) {
+        self.page = page
         self.areasBuilder = areas
         super.init(page: page)
     }
 
     required init?(coder: NSCoder) {
         nil
+    }
+
+    override func makeDecorativeLayer() -> UIView? {
+        switch page {
+        case .discover:
+            return DecorativeGradientView(palette: .topLeftGlow)
+        default:
+            return nil
+        }
     }
 
     override func viewDidLayoutSubviews() {
