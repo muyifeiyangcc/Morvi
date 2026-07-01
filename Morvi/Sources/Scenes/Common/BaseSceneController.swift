@@ -156,6 +156,9 @@ class BaseSceneController: UIViewController {
                 self?.dismissCanvasOverlay()
             }
         }
+        overlayView.didRequestOverlayPage = { [weak self] targetPage in
+            self?.showCanvasOverlay(targetPage)
+        }
     }
 
     private func dismissCanvasOverlay() {

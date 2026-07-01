@@ -49,6 +49,9 @@ class ReferencePageController: BaseSceneController {
             overlayView.topAnchor.constraint(equalTo: view.topAnchor),
             overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        overlayView.didRequestOverlayPage = { [weak self] targetPage in
+            self?.showOverlay(targetPage)
+        }
     }
 
     func enterMainFlow() {

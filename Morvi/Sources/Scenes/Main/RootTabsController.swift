@@ -215,6 +215,9 @@ final class RootTabsController: UIViewController {
                 self?.dismissActiveOverlay()
             }
         }
+        overlayView.didRequestOverlayPage = { [weak self] targetPage in
+            self?.showOverlay(targetPage)
+        }
     }
 
     private func dismissActiveOverlay() {

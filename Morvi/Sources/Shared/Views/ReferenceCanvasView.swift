@@ -962,7 +962,9 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = sheet
         addText("Report or block", size: 31, weight: .black, top: 28, left: 20, usesOneFont: true)
         addOptionTile(iconName: "restrict_report_icon", top: 81, left: 49, width: 130)
-        addOptionTile(iconName: "restrict_block_icon", top: 81, left: 196, width: 130)
+        addOptionTile(iconName: "restrict_block_icon", top: 81, left: 196, width: 130) { [weak self] in
+            self?.didRequestOverlayPage?(.restrictConfirm)
+        }
         activeLayoutContainer = nil
         installBlankAreaKeyboardDismissal()
     }
@@ -2018,7 +2020,13 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addOptionTile(iconName: String, top: CGFloat, left: CGFloat, width: CGFloat = 158) {
+    private func addOptionTile(
+        iconName: String,
+        top: CGFloat,
+        left: CGFloat,
+        width: CGFloat = 158,
+        action: (() -> Void)? = nil
+    ) {
         let layoutContainer = activeLayoutContainer ?? self
         let tile = UIView()
         tile.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
@@ -2043,6 +2051,17 @@ final class ReferenceCanvasView: UIView {
             iconView.widthAnchor.constraint(equalToConstant: 60),
             iconView.heightAnchor.constraint(equalToConstant: 60)
         ])
+        if let action {
+            let button = ClearTapButton(frame: .zero, action: action)
+            tile.addSubview(button)
+            button.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                button.leadingAnchor.constraint(equalTo: tile.leadingAnchor),
+                button.trailingAnchor.constraint(equalTo: tile.trailingAnchor),
+                button.topAnchor.constraint(equalTo: tile.topAnchor),
+                button.bottomAnchor.constraint(equalTo: tile.bottomAnchor)
+            ])
+        }
     }
 
     @discardableResult
