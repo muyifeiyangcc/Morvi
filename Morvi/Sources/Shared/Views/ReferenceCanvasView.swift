@@ -851,7 +851,7 @@ final class ReferenceCanvasView: UIView {
             addPopupWordmark(to: panel)
         }
         if portrait {
-            addPortrait(top: 286, left: 150, size: 76, tint: .warm)
+            addRestrictPopupAvatar(top: 286, left: 150, size: 76)
         }
         if let title {
             addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : titleTop, centered: !portrait, usesOneFont: true)
@@ -899,6 +899,33 @@ final class ReferenceCanvasView: UIView {
             imageView.topAnchor.constraint(equalTo: panel.topAnchor, constant: 15),
             imageView.widthAnchor.constraint(equalToConstant: 237),
             imageView.heightAnchor.constraint(equalToConstant: 88)
+        ])
+    }
+
+    private func addRestrictPopupAvatar(top: CGFloat, left: CGFloat, size: CGFloat) {
+        let ringInset: CGFloat = 2
+        let ringView = UIImageView(image: UIImage(named: "restrict_avatar_ring"))
+        ringView.contentMode = .scaleAspectFit
+        addSubview(ringView)
+        ringView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            ringView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left - ringInset),
+            ringView.topAnchor.constraint(equalTo: topAnchor, constant: top - ringInset),
+            ringView.widthAnchor.constraint(equalToConstant: size + ringInset * 2),
+            ringView.heightAnchor.constraint(equalToConstant: size + ringInset * 2)
+        ])
+
+        let imageView = UIImageView(image: UIImage(named: "profile_avatar"))
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = size / 2
+        imageView.layer.masksToBounds = true
+        addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            imageView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            imageView.widthAnchor.constraint(equalToConstant: size),
+            imageView.heightAnchor.constraint(equalToConstant: size)
         ])
     }
 
