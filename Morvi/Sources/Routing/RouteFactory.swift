@@ -8,11 +8,33 @@ enum RouteFactory {
         case .home:
             return RootTabsController(initialPage: .home)
         case .discover:
-            return RootTabsController(initialPage: .discover)
+            return ReferencePageController(page: .discover) { scene in
+                [
+                    HitArea(frame: CGRect(x: 20, y: 142, width: 50, height: 70)) { scene.push(.uploadEmpty) },
+                    HitArea(frame: CGRect(x: 20, y: 286, width: 335, height: 360)) { scene.push(.galleryDetail) },
+                    HitArea(frame: CGRect(x: 98, y: 142, width: 50, height: 70)) { scene.push(.publicPersona) },
+                    HitArea(frame: CGRect(x: 100, y: 656, width: 118, height: 44)) { scene.push(.repliesPanel) }
+                ]
+            }
         case .dialogueList:
-            return RootTabsController(initialPage: .dialogueList)
+            return ReferencePageController(page: .dialogueList) { scene in
+                [
+                    HitArea(frame: CGRect(x: 20, y: 146, width: 164, height: 186)) { scene.push(.directDialogue) },
+                    HitArea(frame: CGRect(x: 192, y: 146, width: 164, height: 186)) { scene.push(.directDialogue) },
+                    HitArea(frame: CGRect(x: 20, y: 342, width: 164, height: 186)) { scene.push(.directDialogue) },
+                    HitArea(frame: CGRect(x: 192, y: 342, width: 164, height: 186)) { scene.push(.directDialogue) }
+                ]
+            }
         case .persona:
-            return RootTabsController(initialPage: .persona)
+            return ReferencePageController(page: .persona) { scene in
+                [
+                    HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { scene.push(.profileEditor) },
+                    HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { scene.push(.settings) },
+                    HitArea(frame: CGRect(x: 20, y: 364, width: 162, height: 232)) { scene.push(.galleryDetail) },
+                    HitArea(frame: CGRect(x: 192, y: 364, width: 164, height: 164)) { scene.push(.galleryDetail) },
+                    HitArea(frame: CGRect(x: 192, y: 538, width: 164, height: 180)) { scene.push(.galleryDetail) }
+                ]
+            }
         case .signIn:
             return AuthSceneController(page: .signIn) { scene in
                 [
