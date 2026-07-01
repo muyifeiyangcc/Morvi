@@ -961,8 +961,8 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = sheet
         addText("Report or block", size: 31, weight: .black, top: 28, left: 20, usesOneFont: true)
-        addOptionTile(symbol: "⚑", top: 84, left: 20)
-        addOptionTile(symbol: "⊘", top: 84, left: 198)
+        addOptionTile(iconName: "restrict_report_icon", top: 81, left: 49, width: 130)
+        addOptionTile(iconName: "restrict_block_icon", top: 81, left: 196, width: 130)
         activeLayoutContainer = nil
         installBlankAreaKeyboardDismissal()
     }
@@ -2018,7 +2018,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addOptionTile(symbol: String, top: CGFloat, left: CGFloat) {
+    private func addOptionTile(iconName: String, top: CGFloat, left: CGFloat, width: CGFloat = 158) {
         let layoutContainer = activeLayoutContainer ?? self
         let tile = UIView()
         tile.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
@@ -2030,19 +2030,18 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             tile.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
             tile.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            tile.widthAnchor.constraint(equalToConstant: 158),
+            tile.widthAnchor.constraint(equalToConstant: width),
             tile.heightAnchor.constraint(equalToConstant: 120)
         ])
-        let label = UILabel()
-        label.text = symbol
-        label.textAlignment = .center
-        label.font = AppFont.source(48, weight: .black)
-        label.textColor = .gray
-        tile.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
+        let iconView = UIImageView(image: UIImage(named: iconName))
+        iconView.contentMode = .scaleAspectFit
+        tile.addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: tile.centerYAnchor)
+            iconView.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
+            iconView.centerYAnchor.constraint(equalTo: tile.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 60),
+            iconView.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
 
