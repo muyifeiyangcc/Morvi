@@ -6,13 +6,15 @@ final class ReferenceCanvasView: UIView {
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
 
     private let page: ScenePage
+    private let selectedMoodIndex: Int
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
 
-    init(page: ScenePage) {
+    init(page: ScenePage, selectedMoodIndex: Int = 1) {
         self.page = page
+        self.selectedMoodIndex = selectedMoodIndex
         super.init(frame: .zero)
         NotificationCenter.default.addObserver(
             self,
@@ -1826,7 +1828,6 @@ final class ReferenceCanvasView: UIView {
 
     private func addMoodRow(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
-        let selectedMoodIndex = 1
         let moodColor = UIColor(red: 1, green: 240 / 255, blue: 110 / 255, alpha: 1)
         ["home_mood_smile", "home_mood_happy", "home_mood_laugh"].enumerated().forEach { index, imageName in
             let tile = UIView()

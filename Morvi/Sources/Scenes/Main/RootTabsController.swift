@@ -2,6 +2,7 @@ import UIKit
 
 final class RootTabsController: UIViewController {
     private var currentPage: ScenePage
+    private var selectedMoodIndex = 1
     private var canvasView: ReferenceCanvasView?
     private let dockView = FloatingDockView()
     private var surfaceView = DesignSurfaceView()
@@ -27,7 +28,7 @@ final class RootTabsController: UIViewController {
     private func renderCurrentPage() {
         view.subviews.forEach { $0.removeFromSuperview() }
         surfaceView = DesignSurfaceView()
-        let newCanvasView = ReferenceCanvasView(page: currentPage)
+        let newCanvasView = ReferenceCanvasView(page: currentPage, selectedMoodIndex: selectedMoodIndex)
         view.addSubview(surfaceView)
         surfaceView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -107,6 +108,9 @@ final class RootTabsController: UIViewController {
         switch currentPage {
         case .home:
             installHitAreas([
+                HitArea(frame: CGRect(x: 20, y: 340, width: 100, height: 100)) { [weak self] in self?.selectMood(at: 0) },
+                HitArea(frame: CGRect(x: 132, y: 340, width: 100, height: 100)) { [weak self] in self?.selectMood(at: 1) },
+                HitArea(frame: CGRect(x: 244, y: 340, width: 100, height: 100)) { [weak self] in self?.selectMood(at: 2) },
                 HitArea(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in self?.show(.feelingEditor) },
                 HitArea(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in self?.switchTo(.discover) },
                 HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.show(.assistantDialogue) }
@@ -136,6 +140,11 @@ final class RootTabsController: UIViewController {
         default:
             break
         }
+    }
+
+    private func selectMood(at index: Int) {
+        selectedMoodIndex = index
+        renderCurrentPage()
     }
 
     private func installDockView() {
