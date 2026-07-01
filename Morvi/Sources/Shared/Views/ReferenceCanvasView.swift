@@ -743,12 +743,35 @@ final class ReferenceCanvasView: UIView {
         ])
         addGrabber(top: 361)
         addText("Today's feelings", size: 31, weight: .black, top: 405, left: 20, usesOneFont: true)
-        let card = addPanel(top: 499, left: 20, width: 335, height: 213, alpha: 1)
+        let card = UIView()
         card.backgroundColor = .white
+        card.layer.cornerRadius = 18
+        card.layer.borderWidth = 1
         card.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
-        addMoodPreview(top: 458, left: 235, size: 100)
-        addLargeField("Input here...", top: 574, height: 134, horizontalMargin: 36)
-        addButton("Upload", top: 728, filled: true, usesOneFont: true, shadowOpacity: 0, bottomPlateHeight: 3)
+        card.layer.shadowColor = UIColor.black.cgColor
+        card.layer.shadowOpacity = 0.12
+        card.layer.shadowOffset = CGSize(width: 0, height: 4)
+        card.layer.shadowRadius = 14
+        addSubview(card)
+        card.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            card.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            card.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            card.topAnchor.constraint(equalTo: topAnchor, constant: 499),
+            card.heightAnchor.constraint(equalToConstant: 209)
+        ])
+        addMoodPreview(top: 458, trailing: 40, size: 100)
+        addLargeField("Input here...", top: 574, height: 118, horizontalMargin: 36)
+        addButton(
+            "Upload",
+            bottom: 29,
+            trailing: 20,
+            filled: true,
+            usesOneFont: true,
+            cornerRadius: 12,
+            shadowOpacity: 0,
+            bottomPlateHeight: 3
+        )
     }
 
     private func renderWeeklyFeeling() {
@@ -1095,9 +1118,11 @@ final class ReferenceCanvasView: UIView {
 
     private func addButton(
         _ text: String,
-        top: CGFloat,
+        top: CGFloat? = nil,
+        bottom: CGFloat? = nil,
         left: CGFloat = 20,
         width: CGFloat = 335,
+        trailing: CGFloat? = nil,
         filled: Bool,
         dark: Bool = false,
         usesOneFont: Bool = false,
@@ -1115,12 +1140,25 @@ final class ReferenceCanvasView: UIView {
             plate.layer.masksToBounds = true
             layoutContainer.addSubview(plate)
             plate.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
+            var plateConstraints = [
                 plate.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-                plate.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-                plate.widthAnchor.constraint(equalToConstant: width),
                 plate.heightAnchor.constraint(equalToConstant: 52 + bottomPlateHeight)
-            ])
+            ]
+            if let bottom {
+                plateConstraints.append(
+                    plate.bottomAnchor.constraint(equalTo: layoutContainer.bottomAnchor, constant: -bottom)
+                )
+            } else if let top {
+                plateConstraints.append(plate.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
+            }
+            if let trailing {
+                plateConstraints.append(
+                    plate.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing)
+                )
+            } else {
+                plateConstraints.append(plate.widthAnchor.constraint(equalToConstant: width))
+            }
+            NSLayoutConstraint.activate(plateConstraints)
         }
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
@@ -1134,6 +1172,7 @@ final class ReferenceCanvasView: UIView {
         button.layer.shadowOpacity = shadowOpacity ?? (filled ? 0.14 : 0.06)
         button.layer.shadowOffset = shadowOffset
         button.layer.shadowRadius = shadowRadius
+        var gradientLayer: CAGradientLayer?
         if filled {
             let gradient = CAGradientLayer()
             gradient.colors = [
@@ -1142,18 +1181,36 @@ final class ReferenceCanvasView: UIView {
             ]
             gradient.startPoint = CGPoint(x: 0, y: 0.5)
             gradient.endPoint = CGPoint(x: 1, y: 0.5)
-            gradient.frame = CGRect(x: 0, y: 0, width: width, height: 52)
             gradient.cornerRadius = cornerRadius
             button.layer.insertSublayer(gradient, at: 0)
+            gradientLayer = gradient
         }
         layoutContainer.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var buttonConstraints = [
             button.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            button.widthAnchor.constraint(equalToConstant: width),
             button.heightAnchor.constraint(equalToConstant: 52)
-        ])
+        ]
+        if let bottom {
+            buttonConstraints.append(
+                button.bottomAnchor.constraint(
+                    equalTo: layoutContainer.bottomAnchor,
+                    constant: -(bottom + bottomPlateHeight)
+                )
+            )
+        } else if let top {
+            buttonConstraints.append(button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
+        }
+        if let trailing {
+            buttonConstraints.append(
+                button.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing)
+            )
+        } else {
+            buttonConstraints.append(button.widthAnchor.constraint(equalToConstant: width))
+        }
+        NSLayoutConstraint.activate(buttonConstraints)
+        layoutContainer.layoutIfNeeded()
+        gradientLayer?.frame = button.bounds
     }
 
     private func usesFredokaText(_ text: String) -> Bool {
@@ -1907,7 +1964,7 @@ final class ReferenceCanvasView: UIView {
         moodImageNames[min(max(selectedMoodIndex, 0), moodImageNames.count - 1)]
     }
 
-    private func addMoodPreview(top: CGFloat, left: CGFloat, size: CGFloat) {
+    private func addMoodPreview(top: CGFloat, trailing: CGFloat, size: CGFloat) {
         let moodColor = UIColor(red: 1, green: 240 / 255, blue: 110 / 255, alpha: 1)
         let tile = UIView()
         tile.backgroundColor = moodColor
@@ -1919,7 +1976,7 @@ final class ReferenceCanvasView: UIView {
         addSubview(tile)
         tile.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tile.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            tile.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -trailing),
             tile.topAnchor.constraint(equalTo: topAnchor, constant: top),
             tile.widthAnchor.constraint(equalToConstant: size),
             tile.heightAnchor.constraint(equalToConstant: size)
