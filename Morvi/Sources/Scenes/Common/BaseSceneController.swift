@@ -151,6 +151,15 @@ class BaseSceneController: UIViewController {
             overlayView.topAnchor.constraint(equalTo: view.topAnchor),
             overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        if page == .feelingEditor || page == .restrictPanel {
+            overlayView.didTapOutsideContent = { [weak self] in
+                self?.dismissCanvasOverlay()
+            }
+        }
+    }
+
+    private func dismissCanvasOverlay() {
+        view.viewWithTag(9102)?.removeFromSuperview()
     }
 }
 

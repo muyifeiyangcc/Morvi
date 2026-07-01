@@ -933,13 +933,38 @@ final class ReferenceCanvasView: UIView {
 
     private func renderRestrictPanel() {
         backgroundColor = UIColor.black.withAlphaComponent(0.58)
-        let sheet = addPanel(top: 560, left: 0, width: 375, height: 252, alpha: 1)
+        let sheet = UIView()
         sheet.backgroundColor = .white
         sheet.layer.cornerRadius = 20
-        addGrabber(top: 551)
-        addText("Report or block", size: 31, weight: .black, top: 596, left: 20)
-        addOptionTile(symbol: "⚑", top: 644, left: 20)
-        addOptionTile(symbol: "⊘", top: 644, left: 198)
+        sheet.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        addSubview(sheet)
+        sheet.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
+            sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
+            sheet.bottomAnchor.constraint(equalTo: bottomAnchor),
+            sheet.heightAnchor.constraint(equalToConstant: 252)
+        ])
+        overlayContentView = sheet
+
+        let grabber = UIView()
+        grabber.backgroundColor = .white
+        grabber.layer.cornerRadius = 2
+        addSubview(grabber)
+        grabber.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            grabber.centerXAnchor.constraint(equalTo: centerXAnchor),
+            grabber.bottomAnchor.constraint(equalTo: sheet.topAnchor, constant: -5),
+            grabber.widthAnchor.constraint(equalToConstant: 112),
+            grabber.heightAnchor.constraint(equalToConstant: 4)
+        ])
+
+        activeLayoutContainer = sheet
+        addText("Report or block", size: 31, weight: .black, top: 36, left: 20)
+        addOptionTile(symbol: "⚑", top: 84, left: 20)
+        addOptionTile(symbol: "⊘", top: 84, left: 198)
+        activeLayoutContainer = nil
+        installBlankAreaKeyboardDismissal()
     }
 
     private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool, showsWordmark: Bool = false) {
@@ -1994,16 +2019,17 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addOptionTile(symbol: String, top: CGFloat, left: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let tile = UIView()
         tile.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
         tile.layer.cornerRadius = 10
         tile.layer.borderWidth = 1
         tile.layer.borderColor = UIColor(red: 0.53, green: 0.86, blue: 0.10, alpha: 1).cgColor
-        addSubview(tile)
+        layoutContainer.addSubview(tile)
         tile.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tile.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            tile.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            tile.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            tile.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             tile.widthAnchor.constraint(equalToConstant: 158),
             tile.heightAnchor.constraint(equalToConstant: 120)
         ])
