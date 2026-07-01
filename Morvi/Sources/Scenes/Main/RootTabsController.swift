@@ -169,7 +169,7 @@ final class RootTabsController: UIViewController {
 
     private func dockItem(for page: ScenePage) -> FloatingDockView.Item {
         switch page {
-        case .discover:
+        case .discover, .weeklyFeeling:
             return .discover
         case .dialogueList:
             return .dialogue
@@ -185,7 +185,7 @@ final class RootTabsController: UIViewController {
         case .home:
             return .home
         case .discover:
-            return .discover
+            return .weeklyFeeling
         case .dialogue:
             return .dialogueList
         case .persona:
