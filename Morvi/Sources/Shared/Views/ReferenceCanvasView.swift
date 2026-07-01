@@ -2327,6 +2327,9 @@ final class ReferenceCanvasView: UIView {
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 48, height: 48)) { [weak self] in
             self?.didRequestPage?(.publicPersona)
         }
+        addDiscoverActionButton(frame: CGRect(x: 68, y: top, width: 160, height: 44)) { [weak self] in
+            self?.didRequestPage?(.publicPersona)
+        }
         addDiscoverActionButton(frame: CGRect(x: 302, y: top, width: 54, height: 44)) { [weak self] in
             self?.didRequestOverlayPage?(.restrictPanel)
         }
