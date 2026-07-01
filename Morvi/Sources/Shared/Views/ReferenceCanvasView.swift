@@ -747,7 +747,7 @@ final class ReferenceCanvasView: UIView {
         card.backgroundColor = .white
         card.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
         addMoodPreview(top: 458, left: 235, size: 100)
-        addLargeField("Input here...", top: 574, height: 134)
+        addLargeField("Input here...", top: 574, height: 134, horizontalMargin: 36)
         addButton("Upload", top: 728, filled: true, usesOneFont: true, shadowOpacity: 0, bottomPlateHeight: 3)
     }
 
@@ -1549,7 +1549,12 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addLargeField(_ text: String, top: CGFloat, height: CGFloat = 98) {
+    private func addLargeField(
+        _ text: String,
+        top: CGFloat,
+        height: CGFloat = 98,
+        horizontalMargin: CGFloat = 20
+    ) {
         let field = UIView()
         field.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
         field.layer.cornerRadius = 10
@@ -1559,8 +1564,8 @@ final class ReferenceCanvasView: UIView {
         addSubview(field)
         field.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            field.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            field.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            field.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalMargin),
+            field.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalMargin),
             field.topAnchor.constraint(equalTo: topAnchor, constant: top),
             field.heightAnchor.constraint(equalToConstant: height)
         ])
