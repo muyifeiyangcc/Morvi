@@ -1644,14 +1644,29 @@ final class ReferenceCanvasView: UIView {
 
     private func addMoodRow(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
-        ["🙂", "😀", "😆"].enumerated().forEach { index, face in
+        let selectedMoodIndex = 1
+        let moodColor = UIColor(red: 1, green: 240 / 255, blue: 110 / 255, alpha: 1)
+        ["home_mood_smile", "home_mood_happy", "home_mood_laugh"].enumerated().forEach { index, imageName in
             let tile = UIView()
-            tile.backgroundColor = UIColor(red: 1, green: 0.91, blue: 0.34, alpha: 0.86)
+            let isSelected = index == selectedMoodIndex
+            tile.backgroundColor = isSelected ? moodColor : .clear
             tile.layer.cornerRadius = 28
             tile.layer.shadowColor = UIColor.black.cgColor
             tile.layer.shadowOpacity = 0.07
             tile.layer.shadowOffset = CGSize(width: 0, height: 5)
             tile.layer.shadowRadius = 12
+            if !isSelected {
+                let gradient = CAGradientLayer()
+                gradient.colors = [
+                    moodColor.cgColor,
+                    moodColor.withAlphaComponent(0).cgColor
+                ]
+                gradient.startPoint = CGPoint(x: 0, y: 0)
+                gradient.endPoint = CGPoint(x: 1, y: 1)
+                gradient.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+                gradient.cornerRadius = 28
+                tile.layer.insertSublayer(gradient, at: 0)
+            }
             layoutContainer.addSubview(tile)
             tile.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
@@ -1660,15 +1675,15 @@ final class ReferenceCanvasView: UIView {
                 tile.widthAnchor.constraint(equalToConstant: 100),
                 tile.heightAnchor.constraint(equalToConstant: 100)
             ])
-            let faceView = UILabel()
-            faceView.text = face
-            faceView.textAlignment = .center
-            faceView.font = AppFont.source(54)
+            let faceView = UIImageView(image: UIImage(named: imageName))
+            faceView.contentMode = .scaleAspectFit
             tile.addSubview(faceView)
             faceView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
                 faceView.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
-                faceView.centerYAnchor.constraint(equalTo: tile.centerYAnchor)
+                faceView.centerYAnchor.constraint(equalTo: tile.centerYAnchor),
+                faceView.widthAnchor.constraint(equalToConstant: 72),
+                faceView.heightAnchor.constraint(equalToConstant: 72)
             ])
         }
     }
