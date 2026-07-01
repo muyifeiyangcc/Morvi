@@ -1607,12 +1607,12 @@ final class ReferenceCanvasView: UIView {
 
         let baseInset = keyboardBaseContentInset ?? .zero
         let baseIndicatorInsets = keyboardBaseIndicatorInsets ?? .zero
-        scrollView.contentInset.bottom = baseInset.bottom + scrollOverlap + 20
-        scrollView.verticalScrollIndicatorInsets.bottom = baseIndicatorInsets.bottom + scrollOverlap + 20
+        scrollView.contentInset.bottom = baseInset.bottom + scrollOverlap + 10
+        scrollView.verticalScrollIndicatorInsets.bottom = baseIndicatorInsets.bottom + scrollOverlap + 10
 
         guard let activeInput = firstResponder(in: scrollView) else { return }
         let targetRect = activeInput.convert(activeInput.bounds.insetBy(dx: 0, dy: -18), to: scrollView)
-        let visibleHeight = max(1, keyboardFrame.minY - scrollFrame.minY - 20)
+        let visibleHeight = max(1, keyboardFrame.minY - scrollFrame.minY - 10)
         let baseOffsetY = keyboardBaseContentOffset?.y ?? scrollView.contentOffset.y
         let requiredOffsetY = max(baseOffsetY, targetRect.maxY - visibleHeight)
         let minimumOffsetY = -scrollView.contentInset.top
