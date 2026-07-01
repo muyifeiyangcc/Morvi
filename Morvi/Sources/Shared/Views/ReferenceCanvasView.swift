@@ -15,6 +15,9 @@ final class ReferenceCanvasView: UIView {
     private weak var keyboardAvoidanceInputView: UIView?
     private weak var overlayContentView: UIView?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
+    private var keyboardBaseContentInset: UIEdgeInsets?
+    private var keyboardBaseIndicatorInsets: UIEdgeInsets?
+    private var keyboardBaseContentOffset: CGPoint?
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
 
@@ -1543,17 +1546,13 @@ final class ReferenceCanvasView: UIView {
         let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) ?? .zero
         let keyboardFrameInView = convert(keyboardFrame, from: nil)
         let overlap = max(0, bounds.maxY - keyboardFrameInView.minY)
+        let isHiding = notification.name == UIResponder.keyboardWillHideNotification
         if let scrollView = keyboardAwareScrollView {
-            let scrollFrameInView = scrollView.convert(scrollView.bounds, to: self)
-            let scrollOverlap = max(0, scrollFrameInView.maxY - keyboardFrameInView.minY)
-            let bottomInset = scrollOverlap > 0 ? scrollOverlap + 20 : 0
-            scrollView.contentInset.bottom = bottomInset
-            scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
-
-            if scrollOverlap > 0, let activeInput = firstResponder(in: scrollView) {
-                let targetRect = activeInput.convert(activeInput.bounds.insetBy(dx: 0, dy: -18), to: scrollView)
-                scrollView.scrollRectToVisible(targetRect, animated: true)
-            }
+            updateKeyboardAwareScrollView(
+                scrollView,
+                keyboardFrame: keyboardFrameInView,
+                isHiding: isHiding
+            )
         }
 
         guard
@@ -1561,7 +1560,6 @@ final class ReferenceCanvasView: UIView {
             let inputView = keyboardAvoidanceInputView
         else { return }
 
-        let isHiding = notification.name == UIResponder.keyboardWillHideNotification
         let inputFrame = inputView.convert(inputView.bounds, to: self)
         let unshiftedInputMaxY = inputFrame.maxY - bottomConstraint.constant
         let requiredOffset = isHiding
@@ -1575,6 +1573,58 @@ final class ReferenceCanvasView: UIView {
         UIView.animate(withDuration: duration, delay: 0, options: options) {
             self.layoutIfNeeded()
         }
+    }
+
+    private func updateKeyboardAwareScrollView(
+        _ scrollView: UIScrollView,
+        keyboardFrame: CGRect,
+        isHiding: Bool
+    ) {
+        let scrollFrame = scrollView.convert(scrollView.bounds, to: self)
+        let scrollOverlap = max(0, scrollFrame.maxY - keyboardFrame.minY)
+
+        if isHiding || scrollOverlap == 0 {
+            if let baseInset = keyboardBaseContentInset {
+                scrollView.contentInset = baseInset
+            }
+            if let baseIndicatorInsets = keyboardBaseIndicatorInsets {
+                scrollView.verticalScrollIndicatorInsets = baseIndicatorInsets
+            }
+            if let baseOffset = keyboardBaseContentOffset {
+                scrollView.setContentOffset(baseOffset, animated: true)
+            }
+            keyboardBaseContentInset = nil
+            keyboardBaseIndicatorInsets = nil
+            keyboardBaseContentOffset = nil
+            return
+        }
+
+        if keyboardBaseContentInset == nil {
+            keyboardBaseContentInset = scrollView.contentInset
+            keyboardBaseIndicatorInsets = scrollView.verticalScrollIndicatorInsets
+            keyboardBaseContentOffset = scrollView.contentOffset
+        }
+
+        let baseInset = keyboardBaseContentInset ?? .zero
+        let baseIndicatorInsets = keyboardBaseIndicatorInsets ?? .zero
+        scrollView.contentInset.bottom = baseInset.bottom + scrollOverlap + 20
+        scrollView.verticalScrollIndicatorInsets.bottom = baseIndicatorInsets.bottom + scrollOverlap + 20
+
+        guard let activeInput = firstResponder(in: scrollView) else { return }
+        let targetRect = activeInput.convert(activeInput.bounds.insetBy(dx: 0, dy: -18), to: scrollView)
+        let visibleHeight = max(1, keyboardFrame.minY - scrollFrame.minY - 20)
+        let baseOffsetY = keyboardBaseContentOffset?.y ?? scrollView.contentOffset.y
+        let requiredOffsetY = max(baseOffsetY, targetRect.maxY - visibleHeight)
+        let minimumOffsetY = -scrollView.contentInset.top
+        let maximumOffsetY = max(
+            minimumOffsetY,
+            scrollView.contentSize.height + scrollView.contentInset.bottom - scrollView.bounds.height
+        )
+        let clampedOffsetY = min(max(requiredOffsetY, minimumOffsetY), maximumOffsetY)
+        scrollView.setContentOffset(
+            CGPoint(x: scrollView.contentOffset.x, y: clampedOffsetY),
+            animated: true
+        )
     }
 
     private func firstResponder(in view: UIView) -> UIView? {
