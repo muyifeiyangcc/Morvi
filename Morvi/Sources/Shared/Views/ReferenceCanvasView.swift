@@ -608,7 +608,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: sheet.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: sheet.trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 18),
+            scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 13),
             scrollView.bottomAnchor.constraint(equalTo: uploadButton.topAnchor, constant: -10)
         ])
 
@@ -622,22 +622,22 @@ final class ReferenceCanvasView: UIView {
             formView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             formView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             formView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            formView.heightAnchor.constraint(equalToConstant: 445)
+            formView.heightAnchor.constraint(equalToConstant: 450)
         ])
 
         activeLayoutContainer = formView
         addText("Title of work:", size: 17, weight: .regular, top: 0, left: 20)
-        addInputField("Enter the title", top: 27)
+        addInputField("Enter the title", top: 32)
         addText("Theme:", size: 17, weight: .regular, top: 94, left: 20)
         if filled {
-            addSmallField("Theme", top: 121, left: 20, width: 70)
-            addSmallField(nil, imageName: "theme_add_icon", top: 121, left: 108, width: 76)
+            addSmallField("Theme", top: 126, left: 20, width: 70)
+            addSmallField(nil, imageName: "theme_add_icon", top: 126, left: 108, width: 76)
         } else {
-            addSmallField(nil, imageName: "theme_add_icon", top: 121, left: 20, width: 78)
+            addSmallField(nil, imageName: "theme_add_icon", top: 126, left: 20, width: 78)
         }
         addText("Description:", size: 17, weight: .regular, top: 189, left: 20)
-        addLargeField("Say something", top: 215)
-        addUploadBox(top: 330) { [weak self] in
+        addLargeField("Say something", top: 220)
+        addUploadBox(top: 335) { [weak self] in
             guard !filled else { return }
             self?.didRequestOverlayPage?(.uploadFilled)
         }
