@@ -63,7 +63,7 @@ class BaseSceneController: UIViewController {
         topLayer.configure(
             title: navigationTitleText(),
             statusBarHeight: statusBarHeight,
-            showsBackIcon: page != .entry
+            showsBackIcon: page != .entry || navigationController?.presentingViewController != nil
         )
         surfaceView.contentView.addSubview(topLayer)
         topLayer.translatesAutoresizingMaskIntoConstraints = false
@@ -121,8 +121,14 @@ class BaseSceneController: UIViewController {
     }
 
     @objc private func returnToPreviousScene() {
-        guard let stack = navigationController?.viewControllers, stack.count > 1 else { return }
-        navigationController?.popViewController(animated: true)
+        guard let navigationController else { return }
+        if navigationController.viewControllers.count > 1 {
+            navigationController.popViewController(animated: true)
+            return
+        }
+        if navigationController.presentingViewController != nil {
+            navigationController.dismiss(animated: true)
+        }
     }
 }
 
