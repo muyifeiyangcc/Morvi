@@ -827,9 +827,21 @@ final class ReferenceCanvasView: UIView {
     private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool) {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
         let panel = addPanel(top: portrait ? 245 : 307, left: 30, width: 322, height: portrait ? 340 : 216, alpha: 1)
-        panel.backgroundColor = UIColor(red: 0.90, green: 1.0, blue: 0.75, alpha: 1)
+        panel.backgroundColor = .clear
         panel.layer.borderWidth = 0
         panel.layer.cornerRadius = 64
+        panel.layer.masksToBounds = true
+        let backgroundImageView = UIImageView(image: UIImage(named: "login_popup_background"))
+        backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.clipsToBounds = true
+        panel.addSubview(backgroundImageView)
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            backgroundImageView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+            backgroundImageView.topAnchor.constraint(equalTo: panel.topAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: panel.bottomAnchor)
+        ])
         addText("MORVI", size: 64, weight: .black, top: portrait ? 304 : 306, left: 76, color: UIColor.white.withAlphaComponent(0.22))
         addRing(top: portrait ? 282 : 294)
         if portrait {
