@@ -7,9 +7,11 @@ final class ReferenceCanvasView: UIView {
 
     private let page: ScenePage
     private let selectedMoodIndex: Int
+    var didTapOutsideContent: (() -> Void)?
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var keyboardAvoidanceInputView: UIView?
+    private weak var overlayContentView: UIView?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
@@ -744,6 +746,7 @@ final class ReferenceCanvasView: UIView {
             sheetBottomConstraint
         ])
         keyboardAvoidanceBottomConstraint = sheetBottomConstraint
+        overlayContentView = sheet
 
         let grabber = UIView()
         grabber.backgroundColor = .white
@@ -1400,14 +1403,23 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func installBlankAreaKeyboardDismissal() {
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardFromBlankArea))
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(handleBlankAreaTap))
         gesture.cancelsTouchesInView = false
         gesture.delegate = self
         addGestureRecognizer(gesture)
     }
 
-    @objc private func dismissKeyboardFromBlankArea() {
-        endEditing(true)
+    @objc private func handleBlankAreaTap(_ gesture: UITapGestureRecognizer) {
+        guard let contentView = overlayContentView else {
+            endEditing(true)
+            return
+        }
+
+        if contentView.frame.contains(gesture.location(in: self)) {
+            endEditing(true)
+        } else {
+            didTapOutsideContent?()
+        }
     }
 
     @objc private func handleKeyboardFrameChange(_ notification: Notification) {
