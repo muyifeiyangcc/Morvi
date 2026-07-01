@@ -848,7 +848,6 @@ final class ReferenceCanvasView: UIView {
             backgroundImageView.bottomAnchor.constraint(equalTo: panel.bottomAnchor)
         ])
         addText("MORVI", size: 64, weight: .black, top: portrait ? 304 : 306, left: 76, color: UIColor.white.withAlphaComponent(0.22))
-        addRing(top: portrait ? 282 : 294)
         if portrait {
             addPortrait(top: 286, left: 150, size: 76, tint: .warm)
         }
@@ -1630,20 +1629,6 @@ final class ReferenceCanvasView: UIView {
             label.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
             label.centerYAnchor.constraint(equalTo: tile.centerYAnchor)
         ])
-    }
-
-    private func addRing(top: CGFloat) {
-        let ring = UILabel()
-        ring.text = "◌"
-        ring.font = AppFont.source(38)
-        ring.textColor = .white
-        addSubview(ring)
-        ring.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            ring.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 22),
-            ring.topAnchor.constraint(equalTo: topAnchor, constant: top)
-        ])
-        addCircle(text: "", top: top + 20, left: 40, size: 9, color: .gray)
     }
 
     private func addPillButton(
