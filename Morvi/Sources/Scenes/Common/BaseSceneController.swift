@@ -96,6 +96,8 @@ class BaseSceneController: UIViewController {
             return "Settings"
         case .wallet:
             return "Wallet"
+        case .discover:
+            return "Discover"
         case .directDialogue, .voiceDialogue:
             return "Victoria"
         case .assistantDialogue:
