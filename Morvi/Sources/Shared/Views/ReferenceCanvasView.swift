@@ -828,8 +828,13 @@ final class ReferenceCanvasView: UIView {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
         let panelTop: CGFloat = portrait ? 245 : 307
         let titleTop = panelTop + 39
+        let portraitAvatarTop: CGFloat = 286
+        let portraitAvatarLeft: CGFloat = 150
+        let portraitAvatarSize: CGFloat = 76
         let titleHeight = title == nil ? 0 : AppFont.fredoka(31).lineHeight
-        let textTop: CGFloat = portrait ? 410 : (title == nil ? panelTop + 39 : titleTop + titleHeight + 24)
+        let textTop: CGFloat = portrait
+            ? portraitAvatarTop + portraitAvatarSize + restrictPopupNamePillHeight() / 2 + 20
+            : (title == nil ? panelTop + 39 : titleTop + titleHeight + 24)
         let textHeight = CGFloat(text.components(separatedBy: "\n").count) * sourceFont(for: text, size: 17, weight: .regular).lineHeight
         let buttonTop: CGFloat = portrait ? 499 : textTop + textHeight + 24
         let panelHeight: CGFloat = portrait ? 340 : buttonTop + 50 + 36 - panelTop
@@ -851,11 +856,11 @@ final class ReferenceCanvasView: UIView {
             addPopupWordmark(to: panel)
         }
         if portrait {
-            addRestrictPopupAvatar(top: 286, left: 150, size: 76)
+            addRestrictPopupAvatar(top: portraitAvatarTop, left: portraitAvatarLeft, size: portraitAvatarSize)
         }
         if let title {
             if portrait {
-                addRestrictPopupNamePill(title, avatarTop: 286, avatarLeft: 150, avatarSize: 76)
+                addRestrictPopupNamePill(title, avatarTop: portraitAvatarTop, avatarLeft: portraitAvatarLeft, avatarSize: portraitAvatarSize)
             } else {
                 addText(title, size: 31, weight: .black, top: titleTop, centered: true, usesOneFont: true)
             }
@@ -940,7 +945,7 @@ final class ReferenceCanvasView: UIView {
         let bottomPadding: CGFloat = 3
         let textSize = (text as NSString).size(withAttributes: [.font: font])
         let width = ceil(textSize.width) + horizontalPadding * 2
-        let height = ceil(font.lineHeight) + topPadding + bottomPadding
+        let height = restrictPopupNamePillHeight()
         let shadowDrop: CGFloat = 3
         let left = avatarLeft + avatarSize / 2 - width / 2
         let top = avatarTop + avatarSize - height / 2
@@ -994,6 +999,10 @@ final class ReferenceCanvasView: UIView {
             label.topAnchor.constraint(equalTo: pillView.topAnchor, constant: topPadding),
             label.bottomAnchor.constraint(equalTo: pillView.bottomAnchor, constant: -bottomPadding)
         ])
+    }
+
+    private func restrictPopupNamePillHeight() -> CGFloat {
+        ceil(AppFont.source(16, weight: .medium).lineHeight) + 3
     }
 
     private func popupBackgroundImage() -> UIImage? {
