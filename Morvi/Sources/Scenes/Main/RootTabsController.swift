@@ -29,6 +29,12 @@ final class RootTabsController: UIViewController {
         view.subviews.forEach { $0.removeFromSuperview() }
         surfaceView = DesignSurfaceView()
         let newCanvasView = ReferenceCanvasView(page: currentPage, selectedMoodIndex: selectedMoodIndex)
+        newCanvasView.didRequestPage = { [weak self] page in
+            self?.show(page)
+        }
+        newCanvasView.didRequestOverlayPage = { [weak self] page in
+            self?.showOverlay(page)
+        }
         view.addSubview(surfaceView)
         surfaceView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -116,12 +122,7 @@ final class RootTabsController: UIViewController {
                 HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.show(.assistantDialogue) }
             ])
         case .discover:
-            installHitAreas([
-                HitArea(frame: CGRect(x: 20, y: 142, width: 50, height: 70)) { [weak self] in self?.show(.uploadEmpty) },
-                HitArea(frame: CGRect(x: 20, y: 286, width: 335, height: 360)) { [weak self] in self?.show(.galleryDetail) },
-                HitArea(frame: CGRect(x: 98, y: 142, width: 50, height: 70)) { [weak self] in self?.show(.publicPersona) },
-                HitArea(frame: CGRect(x: 100, y: 656, width: 118, height: 44)) { [weak self] in self?.show(.repliesPanel) }
-            ])
+            break
         case .dialogueList:
             installHitAreas([
                 HitArea(frame: CGRect(x: 20, y: 146, width: 164, height: 186)) { [weak self] in self?.show(.directDialogue) },

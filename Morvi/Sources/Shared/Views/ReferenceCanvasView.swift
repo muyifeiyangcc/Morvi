@@ -8,6 +8,8 @@ final class ReferenceCanvasView: UIView {
     private let page: ScenePage
     private let selectedMoodIndex: Int
     var didTapOutsideContent: (() -> Void)?
+    var didRequestPage: ((ScenePage) -> Void)?
+    var didRequestOverlayPage: ((ScenePage) -> Void)?
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var keyboardAvoidanceInputView: UIView?
@@ -2279,6 +2281,9 @@ final class ReferenceCanvasView: UIView {
     private func addStoryStrip(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let stripView = DiscoverStoryStripView()
+        stripView.didSelectEntry = { [weak self] index in
+            self?.didRequestPage?(index == 0 ? .uploadEmpty : .publicPersona)
+        }
         layoutContainer.addSubview(stripView)
         stripView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -2316,6 +2321,21 @@ final class ReferenceCanvasView: UIView {
         addFeedMoreIcon(top: top + 6, left: 314)
         addTags(top: top + 366)
         addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: top + 424, left: 22, color: .darkGray)
+        addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 335, height: 444)) { [weak self] in
+            self?.didRequestPage?(.galleryDetail)
+        }
+        addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 48, height: 48)) { [weak self] in
+            self?.didRequestPage?(.publicPersona)
+        }
+        addDiscoverActionButton(frame: CGRect(x: 302, y: top, width: 54, height: 44)) { [weak self] in
+            self?.didRequestOverlayPage?(.restrictPanel)
+        }
+    }
+
+    private func addDiscoverActionButton(frame: CGRect, action: @escaping () -> Void) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let button = ClearTapButton(frame: frame, action: action)
+        layoutContainer.addSubview(button)
     }
 
     private func addFeedMoreIcon(top: CGFloat, left: CGFloat) {

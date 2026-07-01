@@ -21,6 +21,12 @@ class BaseSceneController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = .white
         let canvasView = ReferenceCanvasView(page: page)
+        canvasView.didRequestPage = { [weak self] targetPage in
+            self?.navigationController?.pushViewController(RouteFactory.controller(for: targetPage), animated: true)
+        }
+        canvasView.didRequestOverlayPage = { [weak self] targetPage in
+            self?.showCanvasOverlay(targetPage)
+        }
         view.addSubview(surfaceView)
         surfaceView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -131,6 +137,20 @@ class BaseSceneController: UIViewController {
         if navigationController.presentingViewController != nil {
             navigationController.dismiss(animated: true)
         }
+    }
+
+    private func showCanvasOverlay(_ page: ScenePage) {
+        let overlayView = ReferenceCanvasView(page: page)
+        overlayView.tag = 9102
+        view.viewWithTag(9102)?.removeFromSuperview()
+        view.addSubview(overlayView)
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 }
 

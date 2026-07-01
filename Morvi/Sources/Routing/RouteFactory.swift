@@ -8,14 +8,7 @@ enum RouteFactory {
         case .home:
             return RootTabsController(initialPage: .home)
         case .discover:
-            return ReferencePageController(page: .discover) { scene in
-                [
-                    HitArea(frame: CGRect(x: 20, y: 142, width: 50, height: 70)) { scene.push(.uploadEmpty) },
-                    HitArea(frame: CGRect(x: 20, y: 286, width: 335, height: 360)) { scene.push(.galleryDetail) },
-                    HitArea(frame: CGRect(x: 98, y: 142, width: 50, height: 70)) { scene.push(.publicPersona) },
-                    HitArea(frame: CGRect(x: 100, y: 656, width: 118, height: 44)) { scene.push(.repliesPanel) }
-                ]
-            }
+            return ReferencePageController(page: .discover)
         case .dialogueList:
             return ReferencePageController(page: .dialogueList) { scene in
                 [

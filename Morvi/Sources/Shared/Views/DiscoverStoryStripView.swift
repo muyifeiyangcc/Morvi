@@ -15,6 +15,8 @@ final class DiscoverStoryStripView: UIView {
         StripEntry(title: "Jasper", imageName: "profile_avatar", clipsToCircle: true)
     ]
 
+    var didSelectEntry: ((Int) -> Void)?
+
     private let collectionView: UICollectionView
 
     override init(frame: CGRect) {
@@ -66,6 +68,10 @@ extension DiscoverStoryStripView: UICollectionViewDataSource, UICollectionViewDe
         }
         cell.configure(with: entries[indexPath.item])
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        didSelectEntry?(indexPath.item)
     }
 }
 
