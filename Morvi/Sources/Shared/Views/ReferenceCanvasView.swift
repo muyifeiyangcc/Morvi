@@ -216,9 +216,40 @@ final class ReferenceCanvasView: UIView {
 
     private func renderDiscover() {
         addTopTitle("Discover")
-        addStoryStrip()
-        addFeedCard(name: "Victoria", top: 246, tint: .coast)
-        addFeedCard(name: "Rowan", top: 686, tint: .sky)
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 1090)
+        ])
+
+        activeLayoutContainer = scrollContent
+        addStoryStrip(top: 22)
+        addFeedCard(name: "Victoria", top: 126, tint: .coast)
+        addFeedCard(name: "Rowan", top: 594, tint: .sky)
+        activeLayoutContainer = nil
     }
 
     private func renderDialogueList() {
@@ -2135,7 +2166,11 @@ final class ReferenceCanvasView: UIView {
         title: String,
         tint: MediaTint = .coast,
         action: MediaAction = .none,
-        imageName: String? = nil
+        imageName: String? = nil,
+        cornerRadius: CGFloat = 14,
+        titleSize: CGFloat = 24,
+        titleTop: CGFloat = 18,
+        titleUsesOneFont: Bool = false
     ) {
         let layoutContainer = activeLayoutContainer ?? self
         let shadowHost = UIView()
@@ -2153,8 +2188,8 @@ final class ReferenceCanvasView: UIView {
             shadowHost.heightAnchor.constraint(equalToConstant: height)
         ])
         let block = UIView()
-        block.backgroundColor = tint.baseColor
-        block.layer.cornerRadius = 14
+        block.backgroundColor = imageName == nil ? tint.baseColor : .clear
+        block.layer.cornerRadius = cornerRadius
         block.layer.masksToBounds = true
         shadowHost.addSubview(block)
         block.translatesAutoresizingMaskIntoConstraints = false
@@ -2191,12 +2226,14 @@ final class ReferenceCanvasView: UIView {
             let label = UILabel()
             label.text = title
             label.textColor = .white
-            label.font = usesFredokaText(title) ? AppFont.fredoka(24) : AppFont.source(24, weight: .black)
+            label.font = titleUsesOneFont || usesFredokaText(title)
+                ? AppFont.fredoka(titleSize)
+                : AppFont.source(titleSize, weight: .black)
             block.addSubview(label)
             label.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
                 label.leadingAnchor.constraint(equalTo: block.leadingAnchor, constant: 14),
-                label.topAnchor.constraint(equalTo: block.topAnchor, constant: 18)
+                label.topAnchor.constraint(equalTo: block.topAnchor, constant: titleTop)
             ])
         }
         if imageName == nil {
@@ -2206,10 +2243,23 @@ final class ReferenceCanvasView: UIView {
         case .arrow:
             addCardArrowIcon(in: block, right: 14, bottom: 14)
         case .play:
-            addSymbolCircle("▶", in: block, right: width / 2 - 22, bottom: height / 2 - 22)
+            addVideoPlayIcon(in: block)
         case .none:
             break
         }
+    }
+
+    private func addVideoPlayIcon(in view: UIView) {
+        let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
+        iconView.contentMode = .scaleAspectFit
+        view.addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            iconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            iconView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 40),
+            iconView.heightAnchor.constraint(equalToConstant: 40)
+        ])
     }
 
     private func addCardArrowIcon(in view: UIView, right: CGFloat, bottom: CGFloat) {
@@ -2226,59 +2276,64 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addStoryStrip() {
-        addStoryMyWorksIcon(top: 142, left: 22)
-        addText("My works", size: 12, weight: .regular, top: 196, left: 20)
-        let names = ["Victoria", "Rowan", "Sophia", "Jasper"]
-        names.enumerated().forEach { index, name in
-            addProfileAvatar(
-                top: 142,
-                left: 98 + CGFloat(index) * 78,
-                size: 48,
-                backgroundColor: .clear,
-                showsBorder: false,
-                showsShadow: false
-            )
-            addText(name, size: 12, weight: .regular, top: 196, left: 96 + CGFloat(index) * 78)
-        }
-    }
-
-    private func addStoryMyWorksIcon(top: CGFloat, left: CGFloat) {
-        let iconView = UIImageView(image: UIImage(named: "story_my_works_icon"))
-        iconView.contentMode = .scaleAspectFit
-        addSubview(iconView)
-        iconView.translatesAutoresizingMaskIntoConstraints = false
+    private func addStoryStrip(top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let stripView = DiscoverStoryStripView()
+        layoutContainer.addSubview(stripView)
+        stripView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            iconView.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            iconView.widthAnchor.constraint(equalToConstant: 48),
-            iconView.heightAnchor.constraint(equalToConstant: 48)
+            stripView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
+            stripView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor),
+            stripView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            stripView.heightAnchor.constraint(equalToConstant: 78)
         ])
     }
 
     private func addFeedCard(name: String, top: CGFloat, tint: MediaTint) {
-        addMediaBlock(top: top + 40, left: 20, width: 335, height: 360, title: "Moments Matter", tint: tint, action: .play)
-        addPortrait(top: top, left: 20, size: 36, tint: .warm)
+        addMediaBlock(
+            top: top + 48,
+            left: 20,
+            width: 335,
+            height: 360,
+            title: "Moments Matter",
+            tint: tint,
+            action: .play,
+            imageName: "discover_feed_cover",
+            cornerRadius: 24,
+            titleSize: 16,
+            titleTop: 286,
+            titleUsesOneFont: true
+        )
+        addProfileAvatar(
+            top: top,
+            left: 20,
+            size: 36,
+            backgroundColor: .clear,
+            showsBorder: false,
+            showsShadow: false
+        )
         addText(name, size: 19, weight: .bold, top: top + 4, left: 68)
         addFeedMoreIcon(top: top + 6, left: 314)
-        addTags(top: top + 320)
-        addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: top + 410, left: 22, color: .darkGray)
+        addTags(top: top + 366)
+        addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: top + 424, left: 22, color: .darkGray)
     }
 
     private func addFeedMoreIcon(top: CGFloat, left: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let iconView = UIImageView(image: UIImage(named: "feed_more_icon"))
         iconView.contentMode = .scaleAspectFit
-        addSubview(iconView)
+        layoutContainer.addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            iconView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            iconView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            iconView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             iconView.widthAnchor.constraint(equalToConstant: 24),
             iconView.heightAnchor.constraint(equalToConstant: 24)
         ])
     }
 
     private func addTags(top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         ["Travel", "Food", "Family", "Friends", "Lifestyle"].enumerated().forEach { index, item in
             let label = UILabel()
             label.text = item
@@ -2287,11 +2342,11 @@ final class ReferenceCanvasView: UIView {
             label.backgroundColor = UIColor(white: 1, alpha: 0.75)
             label.layer.cornerRadius = 5
             label.layer.masksToBounds = true
-            addSubview(label)
+            layoutContainer.addSubview(label)
             label.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 36 + CGFloat(index) * 62),
-                label.topAnchor.constraint(equalTo: topAnchor, constant: top),
+                label.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 36 + CGFloat(index) * 62),
+                label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
                 label.widthAnchor.constraint(equalToConstant: 56),
                 label.heightAnchor.constraint(equalToConstant: 26)
             ])
