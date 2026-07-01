@@ -541,24 +541,105 @@ final class ReferenceCanvasView: UIView {
 
     private func renderUpload(filled: Bool) {
         backgroundColor = UIColor.black.withAlphaComponent(filled ? 0.62 : 0.58)
-        let sheet = addPanel(top: 177, left: 0, width: 375, height: 635, alpha: 1)
+        let sheet = UIView()
         sheet.backgroundColor = .white
         sheet.layer.cornerRadius = 20
-        addGrabber(top: 168)
-        addText("Upload work", size: 31, weight: .black, top: 212, left: 20)
-        addText("Title of work:", size: 17, weight: .regular, top: 266, left: 20)
-        addField("Enter the title", top: 293)
-        addText("Theme:", size: 17, weight: .regular, top: 360, left: 20)
+        sheet.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        addSubview(sheet)
+        sheet.translatesAutoresizingMaskIntoConstraints = false
+        let preferredHeight = sheet.heightAnchor.constraint(equalToConstant: 635)
+        preferredHeight.priority = .defaultHigh
+        NSLayoutConstraint.activate([
+            sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
+            sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
+            sheet.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 20),
+            sheet.bottomAnchor.constraint(equalTo: bottomAnchor),
+            sheet.heightAnchor.constraint(lessThanOrEqualToConstant: 635),
+            preferredHeight
+        ])
+        overlayContentView = sheet
+
+        let grabber = UIView()
+        grabber.backgroundColor = .white
+        grabber.layer.cornerRadius = 2
+        addSubview(grabber)
+        grabber.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            grabber.centerXAnchor.constraint(equalTo: centerXAnchor),
+            grabber.bottomAnchor.constraint(equalTo: sheet.topAnchor, constant: -6),
+            grabber.widthAnchor.constraint(equalToConstant: 112),
+            grabber.heightAnchor.constraint(equalToConstant: 4)
+        ])
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Upload work"
+        titleLabel.font = AppFont.fredoka(31)
+        titleLabel.textColor = .black
+        sheet.addSubview(titleLabel)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 20),
+            titleLabel.topAnchor.constraint(equalTo: sheet.topAnchor, constant: 34)
+        ])
+
+        activeLayoutContainer = sheet
+        let uploadButton = addButton(
+            "Upload",
+            bottom: 29,
+            trailing: 20,
+            filled: true,
+            usesOneFont: true,
+            cornerRadius: 12,
+            shadowOpacity: 0,
+            bottomPlateHeight: 3
+        )
+        activeLayoutContainer = nil
+
+        let scrollView = UIScrollView()
+        scrollView.backgroundColor = .clear
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.keyboardDismissMode = .interactive
+        sheet.addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: sheet.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: sheet.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 18),
+            scrollView.bottomAnchor.constraint(equalTo: uploadButton.topAnchor, constant: -20)
+        ])
+
+        let formView = UIView()
+        formView.backgroundColor = .clear
+        scrollView.addSubview(formView)
+        formView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            formView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            formView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            formView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            formView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            formView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            formView.heightAnchor.constraint(equalToConstant: 445)
+        ])
+
+        activeLayoutContainer = formView
+        addText("Title of work:", size: 17, weight: .regular, top: 0, left: 20)
+        addInputField("Enter the title", top: 27)
+        addText("Theme:", size: 17, weight: .regular, top: 94, left: 20)
         if filled {
-            addSmallField("Theme", top: 387, left: 20, width: 70)
-            addSmallField("+", top: 387, left: 108, width: 76)
+            addSmallField("Theme", top: 121, left: 20, width: 70)
+            addSmallField("+", top: 121, left: 108, width: 76)
         } else {
-            addSmallField("+", top: 387, left: 20, width: 78)
+            addSmallField("+", top: 121, left: 20, width: 78)
         }
-        addText("Description:", size: 17, weight: .regular, top: 455, left: 20)
-        addLargeField("Say something", top: 481)
-        addUploadBox(top: 596)
-        addButton("Upload", top: 732, filled: true, usesOneFont: true)
+        addText("Description:", size: 17, weight: .regular, top: 189, left: 20)
+        addLargeField("Say something", top: 215)
+        addUploadBox(top: 330)
+        activeLayoutContainer = nil
+
+        keyboardAwareScrollView = scrollView
+        installKeyboardAvoidance()
+        installBlankAreaKeyboardDismissal()
     }
 
     private func renderList(title: String, sections: [[String]]) {
@@ -1272,7 +1353,7 @@ final class ReferenceCanvasView: UIView {
             }
             NSLayoutConstraint.activate(plateConstraints)
         }
-        let button = UIButton(type: .custom)
+        let button: UIButton = filled ? GradientActionButton() : UIButton(type: .custom)
         button.setTitle(text, for: .normal)
         button.titleLabel?.font = usesOneFont || usesFredokaText(text) ? AppFont.fredoka(16) : AppFont.source(16, weight: .black)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
@@ -1284,19 +1365,6 @@ final class ReferenceCanvasView: UIView {
         button.layer.shadowOpacity = shadowOpacity ?? (filled ? 0.14 : 0.06)
         button.layer.shadowOffset = shadowOffset
         button.layer.shadowRadius = shadowRadius
-        var gradientLayer: CAGradientLayer?
-        if filled {
-            let gradient = CAGradientLayer()
-            gradient.colors = [
-                UIColor(red: 0.78, green: 1.0, blue: 0.16, alpha: 1).cgColor,
-                UIColor(red: 0.86, green: 1.0, blue: 0.95, alpha: 1).cgColor
-            ]
-            gradient.startPoint = CGPoint(x: 0, y: 0.5)
-            gradient.endPoint = CGPoint(x: 1, y: 0.5)
-            gradient.cornerRadius = cornerRadius
-            button.layer.insertSublayer(gradient, at: 0)
-            gradientLayer = gradient
-        }
         layoutContainer.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
         var buttonConstraints = [
@@ -1321,8 +1389,6 @@ final class ReferenceCanvasView: UIView {
             buttonConstraints.append(button.widthAnchor.constraint(equalToConstant: width))
         }
         NSLayoutConstraint.activate(buttonConstraints)
-        layoutContainer.layoutIfNeeded()
-        gradientLayer?.frame = button.bounds
         return button
     }
 
@@ -1379,12 +1445,13 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
+    @discardableResult
     private func addInputField(
         _ placeholder: String,
         top: CGFloat,
         keyboardType: UIKeyboardType = .default,
         isSecureTextEntry: Bool = false
-    ) {
+    ) -> UITextField {
         let field = addFieldContainer(top: top)
         let textField = UITextField()
         textField.borderStyle = .none
@@ -1411,31 +1478,18 @@ final class ReferenceCanvasView: UIView {
             textField.topAnchor.constraint(equalTo: field.topAnchor),
             textField.bottomAnchor.constraint(equalTo: field.bottomAnchor)
         ])
+        return textField
     }
 
     private func addFieldContainer(top: CGFloat) -> UIView {
         let layoutContainer = activeLayoutContainer ?? self
-        let field = UIView()
-        field.backgroundColor = .clear
-        field.layer.cornerRadius = 10
-        field.layer.masksToBounds = true
-        let gradient = CAGradientLayer()
-        gradient.colors = [
-            UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1).cgColor,
-            UIColor(red: 0.88, green: 1, blue: 0.95, alpha: 1).cgColor
-        ]
-        gradient.startPoint = CGPoint(x: 0, y: 0.5)
-        gradient.endPoint = CGPoint(x: 1, y: 0.5)
-        gradient.frame = CGRect(x: 0, y: 0, width: 335, height: 54)
-        gradient.cornerRadius = 10
-        field.layer.insertSublayer(gradient, at: 0)
-        let border = CAShapeLayer()
-        border.strokeColor = UIColor(red: 0.53, green: 0.86, blue: 0.10, alpha: 1).cgColor
-        border.fillColor = UIColor.clear.cgColor
-        border.lineDashPattern = [3, 2]
-        border.lineWidth = 1
-        border.path = UIBezierPath(roundedRect: CGRect(x: 0.5, y: 0.5, width: 334, height: 53), cornerRadius: 10).cgPath
-        field.layer.addSublayer(border)
+        let field = AdaptiveInputView(
+            backgroundColor: .clear,
+            gradientColors: [
+                UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1),
+                UIColor(red: 0.88, green: 1, blue: 0.95, alpha: 1)
+            ]
+        )
         layoutContainer.addSubview(field)
         field.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -1737,23 +1791,28 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addSmallField(_ text: String, top: CGFloat, left: CGFloat, width: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let field = AdaptiveInputView(
+            backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
+        )
         let label = UILabel()
         label.text = text
         label.textAlignment = .center
         label.textColor = .darkGray
         label.font = AppFont.source(14)
-        label.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
-        label.layer.cornerRadius = 10
-        label.layer.borderWidth = 1
-        label.layer.borderColor = UIColor(red: 0.53, green: 0.86, blue: 0.10, alpha: 1).cgColor
-        label.layer.masksToBounds = true
-        addSubview(label)
+        layoutContainer.addSubview(field)
+        field.addSubview(label)
+        field.translatesAutoresizingMaskIntoConstraints = false
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            label.widthAnchor.constraint(equalToConstant: width),
-            label.heightAnchor.constraint(equalToConstant: 45)
+            field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            field.widthAnchor.constraint(equalToConstant: width),
+            field.heightAnchor.constraint(equalToConstant: 45),
+            label.leadingAnchor.constraint(equalTo: field.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: field.trailingAnchor),
+            label.topAnchor.constraint(equalTo: field.topAnchor),
+            label.bottomAnchor.constraint(equalTo: field.bottomAnchor)
         ])
     }
 
@@ -1767,16 +1826,15 @@ final class ReferenceCanvasView: UIView {
         bottomAnchor: NSLayoutYAxisAnchor? = nil,
         bottomInset: CGFloat = 0
     ) -> UIView {
-        let layoutContainer = parent ?? self
-        let field = UIView()
-        field.backgroundColor = UIColor(
-            red: 212 / 255,
-            green: 1,
-            blue: 59 / 255,
-            alpha: 0.3
+        let layoutContainer = parent ?? activeLayoutContainer ?? self
+        let field = AdaptiveInputView(
+            backgroundColor: UIColor(
+                red: 212 / 255,
+                green: 1,
+                blue: 59 / 255,
+                alpha: 0.3
+            )
         )
-        field.layer.cornerRadius = 10
-        field.layer.masksToBounds = true
         layoutContainer.addSubview(field)
         field.translatesAutoresizingMaskIntoConstraints = false
         var fieldConstraints = [
@@ -1790,25 +1848,6 @@ final class ReferenceCanvasView: UIView {
             fieldConstraints.append(field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
         }
         NSLayoutConstraint.activate(fieldConstraints)
-        layoutContainer.layoutIfNeeded()
-
-        let dashedBorder = CAShapeLayer()
-        dashedBorder.strokeColor = UIColor(
-            red: 165 / 255,
-            green: 214 / 255,
-            blue: 63 / 255,
-            alpha: 1
-        ).cgColor
-        dashedBorder.fillColor = UIColor.clear.cgColor
-        dashedBorder.lineDashPattern = [3, 2]
-        dashedBorder.lineWidth = 1
-        dashedBorder.frame = field.bounds
-        dashedBorder.path = UIBezierPath(
-            roundedRect: field.bounds.insetBy(dx: 0.5, dy: 0.5),
-            cornerRadius: 10
-        ).cgPath
-        field.layer.addSublayer(dashedBorder)
-
         let inputView = UITextView()
         inputView.text = text
         inputView.textColor = .darkGray
@@ -1862,16 +1901,15 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addUploadBox(top: CGFloat) {
-        let box = UIView()
-        box.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
-        box.layer.cornerRadius = 10
-        box.layer.borderWidth = 1
-        box.layer.borderColor = UIColor(red: 0.53, green: 0.86, blue: 0.10, alpha: 1).cgColor
-        addSubview(box)
+        let layoutContainer = activeLayoutContainer ?? self
+        let box = AdaptiveInputView(
+            backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
+        )
+        layoutContainer.addSubview(box)
         box.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            box.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            box.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            box.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
+            box.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             box.widthAnchor.constraint(equalToConstant: 92),
             box.heightAnchor.constraint(equalToConstant: 115)
         ])

@@ -210,7 +210,10 @@ final class RootTabsController: UIViewController {
             overlayView.topAnchor.constraint(equalTo: view.topAnchor),
             overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        if page == .feelingEditor || page == .restrictPanel {
+        if page == .feelingEditor
+            || page == .uploadEmpty
+            || page == .uploadFilled
+            || page == .restrictPanel {
             overlayView.didTapOutsideContent = { [weak self] in
                 self?.dismissActiveOverlay()
             }

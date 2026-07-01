@@ -49,6 +49,14 @@ class ReferencePageController: BaseSceneController {
             overlayView.topAnchor.constraint(equalTo: view.topAnchor),
             overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        if page == .feelingEditor
+            || page == .uploadEmpty
+            || page == .uploadFilled
+            || page == .restrictPanel {
+            overlayView.didTapOutsideContent = { [weak self] in
+                self?.view.viewWithTag(9102)?.removeFromSuperview()
+            }
+        }
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
         }
