@@ -851,11 +851,11 @@ final class ReferenceCanvasView: UIView {
             addPopupWordmark(to: panel)
         }
         if portrait {
-            addRestrictPopupAvatar(top: 286, left: 150, size: 72)
+            addRestrictPopupAvatar(top: 286, left: 150, size: 76)
         }
         if let title {
             if portrait {
-                addRestrictPopupNamePill(title, avatarTop: 286, avatarLeft: 150, avatarSize: 72)
+                addRestrictPopupNamePill(title, avatarTop: 286, avatarLeft: 150, avatarSize: 76)
             } else {
                 addText(title, size: 31, weight: .black, top: titleTop, centered: true, usesOneFont: true)
             }
@@ -907,7 +907,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addRestrictPopupAvatar(top: CGFloat, left: CGFloat, size: CGFloat) {
-        let ringInset: CGFloat = 2
+        let ringInset: CGFloat = 6
         let ringView = UIImageView(image: UIImage(named: "restrict_avatar_ring"))
         ringView.contentMode = .scaleAspectFit
         addSubview(ringView)
