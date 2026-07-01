@@ -872,7 +872,10 @@ final class ReferenceCanvasView: UIView {
     @objc private func openSignInFromPopup() {
         let controller = owningController()
         removeFromSuperview()
-        controller?.navigationController?.pushViewController(RouteFactory.controller(for: .signIn), animated: true)
+        let authFlow = FlowShellController(rootViewController: EntrySceneController())
+        authFlow.modalPresentationStyle = .fullScreen
+        authFlow.modalTransitionStyle = .coverVertical
+        controller?.present(authFlow, animated: true)
     }
 
     private func owningController() -> UIViewController? {

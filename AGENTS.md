@@ -39,7 +39,8 @@
 - The main navigation root is the custom tab root controller.
 - App launch enters the main flow directly. Do not show the login flow on startup.
 - Sensitive actions that require authentication should show the login/access popup as an overlay on the current page.
-- Tapping the login popup's `Log in` button should close the popup and push the sign-in page on the current navigation stack, so the custom back button can return to the previous main-flow page.
+- Tapping the login popup's `Log in` button should close the popup and present a separate auth `FlowShellController` from the bottom. The auth navigation root is `EntrySceneController`, not the email sign-in page.
+- When auth succeeds from a modally presented auth flow, dismiss the auth navigation flow to reveal the existing main flow underneath.
 - Do not use `UITabBarController` or the system `UITabBar`; the tabbar is custom to avoid secondary page hiding logic.
 - Confirmation/access popup cards must not be pushed onto a navigation stack. Present them as a direct overlay on the current page with no transition animation.
 

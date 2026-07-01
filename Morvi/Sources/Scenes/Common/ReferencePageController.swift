@@ -41,6 +41,10 @@ class ReferencePageController: BaseSceneController {
     }
 
     func enterMainFlow() {
+        if navigationController?.presentingViewController != nil {
+            navigationController?.dismiss(animated: true)
+            return
+        }
         navigationController?.setViewControllers([RootTabsController()], animated: true)
     }
 }

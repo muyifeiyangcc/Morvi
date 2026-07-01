@@ -6,7 +6,7 @@ This document records the current page flow implemented in UIKit.
 
 - App root: `FlowShellController`
 - Main flow root: `RootTabsController`
-- Login/auth pages are pushed only after an authentication-required action.
+- Login/auth pages live in a separate auth `FlowShellController` that is presented from the bottom after an authentication-required action.
 - Visible system navigation bars are hidden. All visible top controls are custom layers.
 - Main tabs are rendered by `FloatingDockView`, not by `UITabBarController`.
 
@@ -17,18 +17,23 @@ flowchart TD
     Launch["LaunchScreen.storyboard"] --> Main["主流程: 首页 tab"]
     Main -->|Sensitive action| AccessGate["登录弹窗 overlay"]
     AccessGate -->|Cancel| Main
-    AccessGate -->|Log in| SignIn["登录页"]
-    SignIn -->|Back| Main
+    AccessGate -->|Log in| AuthNav["登录导航 modal"]
+    AuthNav --> Entry["登录注册页"]
+    Entry -->|Login by email| SignIn["登录页"]
+    Entry -->|I'm new| SignUp["注册"]
+    Entry -->|Sign up text| SignUp
+    Entry -->|User Agreement / Privacy Policy| EULA["EULA"]
     SignIn -->|Log in| Main["主流程: 首页 tab"]
     SignIn -->|Forgot ?| ResetAccess["忘记密码"]
-    SignIn -->|Sign up text| SignUp["注册"]
     SignUp -->|Sign up| Main
     ResetAccess -->|Next| SignIn
 ```
 
 - App launch enters the main flow directly.
 - Login/access popup cards are overlays on top of the current main-flow page.
-- Tapping `Log in` in the popup closes the overlay and pushes the sign-in page on the current navigation stack, so the custom back button returns to the previous main-flow page.
+- Tapping `Log in` in the popup closes the overlay and presents a separate auth navigation flow from the bottom.
+- The auth navigation root is `EntrySceneController`, so the first presented page is the login/register entry screen.
+- Successful auth dismisses the modal auth navigation flow and reveals the existing main-flow page underneath.
 
 ## Main Tabs
 
