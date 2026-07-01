@@ -872,7 +872,7 @@ final class ReferenceCanvasView: UIView {
     @objc private func openSignInFromPopup() {
         let controller = owningController()
         removeFromSuperview()
-        controller?.navigationController?.setViewControllers([RouteFactory.controller(for: .signIn)], animated: true)
+        controller?.navigationController?.pushViewController(RouteFactory.controller(for: .signIn), animated: true)
     }
 
     private func owningController() -> UIViewController? {

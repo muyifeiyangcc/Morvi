@@ -37,6 +37,9 @@
 - The custom navigation layer is based on the compact iOS navigation area but taller for this design: total height is `statusBarHeight + 76`, and navigation title/buttons are vertically centered inside the 76pt content area.
 - Login flow and main flow are separate navigation controller flows.
 - The main navigation root is the custom tab root controller.
+- App launch enters the main flow directly. Do not show the login flow on startup.
+- Sensitive actions that require authentication should show the login/access popup as an overlay on the current page.
+- Tapping the login popup's `Log in` button should close the popup and push the sign-in page on the current navigation stack, so the custom back button can return to the previous main-flow page.
 - Do not use `UITabBarController` or the system `UITabBar`; the tabbar is custom to avoid secondary page hiding logic.
 - Confirmation/access popup cards must not be pushed onto a navigation stack. Present them as a direct overlay on the current page with no transition animation.
 

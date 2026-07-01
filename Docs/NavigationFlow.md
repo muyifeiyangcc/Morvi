@@ -5,8 +5,8 @@ This document records the current page flow implemented in UIKit.
 ## Flow Containers
 
 - App root: `FlowShellController`
-- Login flow root: `EntrySceneController`
 - Main flow root: `RootTabsController`
+- Login/auth pages are pushed only after an authentication-required action.
 - Visible system navigation bars are hidden. All visible top controls are custom layers.
 - Main tabs are rendered by `FloatingDockView`, not by `UITabBarController`.
 
@@ -14,16 +14,21 @@ This document records the current page flow implemented in UIKit.
 
 ```mermaid
 flowchart TD
-    Launch["LaunchScreen.storyboard"] --> Entry["登录注册页"]
-    Entry -->|Login by email| SignIn["登录页"]
-    Entry -->|I'm new| SignUp["注册"]
-    Entry -->|Sign up text| SignUp
-    Entry -->|User Agreement / Privacy Policy| EULA["EULA"]
+    Launch["LaunchScreen.storyboard"] --> Main["主流程: 首页 tab"]
+    Main -->|Sensitive action| AccessGate["登录弹窗 overlay"]
+    AccessGate -->|Cancel| Main
+    AccessGate -->|Log in| SignIn["登录页"]
+    SignIn -->|Back| Main
     SignIn -->|Log in| Main["主流程: 首页 tab"]
     SignIn -->|Forgot ?| ResetAccess["忘记密码"]
+    SignIn -->|Sign up text| SignUp["注册"]
     SignUp -->|Sign up| Main
     ResetAccess -->|Next| SignIn
 ```
+
+- App launch enters the main flow directly.
+- Login/access popup cards are overlays on top of the current main-flow page.
+- Tapping `Log in` in the popup closes the overlay and pushes the sign-in page on the current navigation stack, so the custom back button returns to the previous main-flow page.
 
 ## Main Tabs
 
