@@ -57,13 +57,9 @@ enum RouteFactory {
                 ]
             }
         case .uploadEmpty:
-            return ReferencePageController(page: .uploadEmpty) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 710, width: 335, height: 62)) { scene.push(.uploadFilled) }]
-            }
+            return ReferencePageController(page: .uploadEmpty)
         case .uploadFilled:
-            return ReferencePageController(page: .uploadFilled) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 710, width: 335, height: 62)) { scene.push(.galleryDetail) }]
-            }
+            return ReferencePageController(page: .uploadFilled)
         case .directDialogue:
             return ReferencePageController(page: .directDialogue) { scene in
                 [

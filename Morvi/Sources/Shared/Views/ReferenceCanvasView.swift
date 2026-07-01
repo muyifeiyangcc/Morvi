@@ -634,7 +634,10 @@ final class ReferenceCanvasView: UIView {
         }
         addText("Description:", size: 17, weight: .regular, top: 189, left: 20)
         addLargeField("Say something", top: 215)
-        addUploadBox(top: 330)
+        addUploadBox(top: 330) { [weak self] in
+            guard !filled else { return }
+            self?.didRequestOverlayPage?(.uploadFilled)
+        }
         activeLayoutContainer = nil
 
         keyboardAwareScrollView = scrollView
@@ -1900,7 +1903,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addUploadBox(top: CGFloat) {
+    private func addUploadBox(top: CGFloat, action: @escaping () -> Void) {
         let layoutContainer = activeLayoutContainer ?? self
         let box = AdaptiveInputView(
             backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
@@ -1923,6 +1926,17 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             icon.centerXAnchor.constraint(equalTo: box.centerXAnchor),
             icon.centerYAnchor.constraint(equalTo: box.centerYAnchor)
+        ])
+
+        let actionButton = UIButton(type: .custom)
+        actionButton.addAction(UIAction { _ in action() }, for: .touchUpInside)
+        box.addSubview(actionButton)
+        actionButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            actionButton.leadingAnchor.constraint(equalTo: box.leadingAnchor),
+            actionButton.trailingAnchor.constraint(equalTo: box.trailingAnchor),
+            actionButton.topAnchor.constraint(equalTo: box.topAnchor),
+            actionButton.bottomAnchor.constraint(equalTo: box.bottomAnchor)
         ])
     }
 
@@ -2364,7 +2378,11 @@ final class ReferenceCanvasView: UIView {
         let layoutContainer = activeLayoutContainer ?? self
         let stripView = DiscoverStoryStripView()
         stripView.didSelectEntry = { [weak self] index in
-            self?.didRequestPage?(index == 0 ? .uploadEmpty : .publicPersona)
+            if index == 0 {
+                self?.didRequestOverlayPage?(.uploadEmpty)
+            } else {
+                self?.didRequestPage?(.publicPersona)
+            }
         }
         layoutContainer.addSubview(stripView)
         stripView.translatesAutoresizingMaskIntoConstraints = false
