@@ -854,7 +854,11 @@ final class ReferenceCanvasView: UIView {
             addRestrictPopupAvatar(top: 286, left: 150, size: 76)
         }
         if let title {
-            addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : titleTop, centered: !portrait, usesOneFont: true)
+            if portrait {
+                addRestrictPopupNamePill(title, avatarTop: 286, avatarLeft: 150, avatarSize: 76)
+            } else {
+                addText(title, size: 31, weight: .black, top: titleTop, centered: true, usesOneFont: true)
+            }
         }
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
         let cancelButton = addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: false, fontWeight: .medium)
@@ -926,6 +930,62 @@ final class ReferenceCanvasView: UIView {
             imageView.topAnchor.constraint(equalTo: topAnchor, constant: top),
             imageView.widthAnchor.constraint(equalToConstant: size),
             imageView.heightAnchor.constraint(equalToConstant: size)
+        ])
+    }
+
+    private func addRestrictPopupNamePill(_ text: String, avatarTop: CGFloat, avatarLeft: CGFloat, avatarSize: CGFloat) {
+        let width: CGFloat = 238
+        let height: CGFloat = 46
+        let shadowDrop: CGFloat = 5
+        let left = avatarLeft + avatarSize / 2 - width / 2
+        let top = avatarTop + avatarSize - height - shadowDrop
+
+        let shadowView = UIView()
+        shadowView.backgroundColor = UIColor(red: 0.37, green: 0.68, blue: 0.03, alpha: 1)
+        shadowView.layer.cornerRadius = height / 2
+        shadowView.layer.cornerCurve = .continuous
+        addSubview(shadowView)
+        shadowView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            shadowView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            shadowView.topAnchor.constraint(equalTo: topAnchor, constant: top + shadowDrop),
+            shadowView.widthAnchor.constraint(equalToConstant: width),
+            shadowView.heightAnchor.constraint(equalToConstant: height)
+        ])
+
+        let pillView = UIView()
+        pillView.layer.cornerRadius = height / 2
+        pillView.layer.cornerCurve = .continuous
+        pillView.layer.masksToBounds = true
+        addSubview(pillView)
+        pillView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            pillView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            pillView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            pillView.widthAnchor.constraint(equalToConstant: width),
+            pillView.heightAnchor.constraint(equalToConstant: height)
+        ])
+
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [
+            UIColor(red: 0.82, green: 1, blue: 0.20, alpha: 1).cgColor,
+            UIColor(red: 0.84, green: 0.97, blue: 0.93, alpha: 1).cgColor
+        ]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        gradientLayer.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        pillView.layer.insertSublayer(gradientLayer, at: 0)
+
+        let label = UILabel()
+        label.text = text
+        label.textColor = .black
+        label.font = AppFont.fredoka(18)
+        label.textAlignment = .center
+        pillView.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: pillView.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: pillView.centerYAnchor)
         ])
     }
 
