@@ -828,7 +828,7 @@ final class ReferenceCanvasView: UIView {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
         let panelTop: CGFloat = portrait ? 245 : 307
         let titleTop = panelTop + 39
-        let titleHeight = title == nil ? 0 : sourceFont(for: title ?? "", size: 31, weight: .black).lineHeight
+        let titleHeight = title == nil ? 0 : AppFont.fredoka(31).lineHeight
         let textTop: CGFloat = portrait ? 410 : (title == nil ? panelTop + 39 : titleTop + titleHeight + 24)
         let textHeight = CGFloat(text.components(separatedBy: "\n").count) * sourceFont(for: text, size: 17, weight: .regular).lineHeight
         let buttonTop: CGFloat = portrait ? 499 : textTop + textHeight + 24
@@ -853,11 +853,11 @@ final class ReferenceCanvasView: UIView {
             addPortrait(top: 286, left: 150, size: 76, tint: .warm)
         }
         if let title {
-            addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : titleTop, centered: !portrait)
+            addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : titleTop, centered: !portrait, usesOneFont: true)
         }
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
-        addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: !portrait, usesOneFont: true)
-        addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, usesOneFont: true)
+        addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: false, fontWeight: .medium)
+        addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, fontWeight: .medium)
     }
 
     private func popupBackgroundImage() -> UIImage? {
@@ -884,14 +884,15 @@ final class ReferenceCanvasView: UIView {
         left: CGFloat? = nil,
         centered: Bool = false,
         color: UIColor = .black,
-        parent: UIView? = nil
+        parent: UIView? = nil,
+        usesOneFont: Bool = false
     ) {
         let layoutContainer = parent ?? activeLayoutContainer ?? self
         let label = UILabel()
         label.text = text
         label.numberOfLines = 0
         label.textColor = color
-        label.font = usesFredokaText(text)
+        label.font = usesOneFont || usesFredokaText(text)
             ? AppFont.fredoka(size)
             : sourceFont(for: text, size: size, weight: weight)
         layoutContainer.addSubview(label)
@@ -1659,7 +1660,7 @@ final class ReferenceCanvasView: UIView {
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
         button.titleLabel?.font = usesOneFont ? AppFont.fredoka(18) : AppFont.source(18, weight: fontWeight)
-        button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .darkGray, for: .normal)
+        button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
         button.layer.cornerRadius = 25
         button.layer.borderWidth = dark ? 0 : 1
