@@ -1544,11 +1544,13 @@ final class ReferenceCanvasView: UIView {
         let keyboardFrameInView = convert(keyboardFrame, from: nil)
         let overlap = max(0, bounds.maxY - keyboardFrameInView.minY)
         if let scrollView = keyboardAwareScrollView {
-            let bottomInset = overlap > 0 ? overlap + 20 : 0
+            let scrollFrameInView = scrollView.convert(scrollView.bounds, to: self)
+            let scrollOverlap = max(0, scrollFrameInView.maxY - keyboardFrameInView.minY)
+            let bottomInset = scrollOverlap > 0 ? scrollOverlap + 20 : 0
             scrollView.contentInset.bottom = bottomInset
             scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
 
-            if overlap > 0, let activeInput = firstResponder(in: scrollView) {
+            if scrollOverlap > 0, let activeInput = firstResponder(in: scrollView) {
                 let targetRect = activeInput.convert(activeInput.bounds.insetBy(dx: 0, dy: -18), to: scrollView)
                 scrollView.scrollRectToVisible(targetRect, animated: true)
             }
