@@ -851,11 +851,11 @@ final class ReferenceCanvasView: UIView {
             addPopupWordmark(to: panel)
         }
         if portrait {
-            addRestrictPopupAvatar(top: 286, left: 150, size: 76)
+            addRestrictPopupAvatar(top: 286, left: 150, size: 72)
         }
         if let title {
             if portrait {
-                addRestrictPopupNamePill(title, avatarTop: 286, avatarLeft: 150, avatarSize: 76)
+                addRestrictPopupNamePill(title, avatarTop: 286, avatarLeft: 150, avatarSize: 72)
             } else {
                 addText(title, size: 31, weight: .black, top: titleTop, centered: true, usesOneFont: true)
             }
