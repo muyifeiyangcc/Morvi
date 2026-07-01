@@ -609,7 +609,7 @@ final class ReferenceCanvasView: UIView {
             scrollView.leadingAnchor.constraint(equalTo: sheet.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: sheet.trailingAnchor),
             scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 18),
-            scrollView.bottomAnchor.constraint(equalTo: uploadButton.topAnchor, constant: -20)
+            scrollView.bottomAnchor.constraint(equalTo: uploadButton.topAnchor, constant: -10)
         ])
 
         let formView = UIView()
