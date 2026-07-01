@@ -2320,7 +2320,7 @@ final class ReferenceCanvasView: UIView {
         addText(name, size: 19, weight: .bold, top: top + 4, left: 68)
         addFeedMoreIcon(top: top + 6, left: 314)
         addTags(top: top + 366)
-        addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: top + 424, left: 22, color: .darkGray)
+        addFeedStats(top: top + 424)
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 335, height: 444)) { [weak self] in
             self?.didRequestPage?(.galleryDetail)
         }
@@ -2341,6 +2341,36 @@ final class ReferenceCanvasView: UIView {
         layoutContainer.addSubview(button)
     }
 
+    private func addFeedStats(top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        addFeedStat(iconName: "feed_like_icon", text: "666 Likes", top: top, left: 22, parent: layoutContainer)
+        addFeedStat(iconName: "feed_reply_icon", text: "777 Comments", top: top, left: 130, parent: layoutContainer)
+    }
+
+    private func addFeedStat(iconName: String, text: String, top: CGFloat, left: CGFloat, parent: UIView) {
+        let iconView = UIImageView(image: UIImage(named: iconName))
+        iconView.contentMode = .scaleAspectFit
+        parent.addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+
+        let label = UILabel()
+        label.text = text
+        label.textColor = .darkGray
+        label.font = AppFont.source(13, weight: .regular)
+        parent.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            iconView.leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: left),
+            iconView.topAnchor.constraint(equalTo: parent.topAnchor, constant: top + 1),
+            iconView.widthAnchor.constraint(equalToConstant: 14),
+            iconView.heightAnchor.constraint(equalToConstant: 14),
+
+            label.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 4),
+            label.centerYAnchor.constraint(equalTo: iconView.centerYAnchor)
+        ])
+    }
+
     private func addFeedMoreIcon(top: CGFloat, left: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let iconView = UIImageView(image: UIImage(named: "feed_more_icon"))
@@ -2357,21 +2387,40 @@ final class ReferenceCanvasView: UIView {
 
     private func addTags(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
-        ["Travel", "Food", "Family", "Friends", "Lifestyle"].enumerated().forEach { index, item in
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.distribution = .fill
+        stackView.spacing = 8
+        layoutContainer.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 36),
+            stackView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            stackView.heightAnchor.constraint(equalToConstant: 26),
+            stackView.trailingAnchor.constraint(lessThanOrEqualTo: layoutContainer.trailingAnchor, constant: -20)
+        ])
+
+        ["Travel", "Food", "Family", "Friends", "Lifestyle"].forEach { item in
+            let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterialLight))
+            blurView.layer.cornerRadius = 6
+            blurView.layer.masksToBounds = true
+            blurView.backgroundColor = UIColor.white.withAlphaComponent(0.22)
+
             let label = UILabel()
             label.text = item
             label.textAlignment = .center
             label.font = AppFont.source(12)
-            label.backgroundColor = UIColor(white: 1, alpha: 0.75)
-            label.layer.cornerRadius = 5
-            label.layer.masksToBounds = true
-            layoutContainer.addSubview(label)
+            label.textColor = UIColor.black.withAlphaComponent(0.78)
+            blurView.contentView.addSubview(label)
             label.translatesAutoresizingMaskIntoConstraints = false
+            stackView.addArrangedSubview(blurView)
+            blurView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                label.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 36 + CGFloat(index) * 62),
-                label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-                label.widthAnchor.constraint(equalToConstant: 56),
-                label.heightAnchor.constraint(equalToConstant: 26)
+                blurView.heightAnchor.constraint(equalToConstant: 26),
+                label.leadingAnchor.constraint(equalTo: blurView.contentView.leadingAnchor, constant: 10),
+                label.trailingAnchor.constraint(equalTo: blurView.contentView.trailingAnchor, constant: -10),
+                label.centerYAnchor.constraint(equalTo: blurView.contentView.centerYAnchor)
             ])
         }
     }
