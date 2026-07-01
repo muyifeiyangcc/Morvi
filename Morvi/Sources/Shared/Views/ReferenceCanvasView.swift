@@ -2387,41 +2387,50 @@ final class ReferenceCanvasView: UIView {
 
     private func addTags(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.distribution = .fill
-        stackView.spacing = 8
-        layoutContainer.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 36),
-            stackView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            stackView.heightAnchor.constraint(equalToConstant: 26),
-            stackView.trailingAnchor.constraint(lessThanOrEqualTo: layoutContainer.trailingAnchor, constant: -20)
-        ])
+        let font = AppFont.source(12)
+        let rowHeight: CGFloat = 26
+        let horizontalInset: CGFloat = 10
+        let itemSpacing: CGFloat = 8
+        let rowSpacing: CGFloat = 8
+        let startX: CGFloat = 28
+        let maxX: CGFloat = 355
+        var cursorX = startX
+        var cursorY = top
 
         ["Travel", "Food", "Family", "Friends", "Lifestyle"].forEach { item in
+            let textWidth = ceil((item as NSString).size(withAttributes: [.font: font]).width)
+            let itemWidth = textWidth + horizontalInset * 2
+            if cursorX > startX, cursorX + itemWidth > maxX {
+                cursorX = startX
+                cursorY += rowHeight + rowSpacing
+            }
+
             let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterialLight))
             blurView.layer.cornerRadius = 6
             blurView.layer.masksToBounds = true
             blurView.backgroundColor = UIColor.white.withAlphaComponent(0.22)
+            layoutContainer.addSubview(blurView)
+            blurView.translatesAutoresizingMaskIntoConstraints = false
 
             let label = UILabel()
             label.text = item
             label.textAlignment = .center
-            label.font = AppFont.source(12)
+            label.font = font
             label.textColor = UIColor.black.withAlphaComponent(0.78)
+            label.lineBreakMode = .byClipping
             blurView.contentView.addSubview(label)
             label.translatesAutoresizingMaskIntoConstraints = false
-            stackView.addArrangedSubview(blurView)
-            blurView.translatesAutoresizingMaskIntoConstraints = false
+
             NSLayoutConstraint.activate([
+                blurView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: cursorX),
+                blurView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: cursorY),
+                blurView.widthAnchor.constraint(equalToConstant: itemWidth),
                 blurView.heightAnchor.constraint(equalToConstant: 26),
-                label.leadingAnchor.constraint(equalTo: blurView.contentView.leadingAnchor, constant: 10),
-                label.trailingAnchor.constraint(equalTo: blurView.contentView.trailingAnchor, constant: -10),
+                label.leadingAnchor.constraint(equalTo: blurView.contentView.leadingAnchor, constant: horizontalInset),
+                label.trailingAnchor.constraint(equalTo: blurView.contentView.trailingAnchor, constant: -horizontalInset),
                 label.centerYAnchor.constraint(equalTo: blurView.contentView.centerYAnchor)
             ])
+            cursorX += itemWidth + itemSpacing
         }
     }
 
