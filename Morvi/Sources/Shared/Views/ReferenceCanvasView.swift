@@ -1577,7 +1577,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             inputView.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
             inputView.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -16),
-            inputView.topAnchor.constraint(equalTo: field.topAnchor, constant: 12),
+            inputView.topAnchor.constraint(equalTo: field.topAnchor, constant: 16),
             inputView.bottomAnchor.constraint(equalTo: field.bottomAnchor, constant: -16)
         ])
     }
