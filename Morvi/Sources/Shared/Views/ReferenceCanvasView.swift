@@ -2227,13 +2227,33 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addStoryStrip() {
-        addCheckCircle(top: 142, left: 22, size: 48, color: UIColor(red: 0.76, green: 1, blue: 0.20, alpha: 1), text: "+")
+        addStoryMyWorksIcon(top: 142, left: 22)
         addText("My works", size: 12, weight: .regular, top: 196, left: 20)
         let names = ["Victoria", "Rowan", "Sophia", "Jasper"]
         names.enumerated().forEach { index, name in
-            addPortrait(top: 142, left: 98 + CGFloat(index) * 78, size: 48, tint: index.isMultiple(of: 2) ? .warm : .cool)
+            addProfileAvatar(
+                top: 142,
+                left: 98 + CGFloat(index) * 78,
+                size: 48,
+                backgroundColor: .clear,
+                showsBorder: false,
+                showsShadow: false
+            )
             addText(name, size: 12, weight: .regular, top: 196, left: 96 + CGFloat(index) * 78)
         }
+    }
+
+    private func addStoryMyWorksIcon(top: CGFloat, left: CGFloat) {
+        let iconView = UIImageView(image: UIImage(named: "story_my_works_icon"))
+        iconView.contentMode = .scaleAspectFit
+        addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            iconView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            iconView.widthAnchor.constraint(equalToConstant: 48),
+            iconView.heightAnchor.constraint(equalToConstant: 48)
+        ])
     }
 
     private func addFeedCard(name: String, top: CGFloat, tint: MediaTint) {
