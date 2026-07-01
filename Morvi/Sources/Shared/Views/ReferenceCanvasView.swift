@@ -2240,9 +2240,22 @@ final class ReferenceCanvasView: UIView {
         addMediaBlock(top: top + 40, left: 20, width: 335, height: 360, title: "Moments Matter", tint: tint, action: .play)
         addPortrait(top: top, left: 20, size: 36, tint: .warm)
         addText(name, size: 19, weight: .bold, top: top + 4, left: 68)
-        addText("•••", size: 20, weight: .black, top: top + 0, left: 318)
+        addFeedMoreIcon(top: top + 6, left: 314)
         addTags(top: top + 320)
         addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: top + 410, left: 22, color: .darkGray)
+    }
+
+    private func addFeedMoreIcon(top: CGFloat, left: CGFloat) {
+        let iconView = UIImageView(image: UIImage(named: "feed_more_icon"))
+        iconView.contentMode = .scaleAspectFit
+        addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            iconView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            iconView.widthAnchor.constraint(equalToConstant: 24),
+            iconView.heightAnchor.constraint(equalToConstant: 24)
+        ])
     }
 
     private func addTags(top: CGFloat) {
