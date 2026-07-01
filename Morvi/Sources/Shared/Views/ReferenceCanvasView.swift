@@ -200,8 +200,8 @@ final class ReferenceCanvasView: UIView {
             top: 458,
             filled: true,
             cornerRadius: 12,
-            shadowOffset: CGSize(width: 0, height: 5),
-            shadowRadius: 5
+            shadowOpacity: 0,
+            bottomPlateHeight: 3
         )
         addFeatureCard(title: "Discover", top: 536, left: 20, tint: .forest, imageName: "home_discover")
         addFeatureCard(title: "Recot Bot", top: 536, left: 192, tint: .night, imageName: "home_recot_bot")
@@ -914,9 +914,25 @@ final class ReferenceCanvasView: UIView {
         usesOneFont: Bool = false,
         cornerRadius: CGFloat = 24,
         shadowOffset: CGSize = CGSize(width: 0, height: 4),
-        shadowRadius: CGFloat = 9
+        shadowRadius: CGFloat = 9,
+        shadowOpacity: Float? = nil,
+        bottomPlateHeight: CGFloat = 0
     ) {
         let layoutContainer = activeLayoutContainer ?? self
+        if bottomPlateHeight > 0 {
+            let plate = UIView()
+            plate.backgroundColor = UIColor(red: 0.39, green: 0.68, blue: 0.02, alpha: 1)
+            plate.layer.cornerRadius = cornerRadius
+            plate.layer.masksToBounds = true
+            layoutContainer.addSubview(plate)
+            plate.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                plate.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+                plate.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+                plate.widthAnchor.constraint(equalToConstant: width),
+                plate.heightAnchor.constraint(equalToConstant: 52 + bottomPlateHeight)
+            ])
+        }
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
         button.titleLabel?.font = usesOneFont || usesFredokaText(text) ? AppFont.fredoka(16) : AppFont.source(16, weight: .black)
@@ -926,7 +942,7 @@ final class ReferenceCanvasView: UIView {
         button.layer.borderWidth = filled || dark ? 0 : 1
         button.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
         button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOpacity = filled ? 0.14 : 0.06
+        button.layer.shadowOpacity = shadowOpacity ?? (filled ? 0.14 : 0.06)
         button.layer.shadowOffset = shadowOffset
         button.layer.shadowRadius = shadowRadius
         if filled {
