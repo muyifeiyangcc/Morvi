@@ -827,12 +827,7 @@ final class ReferenceCanvasView: UIView {
     private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool) {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
         let panelTop: CGFloat = portrait ? 245 : 307
-        let textTop: CGFloat = portrait ? 410 : (title == nil ? 348 : 385)
-        let minimumButtonTop: CGFloat = portrait ? 499 : 437
-        let textLineCount = CGFloat(text.components(separatedBy: "\n").count)
-        let textBottom = textTop + textLineCount * 22
-        let buttonTop = max(minimumButtonTop, textBottom + 28)
-        let panelHeight = buttonTop + 50 + 34 - panelTop
+        let panelHeight: CGFloat = portrait ? 340 : 216
         let panel = addPanel(top: panelTop, left: 30, width: 322, height: panelHeight, alpha: 1)
         panel.backgroundColor = .clear
         panel.layer.borderWidth = 0
@@ -855,9 +850,10 @@ final class ReferenceCanvasView: UIView {
         if let title {
             addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : 316, centered: !portrait)
         }
+        let textTop: CGFloat = portrait ? 410 : (title == nil ? 348 : 385)
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
-        addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: !portrait, usesOneFont: true)
-        addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, usesOneFont: true)
+        addPillButton("Cancel", top: portrait ? 499 : 437, left: 66, width: 112, dark: !portrait, usesOneFont: true)
+        addPillButton(confirm, top: portrait ? 499 : 437, left: 204, width: 112, dark: true, usesOneFont: true)
     }
 
     private func popupBackgroundImage() -> UIImage? {
