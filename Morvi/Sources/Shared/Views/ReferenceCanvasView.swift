@@ -9,6 +9,8 @@ final class ReferenceCanvasView: UIView {
     private let selectedMoodIndex: Int
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
+    private weak var keyboardAvoidanceInputView: UIView?
+    private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
 
@@ -735,11 +737,13 @@ final class ReferenceCanvasView: UIView {
         sheet.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         addSubview(sheet)
         sheet.translatesAutoresizingMaskIntoConstraints = false
+        let sheetBottomConstraint = sheet.bottomAnchor.constraint(equalTo: bottomAnchor)
         NSLayoutConstraint.activate([
             sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
             sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
-            sheet.bottomAnchor.constraint(equalTo: bottomAnchor)
+            sheetBottomConstraint
         ])
+        keyboardAvoidanceBottomConstraint = sheetBottomConstraint
 
         let grabber = UIView()
         grabber.backgroundColor = .white
@@ -811,6 +815,9 @@ final class ReferenceCanvasView: UIView {
             bottomInset: 16
         )
         feelingInput.topAnchor.constraint(equalTo: card.topAnchor, constant: 75).isActive = true
+        keyboardAvoidanceInputView = feelingInput
+        installKeyboardAvoidance()
+        installBlankAreaKeyboardDismissal()
         sheet.layoutIfNeeded()
         (uploadButton.layer.sublayers?.first as? CAGradientLayer)?.frame = uploadButton.bounds
     }
@@ -1392,22 +1399,51 @@ final class ReferenceCanvasView: UIView {
         )
     }
 
+    private func installBlankAreaKeyboardDismissal() {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardFromBlankArea))
+        gesture.cancelsTouchesInView = false
+        gesture.delegate = self
+        addGestureRecognizer(gesture)
+    }
+
+    @objc private func dismissKeyboardFromBlankArea() {
+        endEditing(true)
+    }
+
     @objc private func handleKeyboardFrameChange(_ notification: Notification) {
-        guard let scrollView = keyboardAwareScrollView else { return }
         let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) ?? .zero
         let keyboardFrameInView = convert(keyboardFrame, from: nil)
         let overlap = max(0, bounds.maxY - keyboardFrameInView.minY)
-        let bottomInset = overlap > 0 ? overlap + 20 : 0
-        scrollView.contentInset.bottom = bottomInset
-        scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+        if let scrollView = keyboardAwareScrollView {
+            let bottomInset = overlap > 0 ? overlap + 20 : 0
+            scrollView.contentInset.bottom = bottomInset
+            scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+
+            if overlap > 0, let activeInput = firstResponder(in: scrollView) {
+                let targetRect = activeInput.convert(activeInput.bounds.insetBy(dx: 0, dy: -18), to: scrollView)
+                scrollView.scrollRectToVisible(targetRect, animated: true)
+            }
+        }
 
         guard
-            overlap > 0,
-            let activeInput = firstResponder(in: scrollView)
+            let bottomConstraint = keyboardAvoidanceBottomConstraint,
+            let inputView = keyboardAvoidanceInputView
         else { return }
 
-        let targetRect = activeInput.convert(activeInput.bounds.insetBy(dx: 0, dy: -18), to: scrollView)
-        scrollView.scrollRectToVisible(targetRect, animated: true)
+        let isHiding = notification.name == UIResponder.keyboardWillHideNotification
+        let inputFrame = inputView.convert(inputView.bounds, to: self)
+        let unshiftedInputMaxY = inputFrame.maxY - bottomConstraint.constant
+        let requiredOffset = isHiding
+            ? 0
+            : max(0, unshiftedInputMaxY + 20 - keyboardFrameInView.minY)
+        bottomConstraint.constant = -requiredOffset
+
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
+        let curveValue = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt ?? 7
+        let options = UIView.AnimationOptions(rawValue: curveValue << 16)
+        UIView.animate(withDuration: duration, delay: 0, options: options) {
+            self.layoutIfNeeded()
+        }
     }
 
     private func firstResponder(in view: UIView) -> UIView? {
@@ -1661,10 +1697,13 @@ final class ReferenceCanvasView: UIView {
     ) -> UIView {
         let layoutContainer = parent ?? self
         let field = UIView()
-        field.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
+        field.backgroundColor = UIColor(
+            red: 212 / 255,
+            green: 1,
+            blue: 59 / 255,
+            alpha: 0.3
+        )
         field.layer.cornerRadius = 10
-        field.layer.borderWidth = 1
-        field.layer.borderColor = UIColor(red: 0.53, green: 0.86, blue: 0.10, alpha: 1).cgColor
         field.layer.masksToBounds = true
         layoutContainer.addSubview(field)
         field.translatesAutoresizingMaskIntoConstraints = false
@@ -1679,6 +1718,24 @@ final class ReferenceCanvasView: UIView {
             fieldConstraints.append(field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
         }
         NSLayoutConstraint.activate(fieldConstraints)
+        layoutContainer.layoutIfNeeded()
+
+        let dashedBorder = CAShapeLayer()
+        dashedBorder.strokeColor = UIColor(
+            red: 165 / 255,
+            green: 214 / 255,
+            blue: 63 / 255,
+            alpha: 1
+        ).cgColor
+        dashedBorder.fillColor = UIColor.clear.cgColor
+        dashedBorder.lineDashPattern = [3, 2]
+        dashedBorder.lineWidth = 1
+        dashedBorder.frame = field.bounds
+        dashedBorder.path = UIBezierPath(
+            roundedRect: field.bounds.insetBy(dx: 0.5, dy: 0.5),
+            cornerRadius: 10
+        ).cgPath
+        field.layer.addSublayer(dashedBorder)
 
         let inputView = UITextView()
         inputView.text = text
@@ -2560,6 +2617,19 @@ final class ReferenceCanvasView: UIView {
     private enum ConversationMode {
         case text
         case voice
+    }
+}
+
+extension ReferenceCanvasView: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        var touchedView = touch.view
+        while let candidate = touchedView, candidate !== self {
+            if candidate is UIControl || candidate is UITextField || candidate is UITextView {
+                return false
+            }
+            touchedView = candidate.superview
+        }
+        return true
     }
 }
 
