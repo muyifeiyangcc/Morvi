@@ -936,8 +936,8 @@ final class ReferenceCanvasView: UIView {
     private func addRestrictPopupNamePill(_ text: String, avatarTop: CGFloat, avatarLeft: CGFloat, avatarSize: CGFloat) {
         let font = AppFont.source(16, weight: .medium)
         let horizontalPadding: CGFloat = 30
-        let topPadding: CGFloat = 4
-        let bottomPadding: CGFloat = 7
+        let topPadding: CGFloat = 0
+        let bottomPadding: CGFloat = 3
         let textSize = (text as NSString).size(withAttributes: [.font: font])
         let width = ceil(textSize.width) + horizontalPadding * 2
         let height = ceil(font.lineHeight) + topPadding + bottomPadding
