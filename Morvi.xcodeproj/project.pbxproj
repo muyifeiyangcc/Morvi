@@ -13,7 +13,6 @@
 		100000000000000000000104 /* RouteFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000004 /* RouteFactory.swift */; };
 		100000000000000000000105 /* ScenePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* ScenePage.swift */; };
 		100000000000000000000106 /* EntrySceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* EntrySceneController.swift */; };
-		100000000000000000000120 /* AuthSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000020 /* AuthSceneController.swift */; };
 		100000000000000000000107 /* BaseSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* BaseSceneController.swift */; };
 		100000000000000000000108 /* ReferencePageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* ReferencePageController.swift */; };
 		100000000000000000000109 /* RootTabsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* RootTabsController.swift */; };
@@ -27,6 +26,7 @@
 		100000000000000000000117 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000017 /* AppFont.swift */; };
 		100000000000000000000118 /* DecorativeGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000018 /* DecorativeGradientView.swift */; };
 		100000000000000000000119 /* RadialGlowLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000019 /* RadialGlowLayer.swift */; };
+		100000000000000000000120 /* AuthSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000020 /* AuthSceneController.swift */; };
 		100000000000000000000121 /* MorviProgressOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000025 /* MorviProgressOverlayView.swift */; };
 		100000000000000000000122 /* DiscoverStoryStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000026 /* DiscoverStoryStripView.swift */; };
 		100000000000000000000201 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000021 /* Assets.xcassets */; };
@@ -48,7 +48,6 @@
 		100000000000000000000004 /* RouteFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteFactory.swift; sourceTree = "<group>"; };
 		100000000000000000000005 /* ScenePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePage.swift; sourceTree = "<group>"; };
 		100000000000000000000006 /* EntrySceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntrySceneController.swift; sourceTree = "<group>"; };
-		100000000000000000000020 /* AuthSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSceneController.swift; sourceTree = "<group>"; };
 		100000000000000000000007 /* BaseSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSceneController.swift; sourceTree = "<group>"; };
 		100000000000000000000008 /* ReferencePageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferencePageController.swift; sourceTree = "<group>"; };
 		100000000000000000000009 /* RootTabsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsController.swift; sourceTree = "<group>"; };
@@ -62,6 +61,7 @@
 		100000000000000000000017 /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
 		100000000000000000000018 /* DecorativeGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecorativeGradientView.swift; sourceTree = "<group>"; };
 		100000000000000000000019 /* RadialGlowLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadialGlowLayer.swift; sourceTree = "<group>"; };
+		100000000000000000000020 /* AuthSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSceneController.swift; sourceTree = "<group>"; };
 		100000000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		100000000000000000000022 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		100000000000000000000023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
