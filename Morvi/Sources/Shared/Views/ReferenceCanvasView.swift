@@ -747,8 +747,8 @@ final class ReferenceCanvasView: UIView {
         card.backgroundColor = .white
         card.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
         addMoodPreview(top: 458, left: 235, size: 100)
-        addLargeField("Input here...", top: 573, height: 122)
-        addButton("Upload", top: 732, filled: true, usesOneFont: true)
+        addLargeField("Input here...", top: 574, height: 134)
+        addButton("Upload", top: 728, filled: true, usesOneFont: true, shadowOpacity: 0, bottomPlateHeight: 3)
     }
 
     private func renderWeeklyFeeling() {
@@ -1578,7 +1578,7 @@ final class ReferenceCanvasView: UIView {
             inputView.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
             inputView.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -16),
             inputView.topAnchor.constraint(equalTo: field.topAnchor, constant: 12),
-            inputView.bottomAnchor.constraint(equalTo: field.bottomAnchor, constant: -12)
+            inputView.bottomAnchor.constraint(equalTo: field.bottomAnchor, constant: -16)
         ])
     }
 
