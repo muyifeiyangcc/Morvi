@@ -1661,8 +1661,8 @@ final class ReferenceCanvasView: UIView {
                     moodColor.cgColor,
                     moodColor.withAlphaComponent(0).cgColor
                 ]
-                gradient.startPoint = CGPoint(x: 0, y: 0)
-                gradient.endPoint = CGPoint(x: 1, y: 1)
+                gradient.startPoint = CGPoint(x: 0.5, y: 0)
+                gradient.endPoint = CGPoint(x: 0.5, y: 1)
                 gradient.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
                 gradient.cornerRadius = 28
                 tile.layer.insertSublayer(gradient, at: 0)
