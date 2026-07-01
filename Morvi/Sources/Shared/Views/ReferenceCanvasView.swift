@@ -855,8 +855,13 @@ final class ReferenceCanvasView: UIView {
             addText(title, size: portrait ? 18 : 31, weight: .black, top: portrait ? 364 : titleTop, centered: !portrait, usesOneFont: true)
         }
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
-        addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: false, fontWeight: .medium)
+        let cancelButton = addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: false, fontWeight: .medium)
+        cancelButton.addTarget(self, action: #selector(closePopupOverlay), for: .touchUpInside)
         addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, fontWeight: .medium)
+    }
+
+    @objc private func closePopupOverlay() {
+        removeFromSuperview()
     }
 
     private func popupBackgroundImage() -> UIImage? {
@@ -1631,6 +1636,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
+    @discardableResult
     private func addPillButton(
         _ text: String,
         top: CGFloat,
@@ -1640,7 +1646,7 @@ final class ReferenceCanvasView: UIView {
         usesOneFont: Bool = false,
         fontWeight: UIFont.Weight = .regular,
         parent: UIView? = nil
-    ) {
+    ) -> UIButton {
         let layoutContainer = parent ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
@@ -1662,6 +1668,7 @@ final class ReferenceCanvasView: UIView {
             button.widthAnchor.constraint(equalToConstant: width),
             button.heightAnchor.constraint(equalToConstant: 50)
         ])
+        return button
     }
 
     private func addGradientBand(height: CGFloat) {
