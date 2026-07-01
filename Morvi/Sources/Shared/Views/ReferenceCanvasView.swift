@@ -873,7 +873,7 @@ final class ReferenceCanvasView: UIView {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             imageView.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
-            imageView.topAnchor.constraint(equalTo: panel.topAnchor),
+            imageView.topAnchor.constraint(equalTo: panel.topAnchor, constant: 15),
             imageView.widthAnchor.constraint(equalToConstant: 237),
             imageView.heightAnchor.constraint(equalToConstant: 88)
         ])
