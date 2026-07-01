@@ -12,7 +12,7 @@ final class ReferenceCanvasView: UIView {
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
 
-    init(page: ScenePage, selectedMoodIndex: Int = 1) {
+    init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
         self.selectedMoodIndex = selectedMoodIndex
         super.init(frame: .zero)
@@ -737,7 +737,7 @@ final class ReferenceCanvasView: UIView {
         let card = addPanel(top: 499, left: 20, width: 335, height: 213, alpha: 1)
         card.backgroundColor = .white
         card.layer.borderColor = UIColor(white: 0.9, alpha: 1).cgColor
-        addCircle(text: "😃", top: 458, left: 235, size: 100, color: UIColor(red: 1, green: 0.91, blue: 0.34, alpha: 1))
+        addMoodPreview(top: 458, left: 235, size: 100)
         addLargeField("Input here...", top: 573, height: 122)
         addButton("Upload", top: 732, filled: true, usesOneFont: true)
     }
@@ -1829,7 +1829,7 @@ final class ReferenceCanvasView: UIView {
     private func addMoodRow(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let moodColor = UIColor(red: 1, green: 240 / 255, blue: 110 / 255, alpha: 1)
-        ["home_mood_smile", "home_mood_happy", "home_mood_laugh"].enumerated().forEach { index, imageName in
+        moodImageNames.enumerated().forEach { index, imageName in
             let tile = UIView()
             let isSelected = index == selectedMoodIndex
             tile.backgroundColor = isSelected ? moodColor : .clear
@@ -1869,6 +1869,44 @@ final class ReferenceCanvasView: UIView {
                 faceView.heightAnchor.constraint(equalToConstant: 72)
             ])
         }
+    }
+
+    private var moodImageNames: [String] {
+        ["home_mood_smile", "home_mood_happy", "home_mood_laugh"]
+    }
+
+    private var selectedMoodImageName: String {
+        moodImageNames[min(max(selectedMoodIndex, 0), moodImageNames.count - 1)]
+    }
+
+    private func addMoodPreview(top: CGFloat, left: CGFloat, size: CGFloat) {
+        let moodColor = UIColor(red: 1, green: 240 / 255, blue: 110 / 255, alpha: 1)
+        let tile = UIView()
+        tile.backgroundColor = moodColor
+        tile.layer.cornerRadius = size * 0.28
+        tile.layer.shadowColor = UIColor.black.cgColor
+        tile.layer.shadowOpacity = 0.07
+        tile.layer.shadowOffset = CGSize(width: 0, height: 5)
+        tile.layer.shadowRadius = 12
+        addSubview(tile)
+        tile.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tile.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            tile.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            tile.widthAnchor.constraint(equalToConstant: size),
+            tile.heightAnchor.constraint(equalToConstant: size)
+        ])
+
+        let faceView = UIImageView(image: UIImage(named: selectedMoodImageName))
+        faceView.contentMode = .scaleAspectFit
+        tile.addSubview(faceView)
+        faceView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            faceView.centerXAnchor.constraint(equalTo: tile.centerXAnchor),
+            faceView.centerYAnchor.constraint(equalTo: tile.centerYAnchor),
+            faceView.widthAnchor.constraint(equalToConstant: size * 0.72),
+            faceView.heightAnchor.constraint(equalToConstant: size * 0.72)
+        ])
     }
 
     private func addFeatureCard(title: String, top: CGFloat, left: CGFloat, tint: MediaTint, imageName: String? = nil) {
