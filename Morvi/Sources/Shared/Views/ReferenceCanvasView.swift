@@ -829,8 +829,6 @@ final class ReferenceCanvasView: UIView {
         let panel = addPanel(top: portrait ? 245 : 307, left: 30, width: 322, height: portrait ? 340 : 216, alpha: 1)
         panel.backgroundColor = .clear
         panel.layer.borderWidth = 0
-        panel.layer.cornerRadius = 64
-        panel.layer.masksToBounds = true
         let backgroundImageView = UIImageView(image: popupBackgroundImage())
         backgroundImageView.contentMode = .scaleToFill
         backgroundImageView.clipsToBounds = true
