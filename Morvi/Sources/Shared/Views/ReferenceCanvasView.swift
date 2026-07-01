@@ -831,8 +831,8 @@ final class ReferenceCanvasView: UIView {
         panel.layer.borderWidth = 0
         panel.layer.cornerRadius = 64
         panel.layer.masksToBounds = true
-        let backgroundImageView = UIImageView(image: UIImage(named: "login_popup_background"))
-        backgroundImageView.contentMode = .scaleAspectFill
+        let backgroundImageView = UIImageView(image: popupBackgroundImage())
+        backgroundImageView.contentMode = .scaleToFill
         backgroundImageView.clipsToBounds = true
         panel.addSubview(backgroundImageView)
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -854,6 +854,22 @@ final class ReferenceCanvasView: UIView {
         addText(text, size: 17, weight: .regular, top: textTop, left: 66)
         addPillButton("Cancel", top: portrait ? 499 : 437, left: 66, width: 112, dark: !portrait, usesOneFont: true)
         addPillButton(confirm, top: portrait ? 499 : 437, left: 204, width: 112, dark: true, usesOneFont: true)
+    }
+
+    private func popupBackgroundImage() -> UIImage? {
+        guard let image = UIImage(named: "login_popup_background") else { return nil }
+        let centerLength = 20 / max(image.scale, 1)
+        let horizontalInset = max((image.size.width - centerLength) / 2, 0)
+        let verticalInset = max((image.size.height - centerLength) / 2, 0)
+        return image.resizableImage(
+            withCapInsets: UIEdgeInsets(
+                top: verticalInset,
+                left: horizontalInset,
+                bottom: verticalInset,
+                right: horizontalInset
+            ),
+            resizingMode: .stretch
+        )
     }
 
     private func addText(
