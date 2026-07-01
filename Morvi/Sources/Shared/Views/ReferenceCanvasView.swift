@@ -934,11 +934,16 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addRestrictPopupNamePill(_ text: String, avatarTop: CGFloat, avatarLeft: CGFloat, avatarSize: CGFloat) {
-        let width: CGFloat = 238
-        let height: CGFloat = 46
+        let font = AppFont.fredoka(18)
+        let horizontalPadding: CGFloat = 30
+        let topPadding: CGFloat = 4
+        let bottomPadding: CGFloat = 7
+        let textSize = (text as NSString).size(withAttributes: [.font: font])
+        let width = ceil(textSize.width) + horizontalPadding * 2
+        let height = ceil(font.lineHeight) + topPadding + bottomPadding
         let shadowDrop: CGFloat = 5
         let left = avatarLeft + avatarSize / 2 - width / 2
-        let top = avatarTop + avatarSize - height - shadowDrop
+        let top = avatarTop + avatarSize - height / 2
 
         let shadowView = UIView()
         shadowView.backgroundColor = UIColor(red: 0.37, green: 0.68, blue: 0.03, alpha: 1)
@@ -979,13 +984,15 @@ final class ReferenceCanvasView: UIView {
         let label = UILabel()
         label.text = text
         label.textColor = .black
-        label.font = AppFont.fredoka(18)
+        label.font = font
         label.textAlignment = .center
         pillView.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: pillView.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: pillView.centerYAnchor)
+            label.leadingAnchor.constraint(equalTo: pillView.leadingAnchor, constant: horizontalPadding),
+            label.trailingAnchor.constraint(equalTo: pillView.trailingAnchor, constant: -horizontalPadding),
+            label.topAnchor.constraint(equalTo: pillView.topAnchor, constant: topPadding),
+            label.bottomAnchor.constraint(equalTo: pillView.bottomAnchor, constant: -bottomPadding)
         ])
     }
 
