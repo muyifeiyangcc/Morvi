@@ -960,7 +960,7 @@ final class ReferenceCanvasView: UIView {
         ])
 
         activeLayoutContainer = sheet
-        addText("Report or block", size: 31, weight: .black, top: 36, left: 20)
+        addText("Report or block", size: 31, weight: .black, top: 28, left: 20, usesOneFont: true)
         addOptionTile(symbol: "⚑", top: 84, left: 20)
         addOptionTile(symbol: "⊘", top: 84, left: 198)
         activeLayoutContainer = nil
