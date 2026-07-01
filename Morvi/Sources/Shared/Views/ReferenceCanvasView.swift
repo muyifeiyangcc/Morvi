@@ -836,7 +836,7 @@ final class ReferenceCanvasView: UIView {
             ? portraitAvatarTop + portraitAvatarSize + restrictPopupNamePillHeight() / 2 + 20
             : (title == nil ? panelTop + 39 : titleTop + titleHeight + 24)
         let textHeight = CGFloat(text.components(separatedBy: "\n").count) * sourceFont(for: text, size: 17, weight: .regular).lineHeight
-        let buttonTop: CGFloat = portrait ? 499 : textTop + textHeight + 24
+        let buttonTop: CGFloat = textTop + textHeight + 24
         let panelHeight: CGFloat = portrait ? 340 : buttonTop + 50 + 36 - panelTop
         let panel = addPanel(top: panelTop, left: 30, width: 322, height: panelHeight, alpha: 1)
         panel.backgroundColor = .clear
