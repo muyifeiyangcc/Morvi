@@ -37,8 +37,8 @@ enum RouteFactory {
                     HitArea(frame: CGRect(x: 36, y: 220, width: 300, height: 54)) { scene.push(.restrictedList) },
                     HitArea(frame: CGRect(x: 36, y: 284, width: 300, height: 54)) { scene.push(.agreement) },
                     HitArea(frame: CGRect(x: 36, y: 348, width: 300, height: 54)) { scene.push(.agreement) },
-                    HitArea(frame: CGRect(x: 36, y: 462, width: 300, height: 54)) { scene.push(.exitConfirm) },
-                    HitArea(frame: CGRect(x: 36, y: 526, width: 300, height: 54)) { scene.push(.exitConfirm) }
+                    HitArea(frame: CGRect(x: 36, y: 462, width: 300, height: 54)) { scene.showOverlay(.exitConfirm) },
+                    HitArea(frame: CGRect(x: 36, y: 526, width: 300, height: 54)) { scene.showOverlay(.exitConfirm) }
                 ]
             }
         case .uploadEmpty:
@@ -58,13 +58,13 @@ enum RouteFactory {
             }
         case .assistantDialogue:
             return ReferencePageController(page: .assistantDialogue) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 690, width: 335, height: 60)) { scene.push(.spendConfirm) }]
+                [HitArea(frame: CGRect(x: 20, y: 690, width: 335, height: 60)) { scene.showOverlay(.spendConfirm) }]
             }
         case .wallet:
             return ReferencePageController(page: .wallet) { scene in
                 [
-                    HitArea(frame: CGRect(x: 30, y: 500, width: 315, height: 58)) { scene.push(.spendConfirm) },
-                    HitArea(frame: CGRect(x: 30, y: 570, width: 315, height: 58)) { scene.push(.creditShortage) }
+                    HitArea(frame: CGRect(x: 30, y: 500, width: 315, height: 58)) { scene.showOverlay(.spendConfirm) },
+                    HitArea(frame: CGRect(x: 30, y: 570, width: 315, height: 58)) { scene.showOverlay(.creditShortage) }
                 ]
             }
         case .publicPersona:
@@ -83,7 +83,7 @@ enum RouteFactory {
             }
         case .restrictPanel:
             return ReferencePageController(page: .restrictPanel) { scene in
-                [HitArea(frame: CGRect(x: 40, y: 650, width: 295, height: 64)) { scene.push(.restrictConfirm) }]
+                [HitArea(frame: CGRect(x: 40, y: 650, width: 295, height: 64)) { scene.showOverlay(.restrictConfirm) }]
             }
         case .feelingEditor:
             return ReferencePageController(page: .feelingEditor) { scene in

@@ -26,6 +26,20 @@ class ReferencePageController: BaseSceneController {
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
+    func showOverlay(_ page: ScenePage) {
+        let overlayView = ReferenceCanvasView(page: page)
+        overlayView.tag = 9102
+        view.viewWithTag(9102)?.removeFromSuperview()
+        view.addSubview(overlayView)
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+
     func enterMainFlow() {
         navigationController?.setViewControllers([RootTabsController()], animated: true)
     }

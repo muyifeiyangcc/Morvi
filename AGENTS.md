@@ -38,6 +38,7 @@
 - Login flow and main flow are separate navigation controller flows.
 - The main navigation root is the custom tab root controller.
 - Do not use `UITabBarController` or the system `UITabBar`; the tabbar is custom to avoid secondary page hiding logic.
+- Confirmation/access popup cards must not be pushed onto a navigation stack. Present them as a direct overlay on the current page with no transition animation.
 
 ## File Organization
 

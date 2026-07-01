@@ -107,7 +107,7 @@ final class RootTabsController: UIViewController {
         switch currentPage {
         case .home:
             installHitAreas([
-                HitArea(frame: CGRect(x: 20, y: 60, width: 58, height: 58)) { [weak self] in self?.show(.accessGate) },
+                HitArea(frame: CGRect(x: 20, y: 60, width: 58, height: 58)) { [weak self] in self?.showOverlay(.accessGate) },
                 HitArea(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in self?.show(.feelingEditor) },
                 HitArea(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in self?.switchTo(.discover) },
                 HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.show(.assistantDialogue) }
@@ -187,6 +187,20 @@ final class RootTabsController: UIViewController {
 
     private func show(_ page: ScenePage) {
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
+    }
+
+    private func showOverlay(_ page: ScenePage) {
+        let overlayView = ReferenceCanvasView(page: page)
+        overlayView.tag = 9102
+        view.viewWithTag(9102)?.removeFromSuperview()
+        view.addSubview(overlayView)
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            overlayView.topAnchor.constraint(equalTo: view.topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 
     @objc private func handleTopLeadingTap() {
