@@ -628,9 +628,9 @@ final class ReferenceCanvasView: UIView {
         addText("Theme:", size: 17, weight: .regular, top: 94, left: 20)
         if filled {
             addSmallField("Theme", top: 121, left: 20, width: 70)
-            addSmallField("+", top: 121, left: 108, width: 76)
+            addSmallField(nil, imageName: "theme_add_icon", top: 121, left: 108, width: 76)
         } else {
-            addSmallField("+", top: 121, left: 20, width: 78)
+            addSmallField(nil, imageName: "theme_add_icon", top: 121, left: 20, width: 78)
         }
         addText("Description:", size: 17, weight: .regular, top: 189, left: 20)
         addLargeField("Say something", top: 215)
@@ -1795,7 +1795,13 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addSmallField(_ text: String, top: CGFloat, left: CGFloat, width: CGFloat) {
+    private func addSmallField(
+        _ text: String?,
+        imageName: String? = nil,
+        top: CGFloat,
+        left: CGFloat,
+        width: CGFloat
+    ) {
         let layoutContainer = activeLayoutContainer ?? self
         let field = AdaptiveInputView(
             backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
@@ -1819,6 +1825,18 @@ final class ReferenceCanvasView: UIView {
             label.topAnchor.constraint(equalTo: field.topAnchor),
             label.bottomAnchor.constraint(equalTo: field.bottomAnchor)
         ])
+        if let imageName {
+            let iconView = UIImageView(image: UIImage(named: imageName))
+            iconView.contentMode = .scaleAspectFit
+            field.addSubview(iconView)
+            iconView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                iconView.centerXAnchor.constraint(equalTo: field.centerXAnchor),
+                iconView.centerYAnchor.constraint(equalTo: field.centerYAnchor),
+                iconView.widthAnchor.constraint(equalToConstant: 30),
+                iconView.heightAnchor.constraint(equalToConstant: 30)
+            ])
+        }
     }
 
     @discardableResult
@@ -1918,16 +1936,15 @@ final class ReferenceCanvasView: UIView {
             box.widthAnchor.constraint(equalToConstant: 92),
             box.heightAnchor.constraint(equalToConstant: 115)
         ])
-        let icon = UILabel()
-        icon.text = "⇧"
-        icon.textAlignment = .center
-        icon.font = AppFont.source(32)
-        icon.textColor = .gray
+        let icon = UIImageView(image: UIImage(named: "upload_media_icon"))
+        icon.contentMode = .scaleAspectFit
         box.addSubview(icon)
         icon.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             icon.centerXAnchor.constraint(equalTo: box.centerXAnchor),
-            icon.centerYAnchor.constraint(equalTo: box.centerYAnchor)
+            icon.centerYAnchor.constraint(equalTo: box.centerYAnchor),
+            icon.widthAnchor.constraint(equalToConstant: 28),
+            icon.heightAnchor.constraint(equalToConstant: 28)
         ])
 
         let actionButton = UIButton(type: .custom)
