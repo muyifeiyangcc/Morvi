@@ -1130,8 +1130,7 @@ final class ReferenceCanvasView: UIView {
         ]
         for index in rows.indices {
             let top = CGFloat(87 + index * 64)
-            addSmallField(rows[index], top: top, left: 20, width: 335)
-            addCheckBox(top: top + 13, left: 314, checked: index == 5)
+            addReportChoiceRow(rows[index], top: top, checked: index == 5)
         }
         addButton(
             "Upload",
@@ -2431,18 +2430,38 @@ final class ReferenceCanvasView: UIView {
     }
 
 
-    private func addCheckBox(top: CGFloat, left: CGFloat, checked: Bool) {
+    private func addReportChoiceRow(_ text: String, top: CGFloat, checked: Bool) {
         let layoutContainer = activeLayoutContainer ?? self
-        let imageName = checked ? "report_check_selected" : "report_check_unselected"
-        let box = UIImageView(image: UIImage(named: imageName))
-        box.contentMode = .scaleAspectFit
-        layoutContainer.addSubview(box)
-        box.translatesAutoresizingMaskIntoConstraints = false
+        let field = AdaptiveInputView(
+            backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
+        )
+        let label = UILabel()
+        label.text = text
+        label.textAlignment = .center
+        label.textColor = .darkGray
+        label.font = AppFont.source(14)
+        let checkIcon = UIImageView(image: UIImage(named: checked ? "report_check_selected" : "report_check_unselected"))
+        checkIcon.contentMode = .scaleAspectFit
+
+        layoutContainer.addSubview(field)
+        field.addSubview(label)
+        field.addSubview(checkIcon)
+        field.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        checkIcon.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            box.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            box.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            box.widthAnchor.constraint(equalToConstant: 24),
-            box.heightAnchor.constraint(equalToConstant: 24)
+            field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
+            field.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
+            field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            field.heightAnchor.constraint(equalToConstant: 45),
+            label.leadingAnchor.constraint(equalTo: field.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: field.trailingAnchor),
+            label.topAnchor.constraint(equalTo: field.topAnchor),
+            label.bottomAnchor.constraint(equalTo: field.bottomAnchor),
+            checkIcon.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -17),
+            checkIcon.centerYAnchor.constraint(equalTo: field.centerYAnchor),
+            checkIcon.widthAnchor.constraint(equalToConstant: 24),
+            checkIcon.heightAnchor.constraint(equalToConstant: 24)
         ])
     }
 
