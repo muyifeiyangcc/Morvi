@@ -1091,11 +1091,34 @@ final class ReferenceCanvasView: UIView {
 
     private func renderReportPanel() {
         backgroundColor = UIColor.black.withAlphaComponent(0.58)
-        let sheet = addPanel(top: 181, left: 0, width: 375, height: 631, alpha: 1)
+        let sheet = UIView()
         sheet.backgroundColor = .white
         sheet.layer.cornerRadius = 20
-        addGrabber(top: 170)
-        addText("Report", size: 31, weight: .black, top: 216, left: 20)
+        sheet.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        addSubview(sheet)
+        sheet.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
+            sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
+            sheet.bottomAnchor.constraint(equalTo: bottomAnchor),
+            sheet.heightAnchor.constraint(equalToConstant: 631)
+        ])
+        overlayContentView = sheet
+
+        let grabber = UIView()
+        grabber.backgroundColor = .white
+        grabber.layer.cornerRadius = 2
+        addSubview(grabber)
+        grabber.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            grabber.centerXAnchor.constraint(equalTo: centerXAnchor),
+            grabber.bottomAnchor.constraint(equalTo: sheet.topAnchor, constant: -7),
+            grabber.widthAnchor.constraint(equalToConstant: 112),
+            grabber.heightAnchor.constraint(equalToConstant: 4)
+        ])
+
+        activeLayoutContainer = sheet
+        addText("Report", size: 31, weight: .black, top: 35, left: 20, usesOneFont: true)
         let rows = [
             "Politically sensitive",
             "Bloody violence",
@@ -1106,11 +1129,21 @@ final class ReferenceCanvasView: UIView {
             "Others"
         ]
         for index in rows.indices {
-            let top = CGFloat(268 + index * 64)
+            let top = CGFloat(87 + index * 64)
             addSmallField(rows[index], top: top, left: 20, width: 335)
             addCheckBox(top: top + 13, left: 314, checked: index == 5)
         }
-        addButton("Upload", top: 732, filled: true, usesOneFont: true)
+        addButton(
+            "Upload",
+            bottom: 29,
+            filled: true,
+            usesOneFont: true,
+            cornerRadius: 12,
+            shadowOpacity: 0,
+            bottomPlateHeight: 3
+        )
+        activeLayoutContainer = nil
+        installBlankAreaKeyboardDismissal()
     }
 
     private func renderRestrictPanel() {
@@ -2399,6 +2432,7 @@ final class ReferenceCanvasView: UIView {
 
 
     private func addCheckBox(top: CGFloat, left: CGFloat, checked: Bool) {
+        let layoutContainer = activeLayoutContainer ?? self
         let box = UILabel()
         box.text = checked ? "✓" : ""
         box.textAlignment = .center
@@ -2407,11 +2441,11 @@ final class ReferenceCanvasView: UIView {
         box.backgroundColor = checked ? UIColor(red: 0.56, green: 1, blue: 0.20, alpha: 1) : UIColor(red: 0.86, green: 0.92, blue: 0.74, alpha: 1)
         box.layer.cornerRadius = 6
         box.layer.masksToBounds = true
-        addSubview(box)
+        layoutContainer.addSubview(box)
         box.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            box.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            box.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            box.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            box.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             box.widthAnchor.constraint(equalToConstant: 24),
             box.heightAnchor.constraint(equalToConstant: 24)
         ])
