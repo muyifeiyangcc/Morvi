@@ -1825,7 +1825,7 @@ final class ReferenceCanvasView: UIView {
 
     private func addGlassPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, radius: CGFloat) -> UIView {
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialLight))
-        blur.backgroundColor = UIColor.white.withAlphaComponent(0.42)
+        blur.backgroundColor = UIColor.white.withAlphaComponent(0.4)
         blur.layer.cornerRadius = radius
         blur.layer.masksToBounds = true
         addSubview(blur)
