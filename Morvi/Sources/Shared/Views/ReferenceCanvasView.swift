@@ -22,6 +22,7 @@ final class ReferenceCanvasView: UIView {
     private var keyboardBaseContentInset: UIEdgeInsets?
     private var keyboardBaseIndicatorInsets: UIEdgeInsets?
     private var keyboardBaseContentOffset: CGPoint?
+    private var keyboardIsVisible = false
     private let replyListDataSource = ReplyListDataSource()
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
@@ -1628,6 +1629,8 @@ final class ReferenceCanvasView: UIView {
 
         if contentView.frame.contains(gesture.location(in: self)) {
             endEditing(true)
+        } else if keyboardIsVisible {
+            endEditing(true)
         } else {
             didTapOutsideContent?()
         }
@@ -1637,6 +1640,7 @@ final class ReferenceCanvasView: UIView {
         let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) ?? .zero
         let keyboardFrameInView = convert(keyboardFrame, from: nil)
         let isHiding = notification.name == UIResponder.keyboardWillHideNotification
+        keyboardIsVisible = !isHiding && keyboardFrameInView.minY < bounds.maxY
         if let scrollView = keyboardAwareScrollView {
             updateKeyboardAwareScrollView(
                 scrollView,
