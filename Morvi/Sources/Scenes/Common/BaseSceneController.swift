@@ -182,7 +182,7 @@ class BaseSceneController: UIViewController {
     @objc private func handleTrailingNavigationTap() {
         switch page {
         case .galleryDetail:
-            showCanvasOverlay(.reportPanel)
+            showCanvasOverlay(.restrictPanel)
         default:
             break
         }

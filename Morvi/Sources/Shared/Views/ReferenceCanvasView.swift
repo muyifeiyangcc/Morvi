@@ -1082,7 +1082,7 @@ final class ReferenceCanvasView: UIView {
             ReplyListItem(name: "Sophia", text: "The video content is great! Keep going!")
         ], to: tableView)
         replyListDataSource.didTapMore = { [weak self] in
-            self?.didRequestOverlayPage?(.reportPanel)
+            self?.didRequestOverlayPage?(.restrictPanel)
         }
         keyboardAvoidanceInputView = inputBar
         installKeyboardAvoidance()
