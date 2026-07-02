@@ -368,21 +368,21 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersonaDetail(title: String) {
-        addMediaBlock(top: 0, left: 0, width: 375, height: 364, title: "", tint: .forest)
+        addMediaBlock(top: 0, left: 0, width: 375, height: 364, title: "", tint: .forest, imageName: "discover_feed_cover")
         addFloatingCircle("‹", top: 66, left: 20)
         addFloatingCircle("•••", top: 66, left: 296)
         let base = addPanel(top: 328, left: 0, width: 375, height: 484, alpha: 1)
         base.backgroundColor = UIColor(red: 0.90, green: 1.0, blue: 0.78, alpha: 1)
         base.layer.borderWidth = 0
         base.layer.cornerRadius = 20
-        addPortrait(top: 268, left: 128, size: 120, tint: .warm)
+        addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: 394, centered: true)
         addStatsPanel(top: 434)
         addPillButton("Chat", top: 535, left: 20, width: 160, dark: true)
         addPillButton("Follow", top: 535, left: 195, width: 160, dark: true)
-        addMediaBlock(top: 599, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play)
-        addMediaBlock(top: 599, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play)
-        addMediaBlock(top: 775, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play)
+        addMediaBlock(top: 599, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
+        addMediaBlock(top: 599, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
+        addMediaBlock(top: 775, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
     }
 
     private func renderSignIn() {

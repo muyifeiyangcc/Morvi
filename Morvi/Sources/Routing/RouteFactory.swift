@@ -82,7 +82,7 @@ enum RouteFactory {
             return ReferencePageController(page: .publicPersona) { scene in
                 [
                     HitArea(frame: CGRect(x: 190, y: 245, width: 160, height: 250)) { scene.push(.galleryDetail) },
-                    HitArea(frame: CGRect(x: 290, y: 60, width: 70, height: 70)) { scene.push(.restrictPanel) }
+                    HitArea(frame: CGRect(x: 290, y: 60, width: 70, height: 70)) { scene.showOverlay(.restrictPanel) }
                 ]
             }
         case .galleryDetail:
