@@ -1081,6 +1081,9 @@ final class ReferenceCanvasView: UIView {
             ReplyListItem(name: "Rowan", text: "The video content is great! Keep going!"),
             ReplyListItem(name: "Sophia", text: "The video content is great! Keep going!")
         ], to: tableView)
+        replyListDataSource.didTapMore = { [weak self] in
+            self?.didRequestOverlayPage?(.reportPanel)
+        }
         keyboardAvoidanceInputView = inputBar
         installKeyboardAvoidance()
         installBlankAreaKeyboardDismissal()

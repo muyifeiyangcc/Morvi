@@ -6,8 +6,10 @@ final class ReplyListCell: UITableViewCell {
     private let avatarView = UIImageView()
     private let nameLabel = UILabel()
     private let moreIconView = UIImageView()
+    private let moreButton = UIButton(type: .custom)
     private let bodyLabel = UILabel()
     private let dividerView = UIView()
+    var didTapMore: (() -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -46,6 +48,11 @@ final class ReplyListCell: UITableViewCell {
         contentView.addSubview(moreIconView)
         moreIconView.translatesAutoresizingMaskIntoConstraints = false
 
+        moreButton.backgroundColor = .clear
+        moreButton.addTarget(self, action: #selector(handleMoreTap), for: .touchUpInside)
+        contentView.addSubview(moreButton)
+        moreButton.translatesAutoresizingMaskIntoConstraints = false
+
         bodyLabel.font = AppFont.source(16)
         bodyLabel.textColor = .darkGray
         bodyLabel.numberOfLines = 0
@@ -70,6 +77,11 @@ final class ReplyListCell: UITableViewCell {
             moreIconView.widthAnchor.constraint(equalToConstant: 24),
             moreIconView.heightAnchor.constraint(equalToConstant: 24),
 
+            moreButton.centerXAnchor.constraint(equalTo: moreIconView.centerXAnchor),
+            moreButton.centerYAnchor.constraint(equalTo: moreIconView.centerYAnchor),
+            moreButton.widthAnchor.constraint(equalToConstant: 44),
+            moreButton.heightAnchor.constraint(equalToConstant: 44),
+
             bodyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             bodyLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             bodyLabel.topAnchor.constraint(equalTo: avatarView.bottomAnchor, constant: 14),
@@ -80,5 +92,9 @@ final class ReplyListCell: UITableViewCell {
             dividerView.heightAnchor.constraint(equalToConstant: 1),
             dividerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
+    }
+
+    @objc private func handleMoreTap() {
+        didTapMore?()
     }
 }
