@@ -1651,11 +1651,12 @@ final class ReferenceCanvasView: UIView {
         else { return }
 
         let baseConstant = keyboardAvoidanceBaseBottomConstant
+        let keyboardGap: CGFloat = 10
         let inputFrame = inputView.convert(inputView.bounds, to: self)
         let unshiftedInputMaxY = inputFrame.maxY - (bottomConstraint.constant - baseConstant)
         let requiredOffset = isHiding
             ? 0
-            : max(0, unshiftedInputMaxY + 20 - keyboardFrameInView.minY)
+            : max(0, unshiftedInputMaxY + keyboardGap - keyboardFrameInView.minY)
         bottomConstraint.constant = baseConstant - requiredOffset
 
         let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
