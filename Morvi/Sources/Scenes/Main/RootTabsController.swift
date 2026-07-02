@@ -214,6 +214,7 @@ final class RootTabsController: UIViewController {
             || page == .uploadEmpty
             || page == .uploadFilled
             || page == .restrictPanel
+            || page == .reportPanel
             || page == .repliesPanel {
             overlayView.didTapOutsideContent = { [weak self] in
                 self?.dismissActiveOverlay()

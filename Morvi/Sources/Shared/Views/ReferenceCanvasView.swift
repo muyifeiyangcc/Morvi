@@ -2454,7 +2454,7 @@ final class ReferenceCanvasView: UIView {
             field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
             field.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
             field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            field.heightAnchor.constraint(equalToConstant: 45),
+            field.heightAnchor.constraint(equalToConstant: 52),
             label.leadingAnchor.constraint(equalTo: field.leadingAnchor),
             label.trailingAnchor.constraint(equalTo: field.trailingAnchor),
             label.topAnchor.constraint(equalTo: field.topAnchor),
