@@ -369,8 +369,6 @@ final class ReferenceCanvasView: UIView {
 
     private func renderPersonaDetail(title: String) {
         addMediaBlock(top: 0, left: 0, width: 375, height: 364, title: "", tint: .forest, imageName: "discover_feed_cover")
-        addFloatingCircle("‹", top: 66, left: 20)
-        addFloatingCircle("•••", top: 66, left: 296)
         let base = addPanel(top: 328, left: 0, width: 375, height: 484, alpha: 1)
         base.backgroundColor = UIColor(red: 0.90, green: 1.0, blue: 0.78, alpha: 1)
         base.layer.borderWidth = 0

@@ -137,6 +137,8 @@ class BaseSceneController: UIViewController {
             return "Discover"
         case .directDialogue, .voiceDialogue:
             return "Victoria"
+        case .publicPersona:
+            return "Victoria"
         case .assistantDialogue:
             return "Recot Bot"
         case .restrictedList:
@@ -150,7 +152,7 @@ class BaseSceneController: UIViewController {
 
     private func trailingNavigationIconName() -> String? {
         switch page {
-        case .galleryDetail:
+        case .galleryDetail, .publicPersona:
             return "gallery_navigation_more"
         default:
             return nil
@@ -181,7 +183,7 @@ class BaseSceneController: UIViewController {
 
     @objc private func handleTrailingNavigationTap() {
         switch page {
-        case .galleryDetail:
+        case .galleryDetail, .publicPersona:
             showCanvasOverlay(.restrictPanel)
         default:
             break
