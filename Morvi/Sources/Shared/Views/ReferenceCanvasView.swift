@@ -628,12 +628,12 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = formView
         addText("Title of work:", size: 17, weight: .regular, top: 0, left: 20)
         addInputField("Enter the title", top: 32)
-        addText("Theme:", size: 17, weight: .regular, top: 94, left: 20)
+        addText("Theme:", size: 17, weight: .regular, top: 99, left: 20)
         if filled {
-            addSmallField("Theme", top: 126, left: 20, width: 70)
-            addSmallField(nil, imageName: "theme_add_icon", top: 126, left: 108, width: 76)
+            addSmallField("Theme", top: 131, left: 20, width: 70)
+            addSmallField(nil, imageName: "theme_add_icon", top: 131, left: 108, width: 76)
         } else {
-            addSmallField(nil, imageName: "theme_add_icon", top: 126, left: 20, width: 78)
+            addSmallField(nil, imageName: "theme_add_icon", top: 131, left: 20, width: 78)
         }
         addText("Description:", size: 17, weight: .regular, top: 190, left: 20)
         addLargeField("Say something", top: 222)
