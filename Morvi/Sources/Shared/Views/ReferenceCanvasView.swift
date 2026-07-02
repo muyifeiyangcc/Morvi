@@ -1101,7 +1101,7 @@ final class ReferenceCanvasView: UIView {
             sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
             sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
             sheet.bottomAnchor.constraint(equalTo: bottomAnchor),
-            sheet.heightAnchor.constraint(equalToConstant: 631)
+            sheet.heightAnchor.constraint(equalToConstant: 567)
         ])
         overlayContentView = sheet
 
