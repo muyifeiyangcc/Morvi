@@ -52,7 +52,8 @@ class ReferencePageController: BaseSceneController {
         if page == .feelingEditor
             || page == .uploadEmpty
             || page == .uploadFilled
-            || page == .restrictPanel {
+            || page == .restrictPanel
+            || page == .repliesPanel {
             overlayView.didTapOutsideContent = { [weak self] in
                 self?.view.viewWithTag(9102)?.removeFromSuperview()
             }

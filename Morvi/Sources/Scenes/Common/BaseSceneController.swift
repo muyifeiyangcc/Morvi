@@ -35,6 +35,7 @@ class BaseSceneController: UIViewController {
             surfaceView.topAnchor.constraint(equalTo: view.topAnchor),
             surfaceView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        installFullScreenBackdropIfNeeded()
         installDecorativeLayerIfNeeded()
         surfaceView.contentView.addSubview(canvasView)
         canvasView.translatesAutoresizingMaskIntoConstraints = false
@@ -50,6 +51,34 @@ class BaseSceneController: UIViewController {
 
     func makeDecorativeLayer() -> UIView? {
         nil
+    }
+
+    private func installFullScreenBackdropIfNeeded() {
+        guard page == .galleryDetail else { return }
+        let image = UIImage(named: "discover_feed_cover")
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        surfaceView.insertSubview(imageView, belowSubview: surfaceView.contentView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+
+        var constraints = [
+            imageView.topAnchor.constraint(equalTo: surfaceView.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: surfaceView.bottomAnchor),
+            imageView.centerXAnchor.constraint(equalTo: surfaceView.centerXAnchor)
+        ]
+        if let image, image.size.height > 0 {
+            constraints.append(imageView.widthAnchor.constraint(
+                equalTo: imageView.heightAnchor,
+                multiplier: image.size.width / image.size.height
+            ))
+        } else {
+            constraints.append(contentsOf: [
+                imageView.leadingAnchor.constraint(equalTo: surfaceView.leadingAnchor),
+                imageView.trailingAnchor.constraint(equalTo: surfaceView.trailingAnchor)
+            ])
+        }
+        NSLayoutConstraint.activate(constraints)
     }
 
     private func installDecorativeLayerIfNeeded() {
@@ -174,7 +203,8 @@ class BaseSceneController: UIViewController {
         if page == .feelingEditor
             || page == .uploadEmpty
             || page == .uploadFilled
-            || page == .restrictPanel {
+            || page == .restrictPanel
+            || page == .repliesPanel {
             overlayView.didTapOutsideContent = { [weak self] in
                 self?.dismissCanvasOverlay()
             }

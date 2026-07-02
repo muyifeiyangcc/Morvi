@@ -1,9 +1,12 @@
 import UIKit
 import WebKit
+import CoreImage
+import CoreImage.CIFilterBuiltins
 
 final class ReferenceCanvasView: UIView {
     private static var agreementConsentAccepted = false
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
+    private static let ciContext = CIContext(options: nil)
 
     private let page: ScenePage
     private let selectedMoodIndex: Int
@@ -15,9 +18,11 @@ final class ReferenceCanvasView: UIView {
     private weak var keyboardAvoidanceInputView: UIView?
     private weak var overlayContentView: UIView?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
+    private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
     private var keyboardBaseContentInset: UIEdgeInsets?
     private var keyboardBaseIndicatorInsets: UIEdgeInsets?
     private var keyboardBaseContentOffset: CGPoint?
+    private let replyListDataSource = ReplyListDataSource()
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
 
@@ -317,27 +322,37 @@ final class ReferenceCanvasView: UIView {
 
     private func renderGalleryDetail() {
         addFullscreenGalleryCover()
-        let panel = addGlassPanel(top: 586, left: 0, width: 375, height: 226, radius: 14)
+        let panelTop: CGFloat = 586
+        let tagsTop: CGFloat = 718
+        let tagsHeight = measuredTagsHeight(left: 20, right: 20)
+        let reactionsTop = tagsTop + tagsHeight + 22
+        let panelHeight = reactionsTop + 18 + 28 - panelTop
+        let panel = addGlassPanel(
+            top: panelTop,
+            left: 0,
+            width: 375,
+            height: panelHeight,
+            radius: 14,
+            fillAlpha: 0.4,
+            blurRadius: 16,
+            backdropAssetName: "discover_feed_cover"
+        )
         panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        addPortrait(top: 609, left: 20, size: 36, tint: .warm)
+        addAssetAvatar("profile_avatar", top: 609, left: 20, size: 36)
         addText("Victoria", size: 17, weight: .bold, top: 617, left: 68)
         addText("Capturing today's happiness. Saving it for\ntomorrow's memories.", size: 16, weight: .regular, top: 664, left: 20)
-        addTags(top: 718)
-        addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: 766, left: 22, color: .darkGray)
+        addTags(top: tagsTop, left: 20, right: 20)
+        addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: reactionsTop, left: 22, color: .darkGray)
     }
 
     private func addFullscreenGalleryCover() {
-        let coverView = UIImageView(image: UIImage(named: "discover_feed_cover"))
+        let coverImage = UIImage(named: "discover_feed_cover")
+        let coverView = UIImageView(image: coverImage)
         coverView.contentMode = .scaleAspectFill
         coverView.clipsToBounds = true
         addSubview(coverView)
         coverView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            coverView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            coverView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            coverView.topAnchor.constraint(equalTo: topAnchor),
-            coverView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
+        pinFullHeightImageView(coverView, image: coverImage)
 
         let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
         iconView.contentMode = .scaleAspectFit
@@ -887,6 +902,7 @@ final class ReferenceCanvasView: UIView {
             sheetBottomConstraint
         ])
         keyboardAvoidanceBottomConstraint = sheetBottomConstraint
+        keyboardAvoidanceBaseBottomConstant = 0
         overlayContentView = sheet
 
         let grabber = UIView()
@@ -1005,14 +1021,68 @@ final class ReferenceCanvasView: UIView {
 
     private func renderRepliesPanel() {
         backgroundColor = UIColor.black.withAlphaComponent(0.58)
-        let sheet = addPanel(top: 421, left: 0, width: 375, height: 391, alpha: 1)
+        let sheet = UIView()
         sheet.backgroundColor = .white
         sheet.layer.cornerRadius = 20
-        addGrabber(top: 410)
-        addReplyRow(name: "Jasper", top: 444, text: "The video content is great! Keep going!The\nvideo content is great! Keep going!")
-        addReplyRow(name: "Rowan", top: 559, text: "The video content is great! Keep going!")
-        addReplyRow(name: "Sophia", top: 651, text: "The video content is great! Keep going!")
-        addInputBar(top: 740, text: "Say something", trailing: "➤")
+        sheet.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        addSubview(sheet)
+        sheet.translatesAutoresizingMaskIntoConstraints = false
+        let sheetBottomConstraint = sheet.bottomAnchor.constraint(equalTo: bottomAnchor)
+        NSLayoutConstraint.activate([
+            sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
+            sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
+            sheet.heightAnchor.constraint(equalToConstant: 391),
+            sheetBottomConstraint
+        ])
+        overlayContentView = sheet
+
+        let grabber = UIView()
+        grabber.backgroundColor = .white
+        grabber.layer.cornerRadius = 2
+        addSubview(grabber)
+        grabber.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            grabber.centerXAnchor.constraint(equalTo: centerXAnchor),
+            grabber.bottomAnchor.constraint(equalTo: sheet.topAnchor, constant: -6),
+            grabber.widthAnchor.constraint(equalToConstant: 112),
+            grabber.heightAnchor.constraint(equalToConstant: 4)
+        ])
+
+        let inputBar = addInputBar(
+            bottom: 29,
+            text: "Say something",
+            trailing: "",
+            usesDashedBorder: true,
+            in: self
+        ) { [weak self] bottomConstraint in
+            self?.keyboardAvoidanceBottomConstraint = bottomConstraint
+            self?.keyboardAvoidanceBaseBottomConstant = -29
+        }
+        let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
+        tableView.showsVerticalScrollIndicator = false
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 116
+        tableView.register(ReplyListCell.self, forCellReuseIdentifier: ReplyListCell.reuseIdentifier)
+        tableView.dataSource = replyListDataSource
+        tableView.delegate = replyListDataSource
+        sheet.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: sheet.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: sheet.trailingAnchor),
+            tableView.topAnchor.constraint(equalTo: sheet.topAnchor, constant: 15),
+            tableView.bottomAnchor.constraint(equalTo: sheet.bottomAnchor, constant: -94)
+        ])
+        replyListDataSource.apply([
+            ReplyListItem(name: "Jasper", text: "The video content is great! Keep going!The\nvideo content is great! Keep going!"),
+            ReplyListItem(name: "Rowan", text: "The video content is great! Keep going!"),
+            ReplyListItem(name: "Sophia", text: "The video content is great! Keep going!")
+        ], to: tableView)
+        keyboardAvoidanceInputView = inputBar
+        installKeyboardAvoidance()
+        installBlankAreaKeyboardDismissal()
     }
 
     private func renderReportPanel() {
@@ -1566,7 +1636,6 @@ final class ReferenceCanvasView: UIView {
     @objc private func handleKeyboardFrameChange(_ notification: Notification) {
         let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect) ?? .zero
         let keyboardFrameInView = convert(keyboardFrame, from: nil)
-        let overlap = max(0, bounds.maxY - keyboardFrameInView.minY)
         let isHiding = notification.name == UIResponder.keyboardWillHideNotification
         if let scrollView = keyboardAwareScrollView {
             updateKeyboardAwareScrollView(
@@ -1581,12 +1650,13 @@ final class ReferenceCanvasView: UIView {
             let inputView = keyboardAvoidanceInputView
         else { return }
 
+        let baseConstant = keyboardAvoidanceBaseBottomConstant
         let inputFrame = inputView.convert(inputView.bounds, to: self)
-        let unshiftedInputMaxY = inputFrame.maxY - bottomConstraint.constant
+        let unshiftedInputMaxY = inputFrame.maxY - (bottomConstraint.constant - baseConstant)
         let requiredOffset = isHiding
             ? 0
             : max(0, unshiftedInputMaxY + 20 - keyboardFrameInView.minY)
-        bottomConstraint.constant = -requiredOffset
+        bottomConstraint.constant = baseConstant - requiredOffset
 
         let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval ?? 0.25
         let curveValue = notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt ?? 7
@@ -1823,20 +1893,97 @@ final class ReferenceCanvasView: UIView {
         return panel
     }
 
-    private func addGlassPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, radius: CGFloat) -> UIView {
-        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialLight))
-        blur.backgroundColor = UIColor.white.withAlphaComponent(0.4)
-        blur.layer.cornerRadius = radius
-        blur.layer.masksToBounds = true
-        addSubview(blur)
-        blur.translatesAutoresizingMaskIntoConstraints = false
+    private func addGlassPanel(
+        top: CGFloat,
+        left: CGFloat,
+        width: CGFloat,
+        height: CGFloat,
+        radius: CGFloat,
+        fillAlpha: CGFloat = 0.4,
+        blurRadius: CGFloat = 16,
+        backdropAssetName: String? = nil
+    ) -> UIView {
+        let panel = UIView()
+        panel.backgroundColor = .clear
+        panel.layer.cornerRadius = radius
+        panel.layer.masksToBounds = true
+        addSubview(panel)
+        panel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            blur.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            blur.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            blur.widthAnchor.constraint(equalToConstant: width),
-            blur.heightAnchor.constraint(equalToConstant: height)
+            panel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
+            panel.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            panel.widthAnchor.constraint(equalToConstant: width),
+            panel.heightAnchor.constraint(equalToConstant: height)
         ])
-        return blur
+
+        if let backdropAssetName, let backdropImage = blurredImage(named: backdropAssetName, radius: blurRadius) {
+            let imageView = UIImageView(image: backdropImage)
+            imageView.contentMode = .scaleAspectFill
+            panel.addSubview(imageView)
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            pinFullHeightImageView(imageView, image: backdropImage)
+        } else {
+            let effectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialLight))
+            panel.addSubview(effectView)
+            effectView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                effectView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+                effectView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+                effectView.topAnchor.constraint(equalTo: panel.topAnchor),
+                effectView.bottomAnchor.constraint(equalTo: panel.bottomAnchor)
+            ])
+        }
+
+        let fillView = UIView()
+        fillView.backgroundColor = UIColor.white.withAlphaComponent(fillAlpha)
+        panel.addSubview(fillView)
+        fillView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            fillView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+            fillView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+            fillView.topAnchor.constraint(equalTo: panel.topAnchor),
+            fillView.bottomAnchor.constraint(equalTo: panel.bottomAnchor)
+        ])
+        return panel
+    }
+
+    private func pinFullHeightImageView(_ imageView: UIImageView, image: UIImage?) {
+        var constraints = [
+            imageView.topAnchor.constraint(equalTo: topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            imageView.centerXAnchor.constraint(equalTo: centerXAnchor)
+        ]
+        if let image, image.size.height > 0 {
+            constraints.append(imageView.widthAnchor.constraint(
+                equalTo: imageView.heightAnchor,
+                multiplier: image.size.width / image.size.height
+            ))
+        } else {
+            constraints.append(contentsOf: [
+                imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                imageView.trailingAnchor.constraint(equalTo: trailingAnchor)
+            ])
+        }
+        NSLayoutConstraint.activate(constraints)
+    }
+
+    private func blurredImage(named name: String, radius: CGFloat) -> UIImage? {
+        guard
+            let sourceImage = UIImage(named: name),
+            let inputImage = CIImage(image: sourceImage)
+        else {
+            return nil
+        }
+        let filter = CIFilter.gaussianBlur()
+        filter.inputImage = inputImage.clampedToExtent()
+        filter.radius = Float(radius)
+        guard
+            let outputImage = filter.outputImage?.cropped(to: inputImage.extent),
+            let cgImage = Self.ciContext.createCGImage(outputImage, from: inputImage.extent)
+        else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage, scale: sourceImage.scale, orientation: sourceImage.imageOrientation)
     }
 
     private func addRow(_ text: String, top: CGFloat) {
@@ -1973,38 +2120,130 @@ final class ReferenceCanvasView: UIView {
         return field
     }
 
-    private func addInputBar(top: CGFloat, text: String, trailing: String) {
-        let bar = UIView()
-        bar.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
-        bar.layer.cornerRadius = 10
-        bar.layer.borderWidth = 1
-        bar.layer.borderColor = UIColor(red: 0.53, green: 0.86, blue: 0.10, alpha: 1).cgColor
-        addSubview(bar)
+    @discardableResult
+    private func addInputBar(top: CGFloat, text: String, trailing: String, usesDashedBorder: Bool = false) -> UIView {
+        let layoutContainer = activeLayoutContainer ?? self
+        return addInputBar(top: top, bottom: nil, text: text, trailing: trailing, usesDashedBorder: usesDashedBorder, in: layoutContainer)
+    }
+
+    private func addInputBar(
+        bottom: CGFloat,
+        text: String,
+        trailing: String,
+        usesDashedBorder: Bool = false,
+        in layoutContainer: UIView,
+        bottomConstraintHandler: ((NSLayoutConstraint) -> Void)? = nil
+    ) -> UIView {
+        addInputBar(
+            top: nil,
+            bottom: bottom,
+            text: text,
+            trailing: trailing,
+            usesDashedBorder: usesDashedBorder,
+            in: layoutContainer,
+            bottomConstraintHandler: bottomConstraintHandler
+        )
+    }
+
+    private func addInputBar(
+        top: CGFloat?,
+        bottom: CGFloat?,
+        text: String,
+        trailing: String,
+        usesDashedBorder: Bool,
+        in layoutContainer: UIView,
+        bottomConstraintHandler: ((NSLayoutConstraint) -> Void)? = nil
+    ) -> UIView {
+        let bar: UIView
+        let inputSurface: UIView
+        if usesDashedBorder {
+            let container = UIView()
+            container.backgroundColor = .clear
+            bar = container
+
+            let fallbackView = UIView()
+            fallbackView.backgroundColor = .white
+            fallbackView.layer.cornerRadius = 10
+            fallbackView.layer.masksToBounds = true
+            container.addSubview(fallbackView)
+            fallbackView.translatesAutoresizingMaskIntoConstraints = false
+
+            let surface = AdaptiveInputView(
+                backgroundColor: UIColor(red: 0.83, green: 1, blue: 0.23, alpha: 0.3),
+                cornerRadius: 10
+            )
+            container.addSubview(surface)
+            surface.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                fallbackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+                fallbackView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+                fallbackView.topAnchor.constraint(equalTo: container.topAnchor),
+                fallbackView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+                surface.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+                surface.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+                surface.topAnchor.constraint(equalTo: container.topAnchor),
+                surface.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+            ])
+            inputSurface = surface
+        } else {
+            let plainBar = UIView()
+            plainBar.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
+            plainBar.layer.cornerRadius = 10
+            plainBar.layer.borderWidth = 1
+            plainBar.layer.borderColor = UIColor(red: 0.53, green: 0.86, blue: 0.10, alpha: 1).cgColor
+            bar = plainBar
+            inputSurface = plainBar
+        }
+        layoutContainer.addSubview(bar)
         bar.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            bar.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            bar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            bar.topAnchor.constraint(equalTo: topAnchor, constant: top),
+        var constraints = [
+            bar.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
+            bar.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
             bar.heightAnchor.constraint(equalToConstant: 45)
-        ])
-        let prompt = UILabel()
-        prompt.text = text
+        ]
+        if let top {
+            constraints.append(bar.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
+        }
+        if let bottom {
+            let bottomConstraint = bar.bottomAnchor.constraint(equalTo: layoutContainer.bottomAnchor, constant: -bottom)
+            constraints.append(bottomConstraint)
+            bottomConstraintHandler?(bottomConstraint)
+        }
+        NSLayoutConstraint.activate(constraints)
+        let prompt = UITextField()
+        prompt.placeholder = text
         prompt.font = AppFont.source(13)
-        prompt.textColor = .darkGray
-        bar.addSubview(prompt)
+        prompt.textColor = .black
+        prompt.tintColor = .black
+        prompt.backgroundColor = .clear
+        prompt.borderStyle = .none
+        prompt.returnKeyType = .send
+        inputSurface.addSubview(prompt)
         prompt.translatesAutoresizingMaskIntoConstraints = false
-        let action = UILabel()
-        action.text = trailing
-        action.font = AppFont.source(26, weight: .black)
-        action.textColor = .gray
-        bar.addSubview(action)
+        let action: UIView
+        if trailing.isEmpty {
+            let iconView = UIImageView(image: UIImage(named: "reply_send_icon"))
+            iconView.contentMode = .scaleAspectFit
+            action = iconView
+        } else {
+            let label = UILabel()
+            label.text = trailing
+            label.font = AppFont.source(26, weight: .black)
+            label.textColor = .gray
+            action = label
+        }
+        inputSurface.addSubview(action)
         action.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            prompt.leadingAnchor.constraint(equalTo: bar.leadingAnchor, constant: 16),
-            prompt.centerYAnchor.constraint(equalTo: bar.centerYAnchor),
-            action.trailingAnchor.constraint(equalTo: bar.trailingAnchor, constant: -16),
-            action.centerYAnchor.constraint(equalTo: bar.centerYAnchor)
+            prompt.leadingAnchor.constraint(equalTo: inputSurface.leadingAnchor, constant: 16),
+            prompt.trailingAnchor.constraint(equalTo: action.leadingAnchor, constant: -12),
+            prompt.centerYAnchor.constraint(equalTo: inputSurface.centerYAnchor),
+            action.trailingAnchor.constraint(equalTo: inputSurface.trailingAnchor, constant: -16),
+            action.centerYAnchor.constraint(equalTo: inputSurface.centerYAnchor),
+            action.widthAnchor.constraint(equalToConstant: trailing.isEmpty ? 28 : 24),
+            action.heightAnchor.constraint(equalToConstant: trailing.isEmpty ? 28 : 28)
         ])
+        return bar
     }
 
     private func addUploadBox(top: CGFloat, action: (() -> Void)? = nil) {
@@ -2148,13 +2387,6 @@ final class ReferenceCanvasView: UIView {
         addText("23 June 2026\n5 : 30PM", size: 12, weight: .regular, top: top + 74, left: 256, color: .darkGray)
     }
 
-    private func addReplyRow(name: String, top: CGFloat, text: String) {
-        addPortrait(top: top + 16, left: 20, size: 38, tint: name == "Sophia" ? .warm : .cool)
-        addText(name, size: 18, weight: .bold, top: top + 24, left: 68)
-        addText("•••", size: 18, weight: .black, top: top + 26, left: 334)
-        addText(text, size: 16, weight: .regular, top: top + 68, left: 20, color: .darkGray)
-        addLine(top: top + 114, left: 20, width: 335, color: UIColor(white: 0.88, alpha: 1))
-    }
 
     private func addCheckBox(top: CGFloat, left: CGFloat, checked: Bool) {
         let box = UILabel()
@@ -2588,19 +2820,19 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addTags(top: CGFloat) {
+    private func addTags(top: CGFloat, left: CGFloat = 28, right: CGFloat = 20) {
         let layoutContainer = activeLayoutContainer ?? self
         let font = AppFont.source(12)
-        let rowHeight: CGFloat = 26
-        let horizontalInset: CGFloat = 10
-        let itemSpacing: CGFloat = 8
-        let rowSpacing: CGFloat = 8
-        let startX: CGFloat = 28
-        let maxX: CGFloat = 355
+        let rowHeight = tagRowHeight
+        let horizontalInset = tagHorizontalInset
+        let itemSpacing = tagItemSpacing
+        let rowSpacing = tagRowSpacing
+        let startX = left
+        let maxX = DesignSurfaceView.baseSize.width - right
         var cursorX = startX
         var cursorY = top
 
-        ["Travel", "Food", "Family", "Friends", "Lifestyle"].forEach { item in
+        tagTexts.forEach { item in
             let textWidth = ceil((item as NSString).size(withAttributes: [.font: font]).width)
             let itemWidth = textWidth + horizontalInset * 2
             if cursorX > startX, cursorX + itemWidth > maxX {
@@ -2635,6 +2867,35 @@ final class ReferenceCanvasView: UIView {
             ])
             cursorX += itemWidth + itemSpacing
         }
+    }
+
+    private var tagTexts: [String] {
+        ["Travel", "Food", "Family", "Friends", "Lifestyle"]
+    }
+
+    private var tagRowHeight: CGFloat { 26 }
+    private var tagHorizontalInset: CGFloat { 10 }
+    private var tagItemSpacing: CGFloat { 8 }
+    private var tagRowSpacing: CGFloat { 8 }
+
+    private func measuredTagsHeight(left: CGFloat = 28, right: CGFloat = 20) -> CGFloat {
+        let font = AppFont.source(12)
+        let startX = left
+        let maxX = DesignSurfaceView.baseSize.width - right
+        var cursorX = startX
+        var rowCount: CGFloat = 1
+
+        tagTexts.forEach { item in
+            let textWidth = ceil((item as NSString).size(withAttributes: [.font: font]).width)
+            let itemWidth = textWidth + tagHorizontalInset * 2
+            if cursorX > startX, cursorX + itemWidth > maxX {
+                cursorX = startX
+                rowCount += 1
+            }
+            cursorX += itemWidth + tagItemSpacing
+        }
+
+        return rowCount * tagRowHeight + max(0, rowCount - 1) * tagRowSpacing
     }
 
     private func addDialogueCard(name: String, top: CGFloat, left: CGFloat, dark: Bool) {
@@ -2818,6 +3079,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addPortrait(top: CGFloat, left: CGFloat, size: CGFloat, tint: PortraitTint) {
+        let layoutContainer = activeLayoutContainer ?? self
         let image = UIView()
         image.layer.cornerRadius = size / 2
         image.layer.masksToBounds = true
@@ -2852,13 +3114,43 @@ final class ReferenceCanvasView: UIView {
             face.heightAnchor.constraint(equalToConstant: size * 0.48)
         ])
 
-        addSubview(image)
+        layoutContainer.addSubview(image)
         image.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            image.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            image.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            image.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            image.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             image.widthAnchor.constraint(equalToConstant: size),
             image.heightAnchor.constraint(equalToConstant: size)
+        ])
+    }
+
+    private func addAssetAvatar(_ imageName: String, top: CGFloat, left: CGFloat, size: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let imageView = UIImageView(image: UIImage(named: imageName))
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = size / 2
+        layoutContainer.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            imageView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            imageView.widthAnchor.constraint(equalToConstant: size),
+            imageView.heightAnchor.constraint(equalToConstant: size)
+        ])
+    }
+
+    private func addAssetIcon(_ imageName: String, top: CGFloat, left: CGFloat, size: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let imageView = UIImageView(image: UIImage(named: imageName))
+        imageView.contentMode = .scaleAspectFit
+        layoutContainer.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            imageView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            imageView.widthAnchor.constraint(equalToConstant: size),
+            imageView.heightAnchor.constraint(equalToConstant: size)
         ])
     }
 
