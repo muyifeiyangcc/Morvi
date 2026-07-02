@@ -2433,14 +2433,9 @@ final class ReferenceCanvasView: UIView {
 
     private func addCheckBox(top: CGFloat, left: CGFloat, checked: Bool) {
         let layoutContainer = activeLayoutContainer ?? self
-        let box = UILabel()
-        box.text = checked ? "✓" : ""
-        box.textAlignment = .center
-        box.font = AppFont.source(16, weight: .black)
-        box.textColor = .black
-        box.backgroundColor = checked ? UIColor(red: 0.56, green: 1, blue: 0.20, alpha: 1) : UIColor(red: 0.86, green: 0.92, blue: 0.74, alpha: 1)
-        box.layer.cornerRadius = 6
-        box.layer.masksToBounds = true
+        let imageName = checked ? "report_check_selected" : "report_check_unselected"
+        let box = UIImageView(image: UIImage(named: imageName))
+        box.contentMode = .scaleAspectFit
         layoutContainer.addSubview(box)
         box.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
