@@ -137,8 +137,6 @@ class BaseSceneController: UIViewController {
             return "Discover"
         case .directDialogue, .voiceDialogue:
             return "Victoria"
-        case .publicPersona:
-            return "Victoria"
         case .assistantDialogue:
             return "Recot Bot"
         case .restrictedList:
