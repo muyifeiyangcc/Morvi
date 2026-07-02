@@ -1125,8 +1125,7 @@ final class ReferenceCanvasView: UIView {
             "Frequent harassment",
             "Infringement of rights",
             "Pornographic and vulgar",
-            "Discrimination",
-            "Others"
+            "Discrimination"
         ]
         for index in rows.indices {
             let top = CGFloat(87 + index * 64)
