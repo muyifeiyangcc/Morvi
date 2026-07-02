@@ -1135,6 +1135,7 @@ final class ReferenceCanvasView: UIView {
         addButton(
             "Upload",
             bottom: 29,
+            trailing: 20,
             filled: true,
             usesOneFont: true,
             cornerRadius: 12,
