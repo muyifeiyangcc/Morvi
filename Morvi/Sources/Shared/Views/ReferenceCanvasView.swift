@@ -316,10 +316,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderGalleryDetail() {
-        addMediaBlock(top: 0, left: 0, width: 375, height: 812, title: "", tint: .sky)
-        addFloatingCircle("‹", top: 60, left: 20)
-        addFloatingCircle("•••", top: 60, left: 296)
-        addCircle(text: "▶", top: 386, left: 168, size: 40, color: UIColor.white.withAlphaComponent(0.72))
+        addFullscreenGalleryCover()
         let panel = addGlassPanel(top: 586, left: 0, width: 375, height: 226, radius: 14)
         panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         addPortrait(top: 609, left: 20, size: 36, tint: .warm)
@@ -327,6 +324,31 @@ final class ReferenceCanvasView: UIView {
         addText("Capturing today's happiness. Saving it for\ntomorrow's memories.", size: 16, weight: .regular, top: 664, left: 20)
         addTags(top: 718)
         addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: 766, left: 22, color: .darkGray)
+    }
+
+    private func addFullscreenGalleryCover() {
+        let coverView = UIImageView(image: UIImage(named: "discover_feed_cover"))
+        coverView.contentMode = .scaleAspectFill
+        coverView.clipsToBounds = true
+        addSubview(coverView)
+        coverView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            coverView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            coverView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            coverView.topAnchor.constraint(equalTo: topAnchor),
+            coverView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
+        iconView.contentMode = .scaleAspectFit
+        coverView.addSubview(iconView)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            iconView.centerXAnchor.constraint(equalTo: coverView.centerXAnchor),
+            iconView.centerYAnchor.constraint(equalTo: coverView.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 40),
+            iconView.heightAnchor.constraint(equalToConstant: 40)
+        ])
     }
 
     private func renderPersonaDetail(title: String) {

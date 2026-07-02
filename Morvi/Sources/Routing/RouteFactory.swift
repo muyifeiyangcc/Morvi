@@ -88,8 +88,7 @@ enum RouteFactory {
         case .galleryDetail:
             return ReferencePageController(page: .galleryDetail) { scene in
                 [
-                    HitArea(frame: CGRect(x: 104, y: 744, width: 96, height: 44)) { scene.push(.repliesPanel) },
-                    HitArea(frame: CGRect(x: 292, y: 60, width: 70, height: 70)) { scene.push(.reportPanel) }
+                    HitArea(frame: CGRect(x: 104, y: 744, width: 96, height: 44)) { scene.push(.repliesPanel) }
                 ]
             }
         case .restrictPanel:

@@ -69,7 +69,8 @@ class BaseSceneController: UIViewController {
         topLayer.configure(
             title: navigationTitleText(),
             statusBarHeight: statusBarHeight,
-            showsBackIcon: page != .entry || navigationController?.presentingViewController != nil
+            showsBackIcon: page != .entry || navigationController?.presentingViewController != nil,
+            trailingIconName: trailingNavigationIconName()
         )
         surfaceView.contentView.addSubview(topLayer)
         topLayer.translatesAutoresizingMaskIntoConstraints = false
@@ -80,6 +81,7 @@ class BaseSceneController: UIViewController {
             topLayer.heightAnchor.constraint(equalToConstant: CustomTopLayerView.totalHeight(statusBarHeight: statusBarHeight))
         ])
         topLayer.backArea.addTarget(self, action: #selector(returnToPreviousScene), for: .touchUpInside)
+        topLayer.trailingArea.addTarget(self, action: #selector(handleTrailingNavigationTap), for: .touchUpInside)
     }
 
     private func normalizedStatusBarHeight() -> CGFloat {
@@ -117,6 +119,15 @@ class BaseSceneController: UIViewController {
         }
     }
 
+    private func trailingNavigationIconName() -> String? {
+        switch page {
+        case .galleryDetail:
+            return "gallery_navigation_more"
+        default:
+            return nil
+        }
+    }
+
     private func installKeyboardDismissGesture() {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboardFromBlankArea))
         gesture.cancelsTouchesInView = false
@@ -136,6 +147,15 @@ class BaseSceneController: UIViewController {
         }
         if navigationController.presentingViewController != nil {
             navigationController.dismiss(animated: true)
+        }
+    }
+
+    @objc private func handleTrailingNavigationTap() {
+        switch page {
+        case .galleryDetail:
+            showCanvasOverlay(.reportPanel)
+        default:
+            break
         }
     }
 
