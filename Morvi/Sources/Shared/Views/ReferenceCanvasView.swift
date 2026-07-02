@@ -633,14 +633,13 @@ final class ReferenceCanvasView: UIView {
             addSmallField("Theme", top: 131, left: 20, width: 70)
             addSmallField(nil, imageName: "theme_add_icon", top: 131, left: 108, width: 76)
         } else {
-            addSmallField(nil, imageName: "theme_add_icon", top: 131, left: 20, width: 78)
+            addSmallField(nil, imageName: "theme_add_icon", top: 131, left: 20, width: 78) { [weak self] in
+                self?.didRequestOverlayPage?(.uploadFilled)
+            }
         }
         addText("Description:", size: 17, weight: .regular, top: 190, left: 20)
         addLargeField("Say something", top: 222)
-        addUploadBox(top: 337) { [weak self] in
-            guard !filled else { return }
-            self?.didRequestOverlayPage?(.uploadFilled)
-        }
+        addUploadBox(top: 337)
         activeLayoutContainer = nil
 
         keyboardAwareScrollView = scrollView
@@ -1850,7 +1849,8 @@ final class ReferenceCanvasView: UIView {
         imageName: String? = nil,
         top: CGFloat,
         left: CGFloat,
-        width: CGFloat
+        width: CGFloat,
+        action: (() -> Void)? = nil
     ) {
         let layoutContainer = activeLayoutContainer ?? self
         let field = AdaptiveInputView(
@@ -1885,6 +1885,18 @@ final class ReferenceCanvasView: UIView {
                 iconView.centerYAnchor.constraint(equalTo: field.centerYAnchor),
                 iconView.widthAnchor.constraint(equalToConstant: 30),
                 iconView.heightAnchor.constraint(equalToConstant: 30)
+            ])
+        }
+        if let action {
+            let actionButton = UIButton(type: .custom)
+            actionButton.addAction(UIAction { _ in action() }, for: .touchUpInside)
+            field.addSubview(actionButton)
+            actionButton.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                actionButton.leadingAnchor.constraint(equalTo: field.leadingAnchor),
+                actionButton.trailingAnchor.constraint(equalTo: field.trailingAnchor),
+                actionButton.topAnchor.constraint(equalTo: field.topAnchor),
+                actionButton.bottomAnchor.constraint(equalTo: field.bottomAnchor)
             ])
         }
     }
@@ -1973,7 +1985,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addUploadBox(top: CGFloat, action: @escaping () -> Void) {
+    private func addUploadBox(top: CGFloat, action: (() -> Void)? = nil) {
         let layoutContainer = activeLayoutContainer ?? self
         let box = AdaptiveInputView(
             backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
@@ -1998,7 +2010,7 @@ final class ReferenceCanvasView: UIView {
         ])
 
         let actionButton = UIButton(type: .custom)
-        actionButton.addAction(UIAction { _ in action() }, for: .touchUpInside)
+        actionButton.addAction(UIAction { _ in action?() }, for: .touchUpInside)
         box.addSubview(actionButton)
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
