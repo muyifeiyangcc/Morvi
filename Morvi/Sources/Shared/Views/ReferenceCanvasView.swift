@@ -1143,7 +1143,9 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = sheet
         addText("Report or block", size: 31, weight: .black, top: 28, left: 20, usesOneFont: true)
-        addOptionTile(iconName: "restrict_report_icon", top: 81, left: 49, width: 130)
+        addOptionTile(iconName: "restrict_report_icon", top: 81, left: 49, width: 130) { [weak self] in
+            self?.didRequestOverlayPage?(.reportPanel)
+        }
         addOptionTile(iconName: "restrict_block_icon", top: 81, left: 196, width: 130) { [weak self] in
             self?.didRequestOverlayPage?(.restrictConfirm)
         }
