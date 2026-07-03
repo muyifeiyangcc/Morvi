@@ -37,6 +37,8 @@ final class ReferenceCanvasView: UIView {
     private var voiceElapsedSeconds = 0
     private var voiceTimer: Timer?
     private var personaMediaFrames: [CGRect] = []
+    private var personaBackdropBaseHeight: CGFloat = 0
+    private var personaBackdropHeightConstraint: NSLayoutConstraint?
 
     init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
@@ -296,7 +298,9 @@ final class ReferenceCanvasView: UIView {
 
     private func renderPersona() {
         addPersonaRootGradient()
+        addPersonaBackdrop()
         let scrollView = CancelFriendlyScrollView()
+        scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 24, right: 0)
         scrollView.scrollIndicatorInsets = scrollView.contentInset
@@ -355,7 +359,6 @@ final class ReferenceCanvasView: UIView {
             scrollContent.heightAnchor.constraint(equalToConstant: contentHeight)
         ])
 
-        addPersonaBackdrop()
         let baseHeight = contentHeight - 228
         let base = addPanel(top: 228, left: 0, width: 375, height: baseHeight, alpha: 1)
         addThemeGradientBackground(
@@ -881,7 +884,9 @@ final class ReferenceCanvasView: UIView {
 
     private func renderPersonaDetail(title: String) {
         addPersonaRootGradient()
+        addPersonaBackdrop()
         let scrollView = UIScrollView()
+        scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -902,7 +907,6 @@ final class ReferenceCanvasView: UIView {
         scrollView.addSubview(scrollContent)
         scrollContent.translatesAutoresizingMaskIntoConstraints = false
         activeLayoutContainer = scrollContent
-        addPersonaBackdrop()
         let nameTop: CGFloat = 394
         let nameHeight = ceil(AppFont.source(26, weight: .bold).lineHeight)
         let statsTop = nameTop + nameHeight + 15
@@ -1021,28 +1025,33 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addPersonaBackdrop() {
-        let layoutContainer = activeLayoutContainer ?? self
         let coverImage = UIImage(named: "discover_feed_cover")
         let coverView = UIImageView(image: coverImage)
         coverView.contentMode = .scaleAspectFill
         coverView.clipsToBounds = true
-        layoutContainer.addSubview(coverView)
+        addSubview(coverView)
         coverView.translatesAutoresizingMaskIntoConstraints = false
 
-        var constraints = [
-            coverView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor),
-            coverView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor),
-            coverView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: -2)
-        ]
+        let screenWidth = UIScreen.main.bounds.width
         if let coverImage, coverImage.size.width > 0 {
-            constraints.append(coverView.heightAnchor.constraint(
-                equalTo: coverView.widthAnchor,
-                multiplier: coverImage.size.height / coverImage.size.width
-            ))
+            personaBackdropBaseHeight = ceil(screenWidth * coverImage.size.height / coverImage.size.width)
         } else {
-            constraints.append(coverView.heightAnchor.constraint(equalToConstant: 403))
+            personaBackdropBaseHeight = 403
         }
-        NSLayoutConstraint.activate(constraints)
+        let heightConstraint = coverView.heightAnchor.constraint(equalToConstant: personaBackdropBaseHeight)
+        personaBackdropHeightConstraint = heightConstraint
+        NSLayoutConstraint.activate([
+            coverView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            coverView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            coverView.topAnchor.constraint(equalTo: topAnchor),
+            heightConstraint
+        ])
+    }
+
+    private func updatePersonaBackdrop(for scrollView: UIScrollView) {
+        guard page == .persona || page == .publicPersona else { return }
+        let pullDistance = max(0, -scrollView.contentOffset.y)
+        personaBackdropHeightConstraint?.constant = personaBackdropBaseHeight + pullDistance
     }
 
     private func addPersonaEditAction(top: CGFloat, left: CGFloat) {
@@ -4363,6 +4372,12 @@ extension ReferenceCanvasView: UIGestureRecognizerDelegate {
             touchedView = candidate.superview
         }
         return true
+    }
+}
+
+extension ReferenceCanvasView: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updatePersonaBackdrop(for: scrollView)
     }
 }
 
