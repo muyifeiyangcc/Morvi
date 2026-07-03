@@ -423,17 +423,17 @@ final class ReferenceCanvasView: UIView {
         panel.addSubview(gridIcon)
         gridIcon.translatesAutoresizingMaskIntoConstraints = false
 
+        let microphoneIcon = UIImageView(image: UIImage(named: "voice_panel_microphone"))
+        microphoneIcon.contentMode = .scaleAspectFit
+        panel.addSubview(microphoneIcon)
+        microphoneIcon.translatesAutoresizingMaskIntoConstraints = false
+
         let microphoneRing = GradientRingView(colors: [
             UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1),
             UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1)
         ], ringWidth: 1)
         panel.addSubview(microphoneRing)
         microphoneRing.translatesAutoresizingMaskIntoConstraints = false
-
-        let microphoneIcon = UIImageView(image: UIImage(named: "voice_panel_microphone"))
-        microphoneIcon.contentMode = .scaleAspectFit
-        panel.addSubview(microphoneIcon)
-        microphoneIcon.translatesAutoresizingMaskIntoConstraints = false
 
         let durationLabel = UILabel()
         durationLabel.text = "0s"
@@ -453,8 +453,8 @@ final class ReferenceCanvasView: UIView {
 
             microphoneRing.centerXAnchor.constraint(equalTo: microphoneIcon.centerXAnchor),
             microphoneRing.centerYAnchor.constraint(equalTo: microphoneIcon.centerYAnchor),
-            microphoneRing.widthAnchor.constraint(equalToConstant: 116),
-            microphoneRing.heightAnchor.constraint(equalToConstant: 116),
+            microphoneRing.widthAnchor.constraint(equalToConstant: 104),
+            microphoneRing.heightAnchor.constraint(equalToConstant: 104),
 
             microphoneIcon.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             microphoneIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 57),
