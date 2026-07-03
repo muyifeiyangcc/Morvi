@@ -428,12 +428,17 @@ final class ReferenceCanvasView: UIView {
         panel.addSubview(microphoneIcon)
         microphoneIcon.translatesAutoresizingMaskIntoConstraints = false
 
-        let microphoneRing = GradientRingView(colors: [
+        let rippleView = VoiceRippleView(colors: [
             UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1),
             UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1)
-        ], ringWidth: 1)
-        panel.addSubview(microphoneRing)
-        microphoneRing.translatesAutoresizingMaskIntoConstraints = false
+        ])
+        panel.addSubview(rippleView)
+        rippleView.translatesAutoresizingMaskIntoConstraints = false
+
+        microphoneIcon.isUserInteractionEnabled = true
+        let pressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleVoiceCapturePress(_:)))
+        pressGesture.minimumPressDuration = 0.08
+        microphoneIcon.addGestureRecognizer(pressGesture)
 
         let durationLabel = UILabel()
         durationLabel.text = "0s"
@@ -451,10 +456,10 @@ final class ReferenceCanvasView: UIView {
             durationLabel.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             durationLabel.centerYAnchor.constraint(equalTo: gridIcon.centerYAnchor),
 
-            microphoneRing.centerXAnchor.constraint(equalTo: microphoneIcon.centerXAnchor),
-            microphoneRing.centerYAnchor.constraint(equalTo: microphoneIcon.centerYAnchor),
-            microphoneRing.widthAnchor.constraint(equalToConstant: 124),
-            microphoneRing.heightAnchor.constraint(equalToConstant: 124),
+            rippleView.centerXAnchor.constraint(equalTo: microphoneIcon.centerXAnchor),
+            rippleView.centerYAnchor.constraint(equalTo: microphoneIcon.centerYAnchor),
+            rippleView.widthAnchor.constraint(equalToConstant: 160),
+            rippleView.heightAnchor.constraint(equalToConstant: 160),
 
             microphoneIcon.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             microphoneIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 57),
@@ -462,6 +467,25 @@ final class ReferenceCanvasView: UIView {
             microphoneIcon.heightAnchor.constraint(equalToConstant: 104)
         ])
         applyVoicePanelAvoidance(panelHeight: 226, gap: 10)
+    }
+
+    @objc private func handleVoiceCapturePress(_ recognizer: UILongPressGestureRecognizer) {
+        guard let microphoneIcon = recognizer.view else { return }
+        let rippleView = microphoneIcon.superview?.subviews.first { $0 is VoiceRippleView } as? VoiceRippleView
+        switch recognizer.state {
+        case .began:
+            rippleView?.startAnimating()
+            UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut]) {
+                microphoneIcon.transform = CGAffineTransform(scaleX: 50 / 104, y: 50 / 104)
+            }
+        case .ended, .cancelled, .failed:
+            rippleView?.stopAnimating()
+            UIView.animate(withDuration: 0.18, delay: 0, options: [.curveEaseOut]) {
+                microphoneIcon.transform = .identity
+            }
+        default:
+            break
+        }
     }
 
     @objc private func hideVoiceInputPanel() {
