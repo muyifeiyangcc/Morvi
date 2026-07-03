@@ -3228,8 +3228,8 @@ final class ReferenceCanvasView: UIView {
             tintColor.cgColor,
             tintColor.withAlphaComponent(0).cgColor
         ]
-        gradient.startPoint = CGPoint(x: 0, y: 0.5)
-        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.startPoint = CGPoint(x: 0.5, y: 0)
+        gradient.endPoint = CGPoint(x: 0.5, y: 1)
         gradient.frame = CGRect(x: 0, y: 0, width: 335, height: cardHeight)
         card.layer.insertSublayer(gradient, at: 0)
         card.backgroundColor = UIColor.clear
@@ -3256,7 +3256,19 @@ final class ReferenceCanvasView: UIView {
             noteLabel.bottomAnchor.constraint(equalTo: note.bottomAnchor, constant: -12)
         ])
         addAssetAvatar("profile_avatar", top: top + 26, left: 291, size: 40)
-        addText("23 June 2026\n5 : 30PM", size: 12, weight: .regular, top: top + 74, left: 256, color: .darkGray)
+        let dateLabel = UILabel()
+        dateLabel.text = "23 June 2026\n5 : 30PM"
+        dateLabel.numberOfLines = 0
+        dateLabel.textAlignment = .right
+        dateLabel.textColor = .darkGray
+        dateLabel.font = AppFont.source(12, weight: .regular)
+        (activeLayoutContainer ?? self).addSubview(dateLabel)
+        dateLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            dateLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -20),
+            dateLabel.topAnchor.constraint(equalTo: card.topAnchor, constant: 74),
+            dateLabel.widthAnchor.constraint(equalToConstant: 94)
+        ])
         return cardHeight
     }
 
