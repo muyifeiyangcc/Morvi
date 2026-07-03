@@ -32,15 +32,6 @@ final class AdaptiveInputView: UIView {
         nil
     }
 
-    func applySelectionAppearance(isSelected: Bool) {
-        backgroundColor = isSelected
-            ? UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
-            : UIColor(red: 0.93, green: 0.93, blue: 0.93, alpha: 1)
-        dashedBorderLayer.strokeColor = isSelected
-            ? UIColor(red: 165 / 255, green: 214 / 255, blue: 63 / 255, alpha: 1).cgColor
-            : UIColor(red: 0.35, green: 0.35, blue: 0.35, alpha: 1).cgColor
-    }
-
     override func layoutSubviews() {
         super.layoutSubviews()
         gradientLayer?.frame = bounds

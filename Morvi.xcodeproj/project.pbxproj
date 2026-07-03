@@ -66,6 +66,7 @@
 		100000000000000000000208 /* SourceHanSansSC-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000035 /* SourceHanSansSC-Bold.otf */; };
 		100000000000000000000209 /* SourceHanSansSC-Heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000036 /* SourceHanSansSC-Heavy.otf */; };
 		100000000000000000000210 /* FredokaOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000037 /* FredokaOne-Regular.ttf */; };
+		200000000000000000000101 /* UploadThemeFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000001 /* UploadThemeFlowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -97,6 +98,7 @@
 		100000000000000000000026 /* DiscoverStoryStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverStoryStripView.swift; sourceTree = "<group>"; };
 		100000000000000000000027 /* AdaptiveInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveInputView.swift; sourceTree = "<group>"; };
 		100000000000000000000028 /* GradientActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientActionButton.swift; sourceTree = "<group>"; };
+		200000000000000000000001 /* UploadThemeFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadThemeFlowView.swift; sourceTree = "<group>"; };
 		100000000000000000000038 /* ReplyListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyListItem.swift; sourceTree = "<group>"; };
 		100000000000000000000039 /* ReplyListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyListCell.swift; sourceTree = "<group>"; };
 		100000000000000000000040 /* ReplyListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyListDataSource.swift; sourceTree = "<group>"; };
@@ -270,6 +272,7 @@
 				100000000000000000000026 /* DiscoverStoryStripView.swift */,
 				100000000000000000000027 /* AdaptiveInputView.swift */,
 				100000000000000000000028 /* GradientActionButton.swift */,
+				200000000000000000000001 /* UploadThemeFlowView.swift */,
 				100000000000000000000038 /* ReplyListItem.swift */,
 				100000000000000000000039 /* ReplyListCell.swift */,
 				100000000000000000000040 /* ReplyListDataSource.swift */,
@@ -432,6 +435,7 @@
 				100000000000000000000122 /* DiscoverStoryStripView.swift in Sources */,
 				100000000000000000000123 /* AdaptiveInputView.swift in Sources */,
 				100000000000000000000124 /* GradientActionButton.swift in Sources */,
+				200000000000000000000101 /* UploadThemeFlowView.swift in Sources */,
 				100000000000000000000125 /* ReplyListItem.swift in Sources */,
 				100000000000000000000126 /* ReplyListCell.swift in Sources */,
 				100000000000000000000127 /* ReplyListDataSource.swift in Sources */,

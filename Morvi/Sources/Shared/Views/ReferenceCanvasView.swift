@@ -40,7 +40,6 @@ final class ReferenceCanvasView: UIView {
     private var personaBackdropBaseHeight: CGFloat = 0
     private var personaBackdropHeightConstraint: NSLayoutConstraint?
     private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
-    private var selectedUploadThemes: Set<String> = ["Travel"]
 
     init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
@@ -1627,7 +1626,7 @@ final class ReferenceCanvasView: UIView {
             formView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             formView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             formView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            formView.heightAnchor.constraint(equalToConstant: 450)
+            formView.heightAnchor.constraint(equalToConstant: 506)
         ])
 
         activeLayoutContainer = formView
@@ -1645,9 +1644,9 @@ final class ReferenceCanvasView: UIView {
         )
         addText("Theme:", size: 17, weight: .regular, top: 99, left: 20)
         addUploadThemeChoices(top: 131)
-        addText("Description:", size: 17, weight: .regular, top: 190, left: 20)
-        addLargeField("Say something", top: 222)
-        addUploadBox(top: 337)
+        addText("Description:", size: 17, weight: .regular, top: 246, left: 20)
+        addLargeField("Say something", top: 278)
+        addUploadBox(top: 393)
         activeLayoutContainer = nil
 
         keyboardAwareScrollView = scrollView
@@ -3353,65 +3352,16 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addUploadThemeChoices(top: CGFloat) {
-        let themes = ["Travel", "Food", "Family", "Friends", "Lifestyle"]
-        var left: CGFloat = 20
-
-        for theme in themes {
-            let textWidth = ceil(
-                (theme as NSString).size(withAttributes: [.font: AppFont.source(14)]).width
-            )
-            let fieldWidth = textWidth + 20
-            addSelectableUploadTheme(theme, top: top, left: left, width: fieldWidth)
-            left += fieldWidth + 8
-        }
-    }
-
-    private func addSelectableUploadTheme(
-        _ theme: String,
-        top: CGFloat,
-        left: CGFloat,
-        width: CGFloat
-    ) {
         let layoutContainer = activeLayoutContainer ?? self
-        let field = AdaptiveInputView(backgroundColor: .clear)
-        field.applySelectionAppearance(isSelected: selectedUploadThemes.contains(theme))
-        layoutContainer.addSubview(field)
-        field.translatesAutoresizingMaskIntoConstraints = false
-
-        let label = UILabel()
-        label.text = theme
-        label.textAlignment = .center
-        label.textColor = .darkGray
-        label.font = AppFont.source(14)
-        field.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        let actionButton = UIButton(type: .custom)
-        actionButton.addAction(UIAction { [weak self, weak field] _ in
-            guard let self, let field else { return }
-            if self.selectedUploadThemes.contains(theme) {
-                self.selectedUploadThemes.remove(theme)
-            } else {
-                self.selectedUploadThemes.insert(theme)
-            }
-            field.applySelectionAppearance(isSelected: self.selectedUploadThemes.contains(theme))
-        }, for: .touchUpInside)
-        field.addSubview(actionButton)
-        actionButton.translatesAutoresizingMaskIntoConstraints = false
+        let flowView = UploadThemeFlowView()
+        layoutContainer.addSubview(flowView)
+        flowView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            field.widthAnchor.constraint(equalToConstant: width),
-            field.heightAnchor.constraint(equalToConstant: 45),
-            label.leadingAnchor.constraint(equalTo: field.leadingAnchor),
-            label.trailingAnchor.constraint(equalTo: field.trailingAnchor),
-            label.topAnchor.constraint(equalTo: field.topAnchor),
-            label.bottomAnchor.constraint(equalTo: field.bottomAnchor),
-            actionButton.leadingAnchor.constraint(equalTo: field.leadingAnchor),
-            actionButton.trailingAnchor.constraint(equalTo: field.trailingAnchor),
-            actionButton.topAnchor.constraint(equalTo: field.topAnchor),
-            actionButton.bottomAnchor.constraint(equalTo: field.bottomAnchor)
+            flowView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
+            flowView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
+            flowView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            flowView.heightAnchor.constraint(equalToConstant: 98)
         ])
     }
 
