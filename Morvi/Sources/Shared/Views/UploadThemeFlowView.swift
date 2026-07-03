@@ -81,9 +81,9 @@ final class UploadThemeFlowView: UIView {
     private func applyAppearance(to button: UIButton, isSelected: Bool) {
         button.backgroundColor = isSelected
             ? UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
-            : UIColor(red: 0.93, green: 0.93, blue: 0.93, alpha: 1)
+            : UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 0.5)
         borderLayers[button]?.strokeColor = isSelected
             ? UIColor(red: 165 / 255, green: 214 / 255, blue: 63 / 255, alpha: 1).cgColor
-            : UIColor(red: 0.35, green: 0.35, blue: 0.35, alpha: 1).cgColor
+            : UIColor(red: 0.75, green: 0.75, blue: 0.75, alpha: 1).cgColor
     }
 }
