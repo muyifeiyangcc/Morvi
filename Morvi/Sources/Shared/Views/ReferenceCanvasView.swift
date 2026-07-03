@@ -1721,34 +1721,6 @@ final class ReferenceCanvasView: UIView {
             nextIconView.heightAnchor.constraint(equalToConstant: 20)
         ])
 
-        let actionArea = UIButton(type: .custom)
-        actionArea.backgroundColor = .clear
-        itemView.addSubview(actionArea)
-        actionArea.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            actionArea.leadingAnchor.constraint(equalTo: itemView.leadingAnchor),
-            actionArea.trailingAnchor.constraint(equalTo: itemView.trailingAnchor),
-            actionArea.topAnchor.constraint(equalTo: itemView.topAnchor),
-            actionArea.bottomAnchor.constraint(equalTo: itemView.bottomAnchor)
-        ])
-        if let action = settingsAction(for: text) {
-            actionArea.addAction(action, for: .touchUpInside)
-        }
-    }
-
-    private func settingsAction(for text: String) -> UIAction? {
-        switch text {
-        case "Wallet":
-            return UIAction { [weak self] _ in self?.didRequestPage?(.wallet) }
-        case "Blacklist":
-            return UIAction { [weak self] _ in self?.didRequestPage?(.restrictedList) }
-        case "Privacy Policy", "User Agreement":
-            return UIAction { [weak self] _ in self?.didRequestPage?(.agreement) }
-        case "Delete account", "Log out":
-            return UIAction { [weak self] _ in self?.didRequestOverlayPage?(.exitConfirm) }
-        default:
-            return nil
-        }
     }
 
     private func renderPersonalDetail() {
