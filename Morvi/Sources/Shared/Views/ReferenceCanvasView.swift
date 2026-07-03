@@ -426,7 +426,7 @@ final class ReferenceCanvasView: UIView {
         let microphoneRing = GradientRingView(colors: [
             UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1),
             UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1)
-        ])
+        ], ringWidth: 1)
         panel.addSubview(microphoneRing)
         microphoneRing.translatesAutoresizingMaskIntoConstraints = false
 

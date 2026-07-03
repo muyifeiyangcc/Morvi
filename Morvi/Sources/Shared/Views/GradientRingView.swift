@@ -13,6 +13,8 @@ final class GradientRingView: UIView {
         gradientLayer.colors = colors.map(\.cgColor)
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        gradientLayer.contentsScale = UIScreen.main.scale
+        ringMaskLayer.contentsScale = UIScreen.main.scale
         layer.addSublayer(gradientLayer)
         gradientLayer.mask = ringMaskLayer
     }
