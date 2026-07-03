@@ -368,6 +368,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersonaDetail(title: String) {
+        addPersonaRootGradient()
         let scrollView = UIScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -458,6 +459,18 @@ final class ReferenceCanvasView: UIView {
             )
         }
         activeLayoutContainer = nil
+    }
+
+    private func addPersonaRootGradient() {
+        let gradient = CAGradientLayer()
+        gradient.colors = [
+            UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1).cgColor,
+            UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1).cgColor
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.frame = CGRect(x: 0, y: 0, width: 375, height: 812)
+        layer.insertSublayer(gradient, at: 0)
     }
 
     private func addPersonaBackdrop() {
