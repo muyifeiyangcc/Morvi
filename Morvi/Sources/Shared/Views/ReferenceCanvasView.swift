@@ -954,10 +954,18 @@ final class ReferenceCanvasView: UIView {
 
         let baseHeight = contentHeight - 328
         let base = addPanel(top: 328, left: 0, width: 375, height: baseHeight, alpha: 1)
-        addThemeGradientBackground(to: base, width: 375, height: baseHeight, cornerRadius: 20)
+        addThemeGradientBackground(
+            to: base,
+            width: 375,
+            height: baseHeight,
+            cornerRadius: 20,
+            maskedCorners: [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        )
         base.backgroundColor = .clear
         base.layer.borderWidth = 0
+        base.layer.shadowOpacity = 0
         base.layer.cornerRadius = 20
+        base.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: nameTop, centered: true)
         addStatsPanel(top: statsTop)
@@ -975,7 +983,8 @@ final class ReferenceCanvasView: UIView {
                 action: .play,
                 imageName: placement.imageName,
                 playIconName: "persona_media_play_icon",
-                playIconSize: 28
+                playIconSize: 28,
+                shadowOpacity: 0
             )
         }
         addPersonaMediaContainerSelection(to: scrollContent)
