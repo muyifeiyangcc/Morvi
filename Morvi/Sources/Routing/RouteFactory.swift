@@ -67,9 +67,7 @@ enum RouteFactory {
                 ]
             }
         case .assistantDialogue:
-            return ReferencePageController(page: .assistantDialogue) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 690, width: 335, height: 60)) { scene.showOverlay(.spendConfirm) }]
-            }
+            return ReferencePageController(page: .assistantDialogue)
         case .wallet:
             return ReferencePageController(page: .wallet) { scene in
                 [
