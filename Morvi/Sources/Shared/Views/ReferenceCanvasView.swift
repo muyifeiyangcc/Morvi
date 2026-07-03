@@ -1708,14 +1708,10 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = contentView
         defer { activeLayoutContainer = previousContainer }
 
-        addText(
-            "This week's feelings",
-            size: 25,
-            weight: .black,
-            top: 60,
-            left: 20,
-            usesOneFont: true
-        )
+        let titleTop: CGFloat = 60
+        let titleSize: CGFloat = 24
+        let barTop = titleTop + ceil(AppFont.source(titleSize, weight: .bold).lineHeight) + 26
+        addText("This week's feelings", size: titleSize, weight: .bold, top: titleTop, left: 20)
         let days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
         let icons = [
             "weekly_mood_happy",
@@ -1729,7 +1725,7 @@ final class ReferenceCanvasView: UIView {
         let heights: [CGFloat] = [200, 148, 118, 82, 104, 156, 198]
         for index in 0..<days.count {
             let x = CGFloat(20 + index * 49)
-            addFeelingBar(day: days[index], iconName: icons[index], height: heights[index], left: x)
+            addFeelingBar(day: days[index], iconName: icons[index], height: heights[index], top: barTop, left: x)
         }
         addFeelingCard(top: 401)
         addFeelingCard(top: 573)
@@ -3168,7 +3164,7 @@ final class ReferenceCanvasView: UIView {
         addPortrait(top: top - 2, left: 306, size: 44, tint: .warm)
     }
 
-    private func addFeelingBar(day: String, iconName: String, height: CGFloat, left: CGFloat) {
+    private func addFeelingBar(day: String, iconName: String, height: CGFloat, top: CGFloat, left: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let bg = UIView()
         bg.backgroundColor = UIColor(red: 1, green: 0.94, blue: 0.62, alpha: 1)
@@ -3177,7 +3173,7 @@ final class ReferenceCanvasView: UIView {
         bg.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             bg.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            bg.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: 121),
+            bg.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             bg.widthAnchor.constraint(equalToConstant: 40),
             bg.heightAnchor.constraint(equalToConstant: 220)
         ])
@@ -3192,8 +3188,8 @@ final class ReferenceCanvasView: UIView {
             fill.bottomAnchor.constraint(equalTo: bg.bottomAnchor),
             fill.heightAnchor.constraint(equalToConstant: height)
         ])
-        addAssetIcon(iconName, top: 121 + (220 - height) - 65, left: left - 10, size: 60)
-        addText(day, size: 16, weight: .regular, top: 354, left: left + 3, color: .darkGray)
+        addAssetIcon(iconName, top: top + (220 - height) - 55, left: left - 10, size: 60)
+        addText(day, size: 16, weight: .regular, top: top + 233, left: left + 3, color: .darkGray)
     }
 
     private func addFeelingCard(top: CGFloat) {
