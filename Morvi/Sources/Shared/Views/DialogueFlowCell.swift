@@ -140,9 +140,15 @@ final class DialogueFlowCell: UITableViewCell {
         ]
 
         if side == .local {
-            constraints.append(bubble.trailingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 288))
+            constraints.append(bubble.trailingAnchor.constraint(
+                equalTo: contentView.trailingAnchor,
+                constant: showsAvatar ? -87 : -20
+            ))
         } else {
-            constraints.append(bubble.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 86))
+            constraints.append(bubble.leadingAnchor.constraint(
+                equalTo: contentView.leadingAnchor,
+                constant: showsAvatar ? 86 : 20
+            ))
         }
 
         NSLayoutConstraint.activate(constraints)

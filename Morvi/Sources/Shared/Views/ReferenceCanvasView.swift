@@ -61,7 +61,7 @@ final class ReferenceCanvasView: UIView {
 
     private var usesDecorativeBackground: Bool {
         switch page {
-        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet:
+        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet, .assistantDialogue:
             return true
         default:
             return false
@@ -326,7 +326,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addDialogueInputDock() -> UIView {
+    private func addDialogueInputDock(showsAccessoryButtons: Bool = true) -> UIView {
         let dockView = UIView()
         dockView.backgroundColor = .clear
         addSubview(dockView)
@@ -335,7 +335,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             dockView.leadingAnchor.constraint(equalTo: leadingAnchor),
             dockView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            dockView.heightAnchor.constraint(equalToConstant: 81),
+            dockView.heightAnchor.constraint(equalToConstant: showsAccessoryButtons ? 81 : 45),
             bottomConstraint
         ])
 
@@ -358,19 +358,27 @@ final class ReferenceCanvasView: UIView {
             trailing: "➤",
             in: dockView
         )
-        NSLayoutConstraint.activate([
-            voiceButton.leadingAnchor.constraint(equalTo: dockView.leadingAnchor, constant: 24),
-            voiceButton.topAnchor.constraint(equalTo: dockView.topAnchor),
-            voiceButton.widthAnchor.constraint(equalToConstant: 24),
-            voiceButton.heightAnchor.constraint(equalToConstant: 24),
+        if showsAccessoryButtons {
+            NSLayoutConstraint.activate([
+                voiceButton.leadingAnchor.constraint(equalTo: dockView.leadingAnchor, constant: 24),
+                voiceButton.topAnchor.constraint(equalTo: dockView.topAnchor),
+                voiceButton.widthAnchor.constraint(equalToConstant: 24),
+                voiceButton.heightAnchor.constraint(equalToConstant: 24),
 
-            photoButton.leadingAnchor.constraint(equalTo: voiceButton.trailingAnchor, constant: 12),
-            photoButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
-            photoButton.widthAnchor.constraint(equalToConstant: 24),
-            photoButton.heightAnchor.constraint(equalToConstant: 24),
+                photoButton.leadingAnchor.constraint(equalTo: voiceButton.trailingAnchor, constant: 12),
+                photoButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
+                photoButton.widthAnchor.constraint(equalToConstant: 24),
+                photoButton.heightAnchor.constraint(equalToConstant: 24),
 
-            inputBar.topAnchor.constraint(equalTo: dockView.topAnchor, constant: 36)
-        ])
+                inputBar.topAnchor.constraint(equalTo: dockView.topAnchor, constant: 36)
+            ])
+        } else {
+            voiceButton.removeFromSuperview()
+            photoButton.removeFromSuperview()
+            NSLayoutConstraint.activate([
+                inputBar.topAnchor.constraint(equalTo: dockView.topAnchor)
+            ])
+        }
         keyboardAvoidanceInputView = dockView
         keyboardAvoidanceBottomConstraint = bottomConstraint
         keyboardAvoidanceBaseBottomConstant = -27
@@ -639,11 +647,11 @@ final class ReferenceCanvasView: UIView {
     private func assistantDialogueEntries() -> [DialogueFlowEntry] {
         [
             .wideAsset(name: "assistant_intro_card_background"),
-            .roundedPhrase(text: "How to develop self-discipline?", side: .local, showsAvatar: true),
+            .roundedPhrase(text: "How to develop self-discipline?", side: .local, showsAvatar: false),
             .roundedPhrase(
                 text: "Cultivating self-discipline is a\nprocess that requires patience,\nstrategy and continuous practice. It\nis not achieved overnight but\nthrough gradually adjusting habits,\nstrengthening willpower and\nestablishing a support system.",
                 side: .remote,
-                showsAvatar: true
+                showsAvatar: false
             )
         ]
     }
@@ -715,9 +723,8 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderAssistantDialogue() {
-        addDecorativeBackground()
         addTopTitle("Recot Bot")
-        let dockView = addDialogueInputDock()
+        let dockView = addDialogueInputDock(showsAccessoryButtons: false)
         addDialogueFlowList(
             top: 136,
             bottomAnchor: dockView.topAnchor,
