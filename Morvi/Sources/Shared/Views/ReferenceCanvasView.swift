@@ -65,7 +65,7 @@ final class ReferenceCanvasView: UIView {
 
     private var usesDecorativeBackground: Bool {
         switch page {
-        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet, .assistantDialogue:
+        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet, .assistantDialogue, .settings:
             return true
         default:
             return false
@@ -1648,7 +1648,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
@@ -1662,12 +1662,12 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: 812)
+            scrollContent.heightAnchor.constraint(equalToConstant: 574)
         ])
 
         activeLayoutContainer = scrollContent
-        addSettingsCard(top: 140, height: 276, rows: ["Wallet", "Blacklist", "Privacy Policy", "User Agreement"])
-        addSettingsCard(top: 443, height: 150, rows: ["Delete account", "Log out"])
+        addSettingsCard(top: 0, height: 276, rows: ["Wallet", "Blacklist", "Privacy Policy", "User Agreement"])
+        addSettingsCard(top: 304, height: 150, rows: ["Delete account", "Log out"])
         activeLayoutContainer = nil
     }
 
@@ -1720,6 +1720,35 @@ final class ReferenceCanvasView: UIView {
             nextIconView.widthAnchor.constraint(equalToConstant: 20),
             nextIconView.heightAnchor.constraint(equalToConstant: 20)
         ])
+
+        let actionArea = UIButton(type: .custom)
+        actionArea.backgroundColor = .clear
+        itemView.addSubview(actionArea)
+        actionArea.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            actionArea.leadingAnchor.constraint(equalTo: itemView.leadingAnchor),
+            actionArea.trailingAnchor.constraint(equalTo: itemView.trailingAnchor),
+            actionArea.topAnchor.constraint(equalTo: itemView.topAnchor),
+            actionArea.bottomAnchor.constraint(equalTo: itemView.bottomAnchor)
+        ])
+        if let action = settingsAction(for: text) {
+            actionArea.addAction(action, for: .touchUpInside)
+        }
+    }
+
+    private func settingsAction(for text: String) -> UIAction? {
+        switch text {
+        case "Wallet":
+            return UIAction { [weak self] _ in self?.didRequestPage?(.wallet) }
+        case "Blacklist":
+            return UIAction { [weak self] _ in self?.didRequestPage?(.restrictedList) }
+        case "Privacy Policy", "User Agreement":
+            return UIAction { [weak self] _ in self?.didRequestPage?(.agreement) }
+        case "Delete account", "Log out":
+            return UIAction { [weak self] _ in self?.didRequestOverlayPage?(.exitConfirm) }
+        default:
+            return nil
+        }
     }
 
     private func renderPersonalDetail() {
