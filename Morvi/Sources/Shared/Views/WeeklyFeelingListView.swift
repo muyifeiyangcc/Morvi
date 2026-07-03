@@ -1,7 +1,7 @@
 import UIKit
 
 final class WeeklyFeelingListView: UIView {
-    private let tableView = UITableView(frame: .zero, style: .plain)
+    private let tableView = CancelFriendlyTableView(frame: .zero, style: .plain)
     private let entries: [WeeklyFeelingEntry] = [
         WeeklyFeelingEntry(style: .lime),
         WeeklyFeelingEntry(style: .aqua)

@@ -1,7 +1,7 @@
 import UIKit
 
 final class DialogueFlowListView: UIView {
-    private let tableView = UITableView(frame: .zero, style: .plain)
+    private let tableView = CancelFriendlyTableView(frame: .zero, style: .plain)
     private var entries: [DialogueFlowEntry] = []
 
     override init(frame: CGRect) {

@@ -142,7 +142,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderEntry() {
         let consentLine = addAgreementConsentLine(bottom: 51)
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -183,7 +183,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderHome() {
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -243,7 +243,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderDiscover() {
         addTopTitle("Discover")
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -887,7 +887,7 @@ final class ReferenceCanvasView: UIView {
     private func renderPersonaDetail(title: String) {
         addPersonaRootGradient()
         addPersonaBackdrop()
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -1004,6 +1004,7 @@ final class ReferenceCanvasView: UIView {
     private func addPersonaMediaContainerSelection(to container: UIView) {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handlePersonaMediaContainerTap(_:)))
         tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self
         container.addGestureRecognizer(tapGesture)
     }
 
@@ -1186,7 +1187,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderSignIn() {
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1232,7 +1233,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderSignUp() {
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1284,7 +1285,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderResetAccess() {
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1362,7 +1363,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderWallet() {
         addTopTitle("Wallet")
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1572,7 +1573,7 @@ final class ReferenceCanvasView: UIView {
         )
         activeLayoutContainer = nil
 
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.backgroundColor = .clear
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
@@ -1638,7 +1639,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderSettings() {
         settingsTapActions = []
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1674,6 +1675,7 @@ final class ReferenceCanvasView: UIView {
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleSettingsTap))
         tapGesture.cancelsTouchesInView = false
+        tapGesture.delegate = self
         scrollContent.addGestureRecognizer(tapGesture)
     }
 
@@ -1756,7 +1758,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersonalDetail() {
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -2219,7 +2221,7 @@ final class ReferenceCanvasView: UIView {
             photoButton.widthAnchor.constraint(equalToConstant: 24),
             photoButton.heightAnchor.constraint(equalToConstant: 24)
         ])
-        let tableView = UITableView(frame: .zero, style: .plain)
+        let tableView = CancelFriendlyTableView(frame: .zero, style: .plain)
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
@@ -3723,7 +3725,7 @@ final class ReferenceCanvasView: UIView {
     private func addMoodRow(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let moodColor = UIColor(red: 1, green: 240 / 255, blue: 110 / 255, alpha: 1)
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.backgroundColor = .clear
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.alwaysBounceHorizontal = true
@@ -4622,6 +4624,24 @@ extension ReferenceCanvasView: UIGestureRecognizerDelegate {
             touchedView = candidate.superview
         }
         return true
+    }
+
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        gestureBelongsToScrollableArea(gestureRecognizer) || gestureBelongsToScrollableArea(otherGestureRecognizer)
+    }
+
+    private func gestureBelongsToScrollableArea(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        var touchedView = gestureRecognizer.view
+        while let candidate = touchedView {
+            if candidate is UIScrollView {
+                return true
+            }
+            touchedView = candidate.superview
+        }
+        return false
     }
 }
 

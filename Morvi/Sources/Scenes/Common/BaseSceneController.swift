@@ -247,4 +247,22 @@ extension BaseSceneController: UIGestureRecognizerDelegate {
         }
         return true
     }
+
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        gestureBelongsToScrollableArea(gestureRecognizer) || gestureBelongsToScrollableArea(otherGestureRecognizer)
+    }
+
+    private func gestureBelongsToScrollableArea(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        var touchedView = gestureRecognizer.view
+        while let candidate = touchedView {
+            if candidate is UIScrollView {
+                return true
+            }
+            touchedView = candidate.superview
+        }
+        return false
+    }
 }

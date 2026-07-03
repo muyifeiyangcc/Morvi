@@ -21,7 +21,7 @@ final class RestrictedRosterListView: UIView {
         layout.minimumInteritemSpacing = 8
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 28, right: 20)
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView = CancelFriendlyCollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: frame)
         configureCollectionView()
     }

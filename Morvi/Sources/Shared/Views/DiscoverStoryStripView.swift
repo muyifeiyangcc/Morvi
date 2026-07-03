@@ -25,7 +25,7 @@ final class DiscoverStoryStripView: UIView {
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         layout.itemSize = CGSize(width: 76, height: 78)
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView = CancelFriendlyCollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: frame)
         configureCollectionView()
     }

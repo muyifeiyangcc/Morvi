@@ -34,7 +34,7 @@ final class DialogueCardListView: UIView {
         layout.minimumInteritemSpacing = 8
         layout.minimumLineSpacing = 10
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 10, right: 19)
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView = CancelFriendlyCollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: frame)
 
         backgroundColor = .clear
