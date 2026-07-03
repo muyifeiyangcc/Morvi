@@ -1684,6 +1684,8 @@ final class ReferenceCanvasView: UIView {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
         scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset.bottom = 124
+        scrollView.verticalScrollIndicatorInsets.bottom = 124
         addSubview(scrollView)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
 
