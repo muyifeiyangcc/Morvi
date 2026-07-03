@@ -377,8 +377,8 @@ final class ReferenceCanvasView: UIView {
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: 394, centered: true)
         addStatsPanel(top: 434)
-        addPillButton("Chat", top: 535, left: 20, width: 160, height: 40, dark: true)
-        addPillButton("Follow", top: 535, left: 195, width: 160, height: 40, dark: true)
+        addPillButton("Chat", top: 535, left: 20, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        addPillButton("Follow", top: 535, left: 195, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         addMediaBlock(top: 599, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
         addMediaBlock(top: 599, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
         addMediaBlock(top: 775, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
@@ -2565,13 +2565,14 @@ final class ReferenceCanvasView: UIView {
         height: CGFloat = 50,
         dark: Bool,
         usesOneFont: Bool = false,
+        fontSize: CGFloat = 18,
         fontWeight: UIFont.Weight = .regular,
         parent: UIView? = nil
     ) -> UIButton {
         let layoutContainer = parent ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
-        button.titleLabel?.font = usesOneFont ? AppFont.fredoka(18) : AppFont.source(18, weight: fontWeight)
+        button.titleLabel?.font = usesOneFont ? AppFont.fredoka(fontSize) : AppFont.source(fontSize, weight: fontWeight)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
         button.layer.cornerRadius = height / 2
