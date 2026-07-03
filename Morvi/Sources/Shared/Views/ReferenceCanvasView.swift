@@ -182,6 +182,8 @@ final class ReferenceCanvasView: UIView {
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
+        scrollView.contentInset.bottom = 104
+        scrollView.verticalScrollIndicatorInsets.bottom = 104
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
         scrollView.backgroundColor = .clear
