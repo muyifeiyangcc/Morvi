@@ -1902,12 +1902,18 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = sheet
         addText("Report or block", size: 31, weight: .black, top: 28, left: 20, usesOneFont: true)
-        addOptionTile(iconName: "restrict_report_icon", top: 81, left: 20, width: 158) { [weak self] in
+        let reportTile = addOptionTile(iconName: "restrict_report_icon", top: 81) { [weak self] in
             self?.didRequestOverlayPage?(.reportPanel)
         }
-        addOptionTile(iconName: "restrict_block_icon", top: 81, left: 197, width: 158) { [weak self] in
+        let restrictTile = addOptionTile(iconName: "restrict_block_icon", top: 81) { [weak self] in
             self?.didRequestOverlayPage?(.restrictConfirm)
         }
+        NSLayoutConstraint.activate([
+            reportTile.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 20),
+            restrictTile.leadingAnchor.constraint(equalTo: reportTile.trailingAnchor, constant: 19),
+            restrictTile.trailingAnchor.constraint(equalTo: sheet.trailingAnchor, constant: -20),
+            reportTile.widthAnchor.constraint(equalTo: restrictTile.widthAnchor)
+        ])
         activeLayoutContainer = nil
         installBlankAreaKeyboardDismissal()
     }
@@ -3169,13 +3175,12 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
+    @discardableResult
     private func addOptionTile(
         iconName: String,
         top: CGFloat,
-        left: CGFloat,
-        width: CGFloat = 158,
         action: (() -> Void)? = nil
-    ) {
+    ) -> UIView {
         let layoutContainer = activeLayoutContainer ?? self
         let tile = UIView()
         tile.backgroundColor = UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
@@ -3185,9 +3190,7 @@ final class ReferenceCanvasView: UIView {
         layoutContainer.addSubview(tile)
         tile.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tile.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
             tile.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            tile.widthAnchor.constraint(equalToConstant: width),
             tile.heightAnchor.constraint(equalToConstant: 120)
         ])
         let iconView = UIImageView(image: UIImage(named: iconName))
@@ -3211,6 +3214,7 @@ final class ReferenceCanvasView: UIView {
                 button.bottomAnchor.constraint(equalTo: tile.bottomAnchor)
             ])
         }
+        return tile
     }
 
     @discardableResult
