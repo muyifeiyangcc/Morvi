@@ -36,6 +36,7 @@ final class ReferenceCanvasView: UIView {
     private weak var activeVoiceIconView: UIView?
     private var voiceElapsedSeconds = 0
     private var voiceTimer: Timer?
+    private var personaMediaFrames: [CGRect] = []
 
     init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
@@ -341,6 +342,9 @@ final class ReferenceCanvasView: UIView {
             columnBottoms[columnIndex] += height + cellGap
             return placement
         }
+        personaMediaFrames = cellPlacements.map {
+            CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height)
+        }
         let contentHeight = max(812, (columnBottoms.max() ?? 812) - cellGap + 10)
         NSLayoutConstraint.activate([
             scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
@@ -381,12 +385,12 @@ final class ReferenceCanvasView: UIView {
                 tint: placement.tint,
                 action: .play,
                 imageName: placement.imageName,
-                destinationPage: .galleryDetail,
                 playIconName: "persona_media_play_icon",
                 playIconSize: 28,
                 shadowOpacity: 0
             )
         }
+        addPersonaMediaContainerSelection(to: scrollContent)
         activeLayoutContainer = nil
     }
 
@@ -934,6 +938,9 @@ final class ReferenceCanvasView: UIView {
             columnBottoms[columnIndex] += height + cellGap
             return placement
         }
+        personaMediaFrames = cellPlacements.map {
+            CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height)
+        }
         let contentHeight = max(812, (columnBottoms.max() ?? 812) - cellGap + 32)
 
         NSLayoutConstraint.activate([
@@ -967,16 +974,29 @@ final class ReferenceCanvasView: UIView {
                 tint: placement.tint,
                 action: .play,
                 imageName: placement.imageName,
-                destinationPage: .galleryDetail,
                 playIconName: "persona_media_play_icon",
                 playIconSize: 28
             )
         }
+        addPersonaMediaContainerSelection(to: scrollContent)
         activeLayoutContainer = nil
     }
 
     @objc private func handlePersonaDialogueTap() {
         didRequestPage?(.directDialogue)
+    }
+
+    private func addPersonaMediaContainerSelection(to container: UIView) {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handlePersonaMediaContainerTap(_:)))
+        tapGesture.cancelsTouchesInView = false
+        container.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func handlePersonaMediaContainerTap(_ gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended, let container = gesture.view else { return }
+        let location = gesture.location(in: container)
+        guard personaMediaFrames.contains(where: { $0.contains(location) }) else { return }
+        didRequestPage?(.galleryDetail)
     }
 
     private func addPersonaRootGradient() {

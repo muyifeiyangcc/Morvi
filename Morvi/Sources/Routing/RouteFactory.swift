@@ -22,10 +22,7 @@ enum RouteFactory {
             return ReferencePageController(page: .persona) { scene in
                 [
                     HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { scene.push(.profileEditor) },
-                    HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { scene.push(.settings) },
-                    HitArea(frame: CGRect(x: 20, y: 364, width: 162, height: 232)) { scene.push(.galleryDetail) },
-                    HitArea(frame: CGRect(x: 192, y: 364, width: 164, height: 164)) { scene.push(.galleryDetail) },
-                    HitArea(frame: CGRect(x: 192, y: 538, width: 164, height: 180)) { scene.push(.galleryDetail) }
+                    HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { scene.push(.settings) }
                 ]
             }
         case .signIn:

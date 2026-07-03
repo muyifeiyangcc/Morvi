@@ -129,10 +129,7 @@ final class RootTabsController: UIViewController {
         case .persona:
             installHitAreas([
                 HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { [weak self] in self?.show(.profileEditor) },
-                HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { [weak self] in self?.show(.settings) },
-                HitArea(frame: CGRect(x: 20, y: 364, width: 162, height: 232)) { [weak self] in self?.show(.galleryDetail) },
-                HitArea(frame: CGRect(x: 192, y: 364, width: 164, height: 164)) { [weak self] in self?.show(.galleryDetail) },
-                HitArea(frame: CGRect(x: 192, y: 538, width: 164, height: 180)) { [weak self] in self?.show(.galleryDetail) }
+                HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { [weak self] in self?.show(.settings) }
             ])
         default:
             break
