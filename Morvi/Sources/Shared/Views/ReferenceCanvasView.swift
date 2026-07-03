@@ -297,7 +297,7 @@ final class ReferenceCanvasView: UIView {
         addPersonaRootGradient()
         let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
-        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 94, right: 0)
+        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 24, right: 0)
         scrollView.scrollIndicatorInsets = scrollView.contentInset
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
@@ -341,7 +341,7 @@ final class ReferenceCanvasView: UIView {
             columnBottoms[columnIndex] += height + cellGap
             return placement
         }
-        let contentHeight = max(812, (columnBottoms.max() ?? 812) - cellGap + 32)
+        let contentHeight = max(812, (columnBottoms.max() ?? 812) - cellGap + 10)
         NSLayoutConstraint.activate([
             scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
@@ -354,10 +354,18 @@ final class ReferenceCanvasView: UIView {
         addPersonaBackdrop()
         let baseHeight = contentHeight - 228
         let base = addPanel(top: 228, left: 0, width: 375, height: baseHeight, alpha: 1)
-        addThemeGradientBackground(to: base, width: 375, height: baseHeight, cornerRadius: 20)
+        addThemeGradientBackground(
+            to: base,
+            width: 375,
+            height: baseHeight,
+            cornerRadius: 20,
+            maskedCorners: [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        )
         base.backgroundColor = .clear
         base.layer.borderWidth = 0
+        base.layer.shadowOpacity = 0
         base.layer.cornerRadius = 20
+        base.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         addProfileAvatar(top: 198, left: 36, size: 74, showsBorder: false, showsShadow: false)
         addText("Amelia", size: 20, weight: .medium, top: 275, left: 36)
         addPersonaMetricLine(top: 311, left: 20)
@@ -375,7 +383,8 @@ final class ReferenceCanvasView: UIView {
                 imageName: placement.imageName,
                 destinationPage: .galleryDetail,
                 playIconName: "persona_media_play_icon",
-                playIconSize: 28
+                playIconSize: 28,
+                shadowOpacity: 0
             )
         }
         activeLayoutContainer = nil
@@ -1076,9 +1085,21 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addThemeGradientBackground(to view: UIView, width: CGFloat, height: CGFloat, cornerRadius: CGFloat) {
+    private func addThemeGradientBackground(
+        to view: UIView,
+        width: CGFloat,
+        height: CGFloat,
+        cornerRadius: CGFloat,
+        maskedCorners: CACornerMask = [
+            .layerMinXMinYCorner,
+            .layerMaxXMinYCorner,
+            .layerMinXMaxYCorner,
+            .layerMaxXMaxYCorner
+        ]
+    ) {
         let backgroundView = UIView()
         backgroundView.layer.cornerRadius = cornerRadius
+        backgroundView.layer.maskedCorners = maskedCorners
         backgroundView.layer.masksToBounds = true
         view.insertSubview(backgroundView, at: 0)
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
@@ -3572,13 +3593,14 @@ final class ReferenceCanvasView: UIView {
         titleUsesOneFont: Bool = false,
         destinationPage: ScenePage? = nil,
         playIconName: String = "video_play_icon",
-        playIconSize: CGFloat = 40
+        playIconSize: CGFloat = 40,
+        shadowOpacity: Float = 0.18
     ) {
         let layoutContainer = activeLayoutContainer ?? self
         let shadowHost = UIView()
         shadowHost.backgroundColor = .clear
         shadowHost.layer.shadowColor = UIColor.black.cgColor
-        shadowHost.layer.shadowOpacity = 0.18
+        shadowHost.layer.shadowOpacity = shadowOpacity
         shadowHost.layer.shadowOffset = CGSize(width: 0, height: 5)
         shadowHost.layer.shadowRadius = 12
         layoutContainer.addSubview(shadowHost)
