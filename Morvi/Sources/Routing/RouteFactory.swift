@@ -80,9 +80,7 @@ enum RouteFactory {
             }
         case .publicPersona:
             return ReferencePageController(page: .publicPersona) { scene in
-                [
-                    HitArea(frame: CGRect(x: 190, y: 245, width: 160, height: 250)) { scene.push(.galleryDetail) }
-                ]
+                []
             }
         case .galleryDetail:
             return ReferencePageController(page: .galleryDetail) { scene in
