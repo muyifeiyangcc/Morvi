@@ -1960,7 +1960,7 @@ final class ReferenceCanvasView: UIView {
         avatarView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             avatarView.centerXAnchor.constraint(equalTo: sheet.centerXAnchor),
-            avatarView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 44),
+            avatarView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 47),
             avatarView.widthAnchor.constraint(equalToConstant: 74),
             avatarView.heightAnchor.constraint(equalToConstant: 74)
         ])
@@ -1981,13 +1981,13 @@ final class ReferenceCanvasView: UIView {
 
         let nameLabel = UILabel()
         nameLabel.text = "Username:"
-        nameLabel.font = AppFont.source(16)
+        nameLabel.font = AppFont.source(16, weight: .medium)
         nameLabel.textColor = .black
         sheet.addSubview(nameLabel)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             nameLabel.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 20),
-            nameLabel.topAnchor.constraint(equalTo: avatarView.bottomAnchor, constant: 34)
+            nameLabel.topAnchor.constraint(equalTo: avatarView.bottomAnchor, constant: 49)
         ])
 
         activeLayoutContainer = sheet
