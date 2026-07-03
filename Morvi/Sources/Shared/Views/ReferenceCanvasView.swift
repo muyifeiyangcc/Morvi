@@ -289,11 +289,13 @@ final class ReferenceCanvasView: UIView {
     private func renderConversation(title: String, mode: ConversationMode) {
         addDecorativeBackground()
         addTopTitle(title)
-        addDialogueFlowList(top: 136, bottom: 696)
         switch mode {
         case .text:
-            addDialogueInputDock()
+            let dockView = addDialogueInputDock()
+            addDialogueFlowList(top: 136, bottomAnchor: dockView.topAnchor, bottomSpacing: 8)
+            bringSubviewToFront(dockView)
         case .voice:
+            addDialogueFlowList(top: 136, bottom: 696)
             addVoiceClip(top: 552)
             let panel = addPanel(top: 586, left: 0, width: 375, height: 226, alpha: 1)
             panel.backgroundColor = UIColor(red: 1.0, green: 0.76, blue: 0.02, alpha: 1)
@@ -315,7 +317,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addDialogueInputDock() {
+    private func addDialogueInputDock() -> UIView {
         let dockView = UIView()
         dockView.backgroundColor = .clear
         addSubview(dockView)
@@ -364,9 +366,15 @@ final class ReferenceCanvasView: UIView {
         keyboardAvoidanceBaseBottomConstant = -27
         installKeyboardAvoidance()
         installBlankAreaKeyboardDismissal()
+        return dockView
     }
 
-    private func addDialogueFlowList(top: CGFloat, bottom: CGFloat) {
+    private func addDialogueFlowList(
+        top: CGFloat,
+        bottom: CGFloat? = nil,
+        bottomAnchor: NSLayoutYAxisAnchor? = nil,
+        bottomSpacing: CGFloat = 0
+    ) {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "en_US_POSIX")
         let referenceDate = Date()
@@ -385,12 +393,17 @@ final class ReferenceCanvasView: UIView {
         ])
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var constraints = [
             listView.leadingAnchor.constraint(equalTo: leadingAnchor),
             listView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            listView.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            listView.bottomAnchor.constraint(equalTo: topAnchor, constant: bottom)
-        ])
+            listView.topAnchor.constraint(equalTo: topAnchor, constant: top)
+        ]
+        if let bottomAnchor {
+            constraints.append(listView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -bottomSpacing))
+        } else if let bottom {
+            constraints.append(listView.bottomAnchor.constraint(equalTo: topAnchor, constant: bottom))
+        }
+        NSLayoutConstraint.activate(constraints)
     }
 
     private func addInputToolbarIcons(top: CGFloat) {
