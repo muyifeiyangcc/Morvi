@@ -374,14 +374,19 @@ final class ReferenceCanvasView: UIView {
         base.backgroundColor = .clear
         base.layer.borderWidth = 0
         base.layer.cornerRadius = 20
+        let nameTop: CGFloat = 394
+        let nameHeight = ceil(AppFont.source(26, weight: .bold).lineHeight)
+        let statsTop = nameTop + nameHeight + 15
+        let buttonTop = statsTop + 80 + 22
+        let cellTop = buttonTop + 40 + 24
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
-        addText(title, size: 26, weight: .bold, top: 394, centered: true)
-        addStatsPanel(top: 434)
-        addPillButton("Chat", top: 535, left: 20, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
-        addPillButton("Follow", top: 535, left: 195, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
-        addMediaBlock(top: 599, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
-        addMediaBlock(top: 599, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
-        addMediaBlock(top: 775, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
+        addText(title, size: 26, weight: .bold, top: nameTop, centered: true)
+        addStatsPanel(top: statsTop)
+        addPillButton("Chat", top: buttonTop, left: 20, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        addPillButton("Follow", top: buttonTop, left: 195, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        addMediaBlock(top: cellTop, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
+        addMediaBlock(top: cellTop, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
+        addMediaBlock(top: cellTop + 176, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
     }
 
     private func addPersonaBackdrop() {
