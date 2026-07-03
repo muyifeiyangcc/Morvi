@@ -1098,6 +1098,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderWallet() {
+        addDecorativeBackground()
         addTopTitle("Wallet")
         let balance = addPanel(top: 156, left: 20, width: 335, height: 122, alpha: 1)
         balance.backgroundColor = UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1)
