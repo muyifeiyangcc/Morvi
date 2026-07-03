@@ -1993,7 +1993,9 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = sheet
         let nameInput = addInputField(
             "Enter username",
-            top: 276,
+            top: 0,
+            topAnchor: nameLabel.bottomAnchor,
+            topOffset: 8,
             fieldBackgroundColor: UIColor(red: 212 / 255, green: 1, blue: 59 / 255, alpha: 0.3),
             usesGradient: false
         )
@@ -2010,7 +2012,7 @@ final class ReferenceCanvasView: UIView {
         )
         activeLayoutContainer = nil
 
-        uploadButton.topAnchor.constraint(equalTo: nameInput.bottomAnchor, constant: 26).isActive = true
+        uploadButton.topAnchor.constraint(equalTo: nameInput.bottomAnchor, constant: 32).isActive = true
         keyboardAvoidanceBottomConstraint = sheetBottomConstraint
         keyboardAvoidanceBaseBottomConstant = 0
         keyboardAvoidanceInputView = nameInput
@@ -2624,6 +2626,8 @@ final class ReferenceCanvasView: UIView {
     private func addInputField(
         _ placeholder: String,
         top: CGFloat,
+        topAnchor: NSLayoutYAxisAnchor? = nil,
+        topOffset: CGFloat = 0,
         keyboardType: UIKeyboardType = .default,
         isSecureTextEntry: Bool = false,
         fieldBackgroundColor: UIColor = .clear,
@@ -2631,6 +2635,8 @@ final class ReferenceCanvasView: UIView {
     ) -> UITextField {
         let field = addFieldContainer(
             top: top,
+            topAnchor: topAnchor,
+            topOffset: topOffset,
             backgroundColor: fieldBackgroundColor,
             usesGradient: usesGradient
         )
@@ -2664,6 +2670,8 @@ final class ReferenceCanvasView: UIView {
 
     private func addFieldContainer(
         top: CGFloat,
+        topAnchor: NSLayoutYAxisAnchor? = nil,
+        topOffset: CGFloat = 0,
         backgroundColor: UIColor = .clear,
         usesGradient: Bool = true
     ) -> UIView {
@@ -2677,12 +2685,17 @@ final class ReferenceCanvasView: UIView {
         )
         layoutContainer.addSubview(field)
         field.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var constraints = [
             field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
             field.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
-            field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             field.heightAnchor.constraint(equalToConstant: 54)
-        ])
+        ]
+        if let topAnchor {
+            constraints.append(field.topAnchor.constraint(equalTo: topAnchor, constant: topOffset))
+        } else {
+            constraints.append(field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
+        }
+        NSLayoutConstraint.activate(constraints)
         return field
     }
 
