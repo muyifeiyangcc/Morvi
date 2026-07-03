@@ -30,6 +30,11 @@ final class ReferenceCanvasView: UIView {
     private let replyListDataSource = ReplyListDataSource()
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
+    private weak var voiceDurationLabel: UILabel?
+    private weak var activeVoiceRippleView: VoiceRippleView?
+    private weak var activeVoiceIconView: UIView?
+    private var voiceElapsedSeconds = 0
+    private var voiceTimer: Timer?
 
     init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
@@ -445,8 +450,10 @@ final class ReferenceCanvasView: UIView {
         durationLabel.textColor = UIColor(red: 0.17, green: 0.22, blue: 0.18, alpha: 1)
         durationLabel.font = AppFont.source(16, weight: .medium)
         durationLabel.textAlignment = .center
+        durationLabel.isHidden = true
         panel.addSubview(durationLabel)
         durationLabel.translatesAutoresizingMaskIntoConstraints = false
+        voiceDurationLabel = durationLabel
         NSLayoutConstraint.activate([
             gridIcon.leadingAnchor.constraint(equalTo: panel.leadingAnchor, constant: 20),
             gridIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 20),
@@ -474,7 +481,7 @@ final class ReferenceCanvasView: UIView {
         let rippleView = microphoneIcon.superview?.subviews.first { $0 is VoiceRippleView } as? VoiceRippleView
         switch recognizer.state {
         case .began:
-            rippleView?.startAnimating()
+            startVoiceCapture(rippleView: rippleView, iconView: microphoneIcon)
             UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut], animations: {
                 microphoneIcon.transform = CGAffineTransform(scaleX: 80 / 104, y: 80 / 104)
             }, completion: { _ in
@@ -488,17 +495,59 @@ final class ReferenceCanvasView: UIView {
                 )
             })
         case .ended, .cancelled, .failed:
-            rippleView?.stopAnimating()
-            microphoneIcon.layer.removeAllAnimations()
-            UIView.animate(withDuration: 0.18, delay: 0, options: [.curveEaseOut]) {
-                microphoneIcon.transform = .identity
-            }
+            stopVoiceCapture()
         default:
             break
         }
     }
 
+    private func startVoiceCapture(rippleView: VoiceRippleView?, iconView: UIView) {
+        stopVoiceTimer()
+        activeVoiceRippleView = rippleView
+        activeVoiceIconView = iconView
+        voiceElapsedSeconds = 0
+        voiceDurationLabel?.text = "0s"
+        voiceDurationLabel?.isHidden = false
+        rippleView?.startAnimating()
+        voiceTimer = Timer.scheduledTimer(
+            timeInterval: 1,
+            target: self,
+            selector: #selector(handleVoiceTimerTick),
+            userInfo: nil,
+            repeats: true
+        )
+        RunLoop.main.add(voiceTimer!, forMode: .common)
+    }
+
+    @objc private func handleVoiceTimerTick() {
+        voiceElapsedSeconds += 1
+        voiceDurationLabel?.text = "\(voiceElapsedSeconds)s"
+        if voiceElapsedSeconds >= 60 {
+            stopVoiceCapture()
+        }
+    }
+
+    private func stopVoiceCapture() {
+        stopVoiceTimer()
+        activeVoiceRippleView?.stopAnimating()
+        if let iconView = activeVoiceIconView {
+            iconView.layer.removeAllAnimations()
+            UIView.animate(withDuration: 0.18, delay: 0, options: [.curveEaseOut]) {
+                iconView.transform = .identity
+            }
+        }
+        voiceDurationLabel?.isHidden = true
+        activeVoiceRippleView = nil
+        activeVoiceIconView = nil
+    }
+
+    private func stopVoiceTimer() {
+        voiceTimer?.invalidate()
+        voiceTimer = nil
+    }
+
     @objc private func hideVoiceInputPanel() {
+        stopVoiceCapture()
         viewWithTag(9206)?.removeFromSuperview()
         resetVoicePanelAvoidance(animated: true)
     }
