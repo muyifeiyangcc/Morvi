@@ -423,17 +423,17 @@ final class ReferenceCanvasView: UIView {
         panel.addSubview(gridIcon)
         gridIcon.translatesAutoresizingMaskIntoConstraints = false
 
+        let rippleView = VoiceRippleView(colors: [
+            UIColor(red: 0.56, green: 0.78, blue: 0.22, alpha: 1),
+            UIColor(red: 0.56, green: 0.78, blue: 0.22, alpha: 1)
+        ])
+        panel.addSubview(rippleView)
+        rippleView.translatesAutoresizingMaskIntoConstraints = false
+
         let microphoneIcon = UIImageView(image: UIImage(named: "voice_panel_microphone"))
         microphoneIcon.contentMode = .scaleAspectFit
         panel.addSubview(microphoneIcon)
         microphoneIcon.translatesAutoresizingMaskIntoConstraints = false
-
-        let rippleView = VoiceRippleView(colors: [
-            UIColor(red: 1, green: 0, blue: 0, alpha: 1),
-            UIColor(red: 1, green: 0.55, blue: 0, alpha: 1)
-        ])
-        panel.addSubview(rippleView)
-        rippleView.translatesAutoresizingMaskIntoConstraints = false
 
         microphoneIcon.isUserInteractionEnabled = true
         let pressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleVoiceCapturePress(_:)))
@@ -476,7 +476,7 @@ final class ReferenceCanvasView: UIView {
         case .began:
             rippleView?.startAnimating()
             UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut]) {
-                microphoneIcon.transform = CGAffineTransform(scaleX: 50 / 104, y: 50 / 104)
+                microphoneIcon.transform = CGAffineTransform(scaleX: 60 / 104, y: 60 / 104)
             }
         case .ended, .cancelled, .failed:
             rippleView?.stopAnimating()
