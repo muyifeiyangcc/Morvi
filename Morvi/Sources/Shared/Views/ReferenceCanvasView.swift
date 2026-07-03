@@ -1129,15 +1129,15 @@ final class ReferenceCanvasView: UIView {
         ])
 
         activeLayoutContainer = scrollContent
-        addNotchedPanel(top: 36, left: 20, width: 335, height: 122)
-        addWalletBalanceTextGroup(parent: scrollContent, cardTop: 36)
+        addNotchedPanel(top: 56, left: 20, width: 335, height: 122)
+        addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56)
         let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900"]
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99"]
         for index in amounts.indices {
-            let top = CGFloat(168 + index * 80)
+            let top = CGFloat(188 + index * 80)
             addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index])
         }
-        addGem(assetName: "balance_gem_mark", top: -24, left: 144, width: 180, height: 182)
+        addGem(assetName: "balance_gem_mark", top: -4, left: 144, width: 180, height: 182)
         activeLayoutContainer = nil
     }
 
