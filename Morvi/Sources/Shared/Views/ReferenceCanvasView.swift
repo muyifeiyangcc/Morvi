@@ -1707,16 +1707,41 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = contentView
         defer { activeLayoutContainer = previousContainer }
 
-        addText("This week's feelings", size: 25, weight: .black, top: 68, left: 20, usesOneFont: true)
+        addText(
+            "This week's feelings",
+            size: 25,
+            weight: .black,
+            top: currentStatusBarHeight() + 16,
+            left: 20,
+            usesOneFont: true
+        )
         let days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
-        let faces = ["😃", "😟", "☹️", "😭", "😆", "😌", "😎"]
+        let icons = [
+            "weekly_mood_happy",
+            "weekly_mood_panic",
+            "weekly_mood_sad",
+            "weekly_mood_crying",
+            "weekly_mood_strained",
+            "weekly_mood_calm",
+            "weekly_mood_cool"
+        ]
         let heights: [CGFloat] = [200, 148, 118, 82, 104, 156, 198]
         for index in 0..<days.count {
             let x = CGFloat(20 + index * 49)
-            addFeelingBar(day: days[index], face: faces[index], height: heights[index], left: x)
+            addFeelingBar(day: days[index], iconName: icons[index], height: heights[index], left: x)
         }
         addFeelingCard(top: 401)
         addFeelingCard(top: 573)
+    }
+
+    private func currentStatusBarHeight() -> CGFloat {
+        if let height = window?.windowScene?.statusBarManager?.statusBarFrame.height, height > 0 {
+            return height
+        }
+        let sceneHeight = UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.statusBarManager?.statusBarFrame.height }
+            .first(where: { $0 > 0 })
+        return sceneHeight ?? 44
     }
 
     private func renderProfileEditor() {
@@ -3152,7 +3177,7 @@ final class ReferenceCanvasView: UIView {
         addPortrait(top: top - 2, left: 306, size: 44, tint: .warm)
     }
 
-    private func addFeelingBar(day: String, face: String, height: CGFloat, left: CGFloat) {
+    private func addFeelingBar(day: String, iconName: String, height: CGFloat, left: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let bg = UIView()
         bg.backgroundColor = UIColor(red: 1, green: 0.94, blue: 0.62, alpha: 1)
@@ -3176,7 +3201,7 @@ final class ReferenceCanvasView: UIView {
             fill.bottomAnchor.constraint(equalTo: bg.bottomAnchor),
             fill.heightAnchor.constraint(equalToConstant: height)
         ])
-        addText(face, size: 26, weight: .regular, top: 120 + (220 - height), left: left + 4)
+        addAssetIcon(iconName, top: 121 + (220 - height) - 20, left: left - 3, size: 46)
         addText(day, size: 16, weight: .regular, top: 354, left: left + 3, color: .darkGray)
     }
 
