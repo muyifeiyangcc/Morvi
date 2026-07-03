@@ -1666,8 +1666,8 @@ final class ReferenceCanvasView: UIView {
         ])
 
         activeLayoutContainer = scrollContent
-        addSettingsCard(top: 140, height: 244, rows: ["Wallet", "Blacklist", "Privacy Policy", "User Agreement"])
-        addSettingsCard(top: 443, height: 116, rows: ["Delete account", "Log out"])
+        addSettingsCard(top: 140, height: 276, rows: ["Wallet", "Blacklist", "Privacy Policy", "User Agreement"])
+        addSettingsCard(top: 443, height: 150, rows: ["Delete account", "Log out"])
         activeLayoutContainer = nil
     }
 
@@ -1681,7 +1681,7 @@ final class ReferenceCanvasView: UIView {
         card.layer.shadowRadius = 12
 
         rows.enumerated().forEach { index, text in
-            addSettingsItem(text, top: top + CGFloat(index) * 64)
+            addSettingsItem(text, top: top + 17 + CGFloat(index) * 64)
         }
     }
 
