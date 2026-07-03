@@ -3207,7 +3207,7 @@ final class ReferenceCanvasView: UIView {
         card.layer.borderWidth = 0
         card.layer.cornerRadius = 20
         card.layer.masksToBounds = true
-        addText("Happy", size: 31, weight: .regular, top: top + 28, left: 40, color: .darkGray, usesOneFont: true)
+        addText("Happy", size: 30, weight: .medium, top: top + 28, left: 40, color: .darkGray)
         let note = addPanel(top: top + 68, left: 40, width: 198, height: 58, alpha: 1)
         note.backgroundColor = UIColor.white.withAlphaComponent(0.72)
         note.layer.borderWidth = 0
