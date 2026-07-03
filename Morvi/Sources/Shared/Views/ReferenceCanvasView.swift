@@ -368,40 +368,104 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersonaDetail(title: String) {
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        activeLayoutContainer = scrollContent
         addPersonaBackdrop()
-        let base = addPanel(top: 328, left: 0, width: 375, height: 484, alpha: 1)
-        addThemeGradientBackground(to: base, width: 375, height: 484, cornerRadius: 20)
-        base.backgroundColor = .clear
-        base.layer.borderWidth = 0
-        base.layer.cornerRadius = 20
         let nameTop: CGFloat = 394
         let nameHeight = ceil(AppFont.source(26, weight: .bold).lineHeight)
         let statsTop = nameTop + nameHeight + 15
         let buttonTop = statsTop + 80 + 22
         let cellTop = buttonTop + 40 + 24
         let cellGap: CGFloat = 15
+        let cellWidth: CGFloat = 160
+        let columnLefts: [CGFloat] = [20, 195]
+        let waterfallItems: [(height: CGFloat, tint: MediaTint)] = [
+            (174, .warm),
+            (150, .coast),
+            (150, .night)
+        ]
+        var columnBottoms = [cellTop, cellTop]
+        let cellPlacements = waterfallItems.map { item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, tint: MediaTint) in
+            let columnIndex = columnBottoms[0] <= columnBottoms[1] ? 0 : 1
+            let placement = (
+                top: columnBottoms[columnIndex],
+                left: columnLefts[columnIndex],
+                width: cellWidth,
+                height: item.height,
+                tint: item.tint
+            )
+            columnBottoms[columnIndex] += item.height + cellGap
+            return placement
+        }
+        let contentHeight = max(812, (columnBottoms.max() ?? 812) - cellGap + 32)
+
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: contentHeight)
+        ])
+
+        let baseHeight = contentHeight - 328
+        let base = addPanel(top: 328, left: 0, width: 375, height: baseHeight, alpha: 1)
+        addThemeGradientBackground(to: base, width: 375, height: baseHeight, cornerRadius: 20)
+        base.backgroundColor = .clear
+        base.layer.borderWidth = 0
+        base.layer.cornerRadius = 20
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: nameTop, centered: true)
         addStatsPanel(top: statsTop)
         addPillButton("Chat", top: buttonTop, left: 20, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         addPillButton("Follow", top: buttonTop, left: 195, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
-        addMediaBlock(top: cellTop, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
-        addMediaBlock(top: cellTop, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
-        addMediaBlock(top: cellTop + 150 + cellGap, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
+        cellPlacements.forEach { placement in
+            addMediaBlock(
+                top: placement.top,
+                left: placement.left,
+                width: placement.width,
+                height: placement.height,
+                title: "",
+                tint: placement.tint,
+                action: .play,
+                imageName: "discover_feed_cover"
+            )
+        }
+        activeLayoutContainer = nil
     }
 
     private func addPersonaBackdrop() {
+        let layoutContainer = activeLayoutContainer ?? self
         let coverImage = UIImage(named: "discover_feed_cover")
         let coverView = UIImageView(image: coverImage)
         coverView.contentMode = .scaleAspectFill
         coverView.clipsToBounds = true
-        addSubview(coverView)
+        layoutContainer.addSubview(coverView)
         coverView.translatesAutoresizingMaskIntoConstraints = false
 
         var constraints = [
-            coverView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            coverView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            coverView.topAnchor.constraint(equalTo: topAnchor, constant: -2)
+            coverView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor),
+            coverView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor),
+            coverView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: -2)
         ]
         if let coverImage, coverImage.size.width > 0 {
             constraints.append(coverView.heightAnchor.constraint(
@@ -1948,6 +2012,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, alpha: CGFloat) -> UIView {
+        let layoutContainer = activeLayoutContainer ?? self
         let panel: UIView
         if alpha < 1 {
             let holder = UIView()
@@ -1977,11 +2042,11 @@ final class ReferenceCanvasView: UIView {
         panel.layer.shadowOpacity = 0.12
         panel.layer.shadowOffset = CGSize(width: 0, height: 4)
         panel.layer.shadowRadius = 14
-        addSubview(panel)
+        layoutContainer.addSubview(panel)
         panel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            panel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            panel.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            panel.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            panel.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             panel.widthAnchor.constraint(equalToConstant: width),
             panel.heightAnchor.constraint(equalToConstant: height)
         ])
