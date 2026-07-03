@@ -377,8 +377,8 @@ final class ReferenceCanvasView: UIView {
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: 394, centered: true)
         addStatsPanel(top: 434)
-        addPillButton("Chat", top: 535, left: 20, width: 160, dark: true)
-        addPillButton("Follow", top: 535, left: 195, width: 160, dark: true)
+        addPillButton("Chat", top: 535, left: 20, width: 160, height: 40, dark: true)
+        addPillButton("Follow", top: 535, left: 195, width: 160, height: 40, dark: true)
         addMediaBlock(top: 599, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
         addMediaBlock(top: 599, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
         addMediaBlock(top: 775, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
@@ -2562,6 +2562,7 @@ final class ReferenceCanvasView: UIView {
         top: CGFloat,
         left: CGFloat,
         width: CGFloat,
+        height: CGFloat = 50,
         dark: Bool,
         usesOneFont: Bool = false,
         fontWeight: UIFont.Weight = .regular,
@@ -2573,7 +2574,7 @@ final class ReferenceCanvasView: UIView {
         button.titleLabel?.font = usesOneFont ? AppFont.fredoka(18) : AppFont.source(18, weight: fontWeight)
         button.setTitleColor(dark ? UIColor(red: 0.78, green: 1, blue: 0.20, alpha: 1) : .black, for: .normal)
         button.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
-        button.layer.cornerRadius = 25
+        button.layer.cornerRadius = height / 2
         button.layer.borderWidth = dark ? 0 : 1
         button.layer.borderColor = UIColor(white: 0.90, alpha: 1).cgColor
         button.layer.shadowColor = UIColor.black.cgColor
@@ -2586,7 +2587,7 @@ final class ReferenceCanvasView: UIView {
             button.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
             button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             button.widthAnchor.constraint(equalToConstant: width),
-            button.heightAnchor.constraint(equalToConstant: 50)
+            button.heightAnchor.constraint(equalToConstant: height)
         ])
         return button
     }
