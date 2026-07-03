@@ -1991,7 +1991,12 @@ final class ReferenceCanvasView: UIView {
         ])
 
         activeLayoutContainer = sheet
-        let nameInput = addInputField("Enter username", top: 276)
+        let nameInput = addInputField(
+            "Enter username",
+            top: 276,
+            fieldBackgroundColor: UIColor(red: 212 / 255, green: 1, blue: 59 / 255, alpha: 0.3),
+            usesGradient: false
+        )
         let uploadButton = addButton(
             "Upload",
             top: nil,
@@ -2620,9 +2625,15 @@ final class ReferenceCanvasView: UIView {
         _ placeholder: String,
         top: CGFloat,
         keyboardType: UIKeyboardType = .default,
-        isSecureTextEntry: Bool = false
+        isSecureTextEntry: Bool = false,
+        fieldBackgroundColor: UIColor = .clear,
+        usesGradient: Bool = true
     ) -> UITextField {
-        let field = addFieldContainer(top: top)
+        let field = addFieldContainer(
+            top: top,
+            backgroundColor: fieldBackgroundColor,
+            usesGradient: usesGradient
+        )
         let textField = UITextField()
         textField.borderStyle = .none
         textField.backgroundColor = .clear
@@ -2651,14 +2662,18 @@ final class ReferenceCanvasView: UIView {
         return textField
     }
 
-    private func addFieldContainer(top: CGFloat) -> UIView {
+    private func addFieldContainer(
+        top: CGFloat,
+        backgroundColor: UIColor = .clear,
+        usesGradient: Bool = true
+    ) -> UIView {
         let layoutContainer = activeLayoutContainer ?? self
         let field = AdaptiveInputView(
-            backgroundColor: .clear,
-            gradientColors: [
+            backgroundColor: backgroundColor,
+            gradientColors: usesGradient ? [
                 UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1),
                 UIColor(red: 0.88, green: 1, blue: 0.95, alpha: 1)
-            ]
+            ] : nil
         )
         layoutContainer.addSubview(field)
         field.translatesAutoresizingMaskIntoConstraints = false
