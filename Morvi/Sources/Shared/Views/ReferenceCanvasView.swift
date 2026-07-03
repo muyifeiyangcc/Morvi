@@ -295,7 +295,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderPersona() {
         addPersonaRootGradient()
-        let scrollView = UIScrollView()
+        let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 94, right: 0)
         scrollView.scrollIndicatorInsets = scrollView.contentInset
@@ -359,8 +359,8 @@ final class ReferenceCanvasView: UIView {
         base.layer.borderWidth = 0
         base.layer.cornerRadius = 20
         addProfileAvatar(top: 198, left: 36, size: 74, showsBorder: false, showsShadow: false)
-        addText("Amelia", size: 21, weight: .regular, top: 290, left: 36)
-        addText("77 Followers    99 Following", size: 14, weight: .regular, top: 328, left: 20, color: .darkGray)
+        addText("Amelia", size: 20, weight: .medium, top: 275, left: 36)
+        addPersonaMetricLine(top: 311, left: 20)
         addAssetIcon("persona_settings_icon", top: 247, left: 214, size: 30)
         addPersonaEditAction(top: 244, left: 256)
         cellPlacements.forEach { placement in
@@ -1029,6 +1029,50 @@ final class ReferenceCanvasView: UIView {
             button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             button.widthAnchor.constraint(equalToConstant: width),
             button.heightAnchor.constraint(equalToConstant: height)
+        ])
+    }
+
+    private func addPersonaMetricLine(top: CGFloat, left: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let font = AppFont.source(14, weight: .regular)
+        let firstValue = UILabel()
+        firstValue.text = "77"
+        firstValue.textColor = UIColor(red: 0.36, green: 0.83, blue: 0.12, alpha: 1)
+        firstValue.font = font
+
+        let firstText = UILabel()
+        firstText.text = "Followers"
+        firstText.textColor = .darkGray
+        firstText.font = font
+
+        let secondValue = UILabel()
+        secondValue.text = "99"
+        secondValue.textColor = UIColor(red: 0.08, green: 0.57, blue: 1.0, alpha: 1)
+        secondValue.font = font
+
+        let secondText = UILabel()
+        secondText.text = "Following"
+        secondText.textColor = .darkGray
+        secondText.font = font
+
+        [firstValue, firstText, secondValue, secondText].forEach {
+            layoutContainer.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+
+        NSLayoutConstraint.activate([
+            firstValue.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            firstValue.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+
+            firstText.leadingAnchor.constraint(equalTo: firstValue.trailingAnchor, constant: 4),
+            firstText.centerYAnchor.constraint(equalTo: firstValue.centerYAnchor),
+
+            secondValue.leadingAnchor.constraint(equalTo: firstText.trailingAnchor, constant: 18),
+            secondValue.centerYAnchor.constraint(equalTo: firstValue.centerYAnchor),
+
+            secondText.leadingAnchor.constraint(equalTo: secondValue.trailingAnchor, constant: 4),
+            secondText.centerYAnchor.constraint(equalTo: firstValue.centerYAnchor),
+            secondText.trailingAnchor.constraint(lessThanOrEqualTo: layoutContainer.trailingAnchor, constant: -20)
         ])
     }
 
