@@ -399,24 +399,27 @@ final class ReferenceCanvasView: UIView {
         let cellGap: CGFloat = 15
         let cellWidth: CGFloat = 160
         let coverImageName = "discover_feed_cover"
-        let coverImageSize = UIImage(named: coverImageName)?.size ?? .zero
-        let cellHeight = coverImageSize.width > 0
-            ? ceil(cellWidth * coverImageSize.height / coverImageSize.width)
-            : cellWidth
+        func proportionalCellHeight(for imageName: String) -> CGFloat {
+            let imageSize = UIImage(named: imageName)?.size ?? .zero
+            return imageSize.width > 0
+                ? ceil(cellWidth * imageSize.height / imageSize.width)
+                : cellWidth
+        }
         let columnLefts: [CGFloat] = [20, 195]
-        let waterfallItems: [(height: CGFloat, tint: MediaTint)] = [
-            (cellHeight, .warm),
-            (cellHeight, .coast),
-            (cellHeight, .night)
+        let waterfallItems: [(imageName: String, height: CGFloat, tint: MediaTint)] = [
+            ("profile_avatar", proportionalCellHeight(for: "profile_avatar"), .warm),
+            (coverImageName, proportionalCellHeight(for: coverImageName), .coast),
+            (coverImageName, proportionalCellHeight(for: coverImageName), .night)
         ]
         var columnBottoms = [cellTop, cellTop]
-        let cellPlacements = waterfallItems.map { item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, tint: MediaTint) in
+        let cellPlacements = waterfallItems.map { item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, imageName: String, tint: MediaTint) in
             let columnIndex = columnBottoms[0] <= columnBottoms[1] ? 0 : 1
             let placement = (
                 top: columnBottoms[columnIndex],
                 left: columnLefts[columnIndex],
                 width: cellWidth,
                 height: item.height,
+                imageName: item.imageName,
                 tint: item.tint
             )
             columnBottoms[columnIndex] += item.height + cellGap
@@ -454,7 +457,8 @@ final class ReferenceCanvasView: UIView {
                 title: "",
                 tint: placement.tint,
                 action: .play,
-                imageName: coverImageName,
+                imageName: placement.imageName,
+                destinationPage: .galleryDetail,
                 playIconName: "persona_media_play_icon",
                 playIconSize: 28
             )
@@ -2807,6 +2811,7 @@ final class ReferenceCanvasView: UIView {
         titleSize: CGFloat = 24,
         titleTop: CGFloat = 18,
         titleUsesOneFont: Bool = false,
+        destinationPage: ScenePage? = nil,
         playIconName: String = "video_play_icon",
         playIconSize: CGFloat = 40
     ) {
@@ -2884,6 +2889,19 @@ final class ReferenceCanvasView: UIView {
             addVideoPlayIcon(in: block, assetName: playIconName, size: playIconSize)
         case .none:
             break
+        }
+        if let destinationPage {
+            let button = ClearTapButton(frame: .zero) { [weak self] in
+                self?.didRequestPage?(destinationPage)
+            }
+            shadowHost.addSubview(button)
+            button.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                button.leadingAnchor.constraint(equalTo: shadowHost.leadingAnchor),
+                button.trailingAnchor.constraint(equalTo: shadowHost.trailingAnchor),
+                button.topAnchor.constraint(equalTo: shadowHost.topAnchor),
+                button.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
+            ])
         }
     }
 
