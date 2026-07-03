@@ -43,16 +43,7 @@ enum RouteFactory {
         case .agreement:
             return AuthSceneController(page: .agreement)
         case .settings:
-            return ReferencePageController(page: .settings) { scene in
-                [
-                    HitArea(frame: CGRect(x: 36, y: 156, width: 300, height: 54)) { scene.push(.wallet) },
-                    HitArea(frame: CGRect(x: 36, y: 220, width: 300, height: 54)) { scene.push(.restrictedList) },
-                    HitArea(frame: CGRect(x: 36, y: 284, width: 300, height: 54)) { scene.push(.agreement) },
-                    HitArea(frame: CGRect(x: 36, y: 348, width: 300, height: 54)) { scene.push(.agreement) },
-                    HitArea(frame: CGRect(x: 36, y: 462, width: 300, height: 54)) { scene.showOverlay(.exitConfirm) },
-                    HitArea(frame: CGRect(x: 36, y: 526, width: 300, height: 54)) { scene.showOverlay(.exitConfirm) }
-                ]
-            }
+            return ReferencePageController(page: .settings)
         case .uploadEmpty:
             return ReferencePageController(page: .uploadEmpty)
         case .uploadFilled:

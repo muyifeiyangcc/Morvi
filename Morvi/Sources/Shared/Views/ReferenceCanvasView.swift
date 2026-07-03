@@ -39,6 +39,7 @@ final class ReferenceCanvasView: UIView {
     private var personaMediaFrames: [CGRect] = []
     private var personaBackdropBaseHeight: CGFloat = 0
     private var personaBackdropHeightConstraint: NSLayoutConstraint?
+    private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
 
     init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
@@ -1636,6 +1637,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderSettings() {
+        settingsTapActions = []
         let scrollView = UIScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -1669,6 +1671,10 @@ final class ReferenceCanvasView: UIView {
         addSettingsCard(top: 0, height: 276, rows: ["Wallet", "Blacklist", "Privacy Policy", "User Agreement"])
         addSettingsCard(top: 304, height: 150, rows: ["Delete account", "Log out"])
         activeLayoutContainer = nil
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleSettingsTap))
+        tapGesture.cancelsTouchesInView = false
+        scrollContent.addGestureRecognizer(tapGesture)
     }
 
     private func addSettingsCard(top: CGFloat, height: CGFloat, rows: [String]) {
@@ -1721,6 +1727,32 @@ final class ReferenceCanvasView: UIView {
             nextIconView.heightAnchor.constraint(equalToConstant: 20)
         ])
 
+        if let action = settingsTapAction(for: text) {
+            settingsTapActions.append((
+                frame: CGRect(x: 36, y: top, width: 303, height: 52),
+                action: action
+            ))
+        }
+    }
+
+    @objc private func handleSettingsTap(_ gesture: UITapGestureRecognizer) {
+        let point = gesture.location(in: gesture.view)
+        settingsTapActions.first { $0.frame.contains(point) }?.action()
+    }
+
+    private func settingsTapAction(for text: String) -> (() -> Void)? {
+        switch text {
+        case "Wallet":
+            return { [weak self] in self?.didRequestPage?(.wallet) }
+        case "Blacklist":
+            return { [weak self] in self?.didRequestPage?(.restrictedList) }
+        case "Privacy Policy", "User Agreement":
+            return { [weak self] in self?.didRequestPage?(.agreement) }
+        case "Delete account", "Log out":
+            return { [weak self] in self?.didRequestOverlayPage?(.exitConfirm) }
+        default:
+            return nil
+        }
     }
 
     private func renderPersonalDetail() {
