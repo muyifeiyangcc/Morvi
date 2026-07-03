@@ -287,17 +287,16 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderConversation(title: String, mode: ConversationMode) {
+        addPersonaRootGradient()
         addTopTitle(title)
-        addText("•••", size: 22, weight: .black, top: 80, left: 318)
         addBubble("Nice to meet you, nice\nto meet you!", top: 198, left: 82, outgoing: true)
-        addPortrait(top: 196, left: 306, size: 44, tint: .warm)
-        addPortrait(top: 298, left: 26, size: 44, tint: .warm)
+        addProfileAvatar(top: 196, left: 306, size: 44, showsBorder: false, showsShadow: false)
+        addProfileAvatar(top: 298, left: 26, size: 44, showsBorder: false, showsShadow: false)
         addBubble("Nice to meet you.", top: 302, left: 86, outgoing: false)
         addMediaBlock(top: 358, left: 82, width: 160, height: 160, title: "", tint: .warm)
         switch mode {
         case .text:
-            addText("♩", size: 28, weight: .regular, top: 704, left: 24, color: .gray)
-            addText("▣", size: 24, weight: .regular, top: 708, left: 56, color: .gray)
+            addInputToolbarIcons(top: 704)
             addInputBar(top: 740, text: "Say something", trailing: "➤")
         case .voice:
             addVoiceClip(top: 552)
@@ -307,6 +306,32 @@ final class ReferenceCanvasView: UIView {
             addText("▦", size: 24, weight: .regular, top: 606, left: 20)
             addCircle(text: "♬", top: 650, left: 138, size: 100, color: UIColor(red: 0.82, green: 1, blue: 0.78, alpha: 1))
         }
+    }
+
+    private func addInputToolbarIcons(top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let voiceButton = UIButton(type: .custom)
+        voiceButton.setImage(UIImage(named: "input_voice_icon"), for: .normal)
+        voiceButton.imageView?.contentMode = .scaleAspectFit
+        layoutContainer.addSubview(voiceButton)
+        voiceButton.translatesAutoresizingMaskIntoConstraints = false
+
+        let photoButton = UIButton(type: .custom)
+        photoButton.setImage(UIImage(named: "input_photo_icon"), for: .normal)
+        photoButton.imageView?.contentMode = .scaleAspectFit
+        layoutContainer.addSubview(photoButton)
+        photoButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            voiceButton.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 24),
+            voiceButton.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            voiceButton.widthAnchor.constraint(equalToConstant: 24),
+            voiceButton.heightAnchor.constraint(equalToConstant: 24),
+
+            photoButton.leadingAnchor.constraint(equalTo: voiceButton.trailingAnchor, constant: 12),
+            photoButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
+            photoButton.widthAnchor.constraint(equalToConstant: 24),
+            photoButton.heightAnchor.constraint(equalToConstant: 24)
+        ])
     }
 
     private func renderAssistantDialogue() {

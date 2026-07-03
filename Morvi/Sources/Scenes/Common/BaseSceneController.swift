@@ -165,7 +165,7 @@ class BaseSceneController: UIViewController {
 
     private func trailingNavigationIconName() -> String? {
         switch page {
-        case .galleryDetail, .publicPersona:
+        case .galleryDetail, .publicPersona, .directDialogue, .voiceDialogue:
             return "gallery_navigation_more"
         default:
             return nil
@@ -196,7 +196,7 @@ class BaseSceneController: UIViewController {
 
     @objc private func handleTrailingNavigationTap() {
         switch page {
-        case .galleryDetail, .publicPersona:
+        case .galleryDetail, .publicPersona, .directDialogue, .voiceDialogue:
             showCanvasOverlay(.restrictPanel)
         default:
             break
