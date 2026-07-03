@@ -75,6 +75,7 @@ final class RootTabsController: UIViewController {
     }
 
     private func installTopLayer() {
+        guard currentPage != .persona && currentPage != .weeklyFeeling else { return }
         let topLayer = CustomTopLayerView()
         let statusBarHeight = normalizedStatusBarHeight()
         topLayer.configure(
