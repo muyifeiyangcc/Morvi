@@ -1683,6 +1683,7 @@ final class ReferenceCanvasView: UIView {
         scrollView.backgroundColor = .clear
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
+        scrollView.contentInsetAdjustmentBehavior = .never
         addSubview(scrollView)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -1711,7 +1712,7 @@ final class ReferenceCanvasView: UIView {
             "This week's feelings",
             size: 25,
             weight: .black,
-            top: currentStatusBarHeight() + 16,
+            top: 60,
             left: 20,
             usesOneFont: true
         )
@@ -1732,16 +1733,6 @@ final class ReferenceCanvasView: UIView {
         }
         addFeelingCard(top: 401)
         addFeelingCard(top: 573)
-    }
-
-    private func currentStatusBarHeight() -> CGFloat {
-        if let height = window?.windowScene?.statusBarManager?.statusBarFrame.height, height > 0 {
-            return height
-        }
-        let sceneHeight = UIApplication.shared.connectedScenes
-            .compactMap { ($0 as? UIWindowScene)?.statusBarManager?.statusBarFrame.height }
-            .first(where: { $0 > 0 })
-        return sceneHeight ?? 44
     }
 
     private func renderProfileEditor() {
@@ -3201,7 +3192,7 @@ final class ReferenceCanvasView: UIView {
             fill.bottomAnchor.constraint(equalTo: bg.bottomAnchor),
             fill.heightAnchor.constraint(equalToConstant: height)
         ])
-        addAssetIcon(iconName, top: 121 + (220 - height) - 20, left: left - 3, size: 46)
+        addAssetIcon(iconName, top: 121 + (220 - height) - 30, left: left - 10, size: 60)
         addText(day, size: 16, weight: .regular, top: 354, left: left + 3, color: .darkGray)
     }
 
