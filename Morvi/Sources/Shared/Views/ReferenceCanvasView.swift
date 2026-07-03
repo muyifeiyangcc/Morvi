@@ -1679,62 +1679,15 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderWeeklyFeeling() {
-        let scrollView = UIScrollView()
-        scrollView.backgroundColor = .clear
-        scrollView.showsVerticalScrollIndicator = false
-        scrollView.alwaysBounceVertical = true
-        scrollView.contentInsetAdjustmentBehavior = .never
-        let dockCoveredHeight: CGFloat = 104
-        scrollView.contentInset.bottom = dockCoveredHeight
-        scrollView.verticalScrollIndicatorInsets.bottom = dockCoveredHeight
-        addSubview(scrollView)
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-
-        let contentView = UIView()
-        contentView.backgroundColor = .clear
-        scrollView.addSubview(contentView)
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        let contentHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: 0)
+        let listView = WeeklyFeelingListView()
+        addSubview(listView)
+        listView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            contentHeightConstraint
+            listView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            listView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            listView.topAnchor.constraint(equalTo: topAnchor),
+            listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
-
-        let previousContainer = activeLayoutContainer
-        activeLayoutContainer = contentView
-        defer { activeLayoutContainer = previousContainer }
-
-        let titleTop: CGFloat = 60
-        let titleSize: CGFloat = 24
-        let barTop = titleTop + ceil(AppFont.source(titleSize, weight: .bold).lineHeight) + 26
-        addText("This week's feelings", size: titleSize, weight: .bold, top: titleTop, left: 20)
-        let days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
-        let icons = [
-            "weekly_mood_happy",
-            "weekly_mood_panic",
-            "weekly_mood_sad",
-            "weekly_mood_crying",
-            "weekly_mood_strained",
-            "weekly_mood_calm",
-            "weekly_mood_cool"
-        ]
-        let heights: [CGFloat] = [200, 148, 118, 82, 104, 156, 198]
-        for index in 0..<days.count {
-            let x = CGFloat(20 + index * 49)
-            addFeelingBar(day: days[index], iconName: icons[index], height: heights[index], top: barTop, left: x)
-        }
-        let firstCardHeight = addFeelingCard(top: 401, style: .lime)
-        let secondCardTop = 401 + firstCardHeight + 24
-        let secondCardHeight = addFeelingCard(top: secondCardTop, style: .aqua)
-        contentHeightConstraint.constant = secondCardTop + secondCardHeight + 10
     }
 
     private func renderProfileEditor() {
@@ -3169,115 +3122,6 @@ final class ReferenceCanvasView: UIView {
         addText("▥ 5s", size: 15, weight: .regular, top: top + 8, left: 238, color: .darkGray)
         addPortrait(top: top - 2, left: 306, size: 44, tint: .warm)
     }
-
-    private func addFeelingBar(day: String, iconName: String, height: CGFloat, top: CGFloat, left: CGFloat) {
-        let layoutContainer = activeLayoutContainer ?? self
-        let bg = UIView()
-        bg.backgroundColor = UIColor(red: 1, green: 0.94, blue: 0.62, alpha: 1)
-        bg.layer.cornerRadius = 19
-        layoutContainer.addSubview(bg)
-        bg.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            bg.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            bg.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            bg.widthAnchor.constraint(equalToConstant: 40),
-            bg.heightAnchor.constraint(equalToConstant: 220)
-        ])
-        let fill = UIView()
-        fill.backgroundColor = UIColor(red: 1, green: 0.83, blue: 0.08, alpha: 1)
-        fill.layer.cornerRadius = 19
-        layoutContainer.addSubview(fill)
-        fill.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            fill.leadingAnchor.constraint(equalTo: bg.leadingAnchor),
-            fill.trailingAnchor.constraint(equalTo: bg.trailingAnchor),
-            fill.bottomAnchor.constraint(equalTo: bg.bottomAnchor),
-            fill.heightAnchor.constraint(equalToConstant: height)
-        ])
-        addAssetIcon(iconName, top: top + (220 - height) - 55, left: left - 10, size: 60)
-        addText(day, size: 16, weight: .regular, top: top + 233, left: left + 3, color: .darkGray)
-    }
-
-    private enum WeeklyFeelingCardStyle {
-        case lime
-        case aqua
-
-        var tintColor: UIColor {
-            switch self {
-            case .lime:
-                return UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1)
-            case .aqua:
-                return UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1)
-            }
-        }
-    }
-
-    private func addFeelingCard(top: CGFloat, style: WeeklyFeelingCardStyle) -> CGFloat {
-        let noteText = "Two pieces of good news\ncame today!"
-        let noteFont = AppFont.source(15, weight: .regular)
-        let noteSize = noteText.boundingRect(
-            with: CGSize(width: 240, height: CGFloat.greatestFiniteMagnitude),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: [.font: noteFont],
-            context: nil
-        ).integral.size
-        let noteWidth = min(295, noteSize.width + 32)
-        let noteHeight = noteSize.height + 24
-        let titleTop: CGFloat = 16
-        let titleHeight = ceil(AppFont.source(30, weight: .medium).lineHeight)
-        let noteTop = titleTop + titleHeight + 8
-        let cardHeight = max(noteTop + noteHeight + 16, 74 + ceil(AppFont.source(12, weight: .regular).lineHeight * 2) + 16)
-        let card = addPanel(top: top, left: 20, width: 335, height: cardHeight, alpha: 1)
-        let gradient = CAGradientLayer()
-        let tintColor = style.tintColor
-        gradient.colors = [
-            tintColor.cgColor,
-            tintColor.withAlphaComponent(0).cgColor
-        ]
-        gradient.startPoint = CGPoint(x: 0.5, y: 0)
-        gradient.endPoint = CGPoint(x: 0.5, y: 1)
-        gradient.frame = CGRect(x: 0, y: 0, width: 335, height: cardHeight)
-        card.layer.insertSublayer(gradient, at: 0)
-        card.backgroundColor = UIColor.clear
-        card.layer.borderWidth = 0
-        card.layer.cornerRadius = 20
-        card.layer.masksToBounds = true
-        addText("Happy", size: 30, weight: .medium, top: top + titleTop, left: 40, color: .darkGray)
-        let note = addPanel(top: top + noteTop, left: 40, width: noteWidth, height: noteHeight, alpha: 1)
-        note.backgroundColor = UIColor.white.withAlphaComponent(0.72)
-        note.layer.borderWidth = 0
-        note.layer.cornerRadius = 12
-        note.layer.shadowOpacity = 0.04
-        let noteLabel = UILabel()
-        noteLabel.text = noteText
-        noteLabel.numberOfLines = 0
-        noteLabel.textColor = .darkGray
-        noteLabel.font = noteFont
-        note.addSubview(noteLabel)
-        noteLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            noteLabel.leadingAnchor.constraint(equalTo: note.leadingAnchor, constant: 16),
-            noteLabel.trailingAnchor.constraint(equalTo: note.trailingAnchor, constant: -16),
-            noteLabel.topAnchor.constraint(equalTo: note.topAnchor, constant: 12),
-            noteLabel.bottomAnchor.constraint(equalTo: note.bottomAnchor, constant: -12)
-        ])
-        addAssetAvatar("profile_avatar", top: top + 26, left: 291, size: 40)
-        let dateLabel = UILabel()
-        dateLabel.text = "23 June 2026\n5 : 30PM"
-        dateLabel.numberOfLines = 0
-        dateLabel.textAlignment = .right
-        dateLabel.textColor = .darkGray
-        dateLabel.font = AppFont.source(12, weight: .regular)
-        (activeLayoutContainer ?? self).addSubview(dateLabel)
-        dateLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            dateLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -20),
-            dateLabel.topAnchor.constraint(equalTo: card.topAnchor, constant: 74),
-            dateLabel.widthAnchor.constraint(equalToConstant: 94)
-        ])
-        return cardHeight
-    }
-
 
     private func addReportChoiceRow(_ text: String, top: CGFloat, checked: Bool) {
         let layoutContainer = activeLayoutContainer ?? self
