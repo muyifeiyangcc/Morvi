@@ -423,11 +423,10 @@ final class ReferenceCanvasView: UIView {
         panel.addSubview(gridIcon)
         gridIcon.translatesAutoresizingMaskIntoConstraints = false
 
-        let microphoneRing = UIView()
-        microphoneRing.backgroundColor = .clear
-        microphoneRing.layer.borderWidth = 1
-        microphoneRing.layer.borderColor = UIColor.red.cgColor
-        microphoneRing.layer.cornerRadius = 58
+        let microphoneRing = GradientRingView(colors: [
+            UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1),
+            UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1)
+        ])
         panel.addSubview(microphoneRing)
         microphoneRing.translatesAutoresizingMaskIntoConstraints = false
 
