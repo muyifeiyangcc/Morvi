@@ -1137,8 +1137,8 @@ final class ReferenceCanvasView: UIView {
             let top = CGFloat(168 + index * 80)
             addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index])
         }
+        addGem(assetName: "balance_gem_mark", top: -24, left: 144, width: 180, height: 182)
         activeLayoutContainer = nil
-        addGem(assetName: "balance_gem_mark", top: 96, left: 144, width: 180, height: 182)
     }
 
     private func addNotchedPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat) {
@@ -3067,17 +3067,18 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addGem(assetName: String, top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let gem = UIImageView(image: UIImage(named: assetName))
         gem.contentMode = .scaleAspectFit
         gem.layer.shadowColor = UIColor.green.cgColor
         gem.layer.shadowOpacity = 0.28
         gem.layer.shadowRadius = 8
         gem.layer.shadowOffset = CGSize(width: 0, height: 4)
-        addSubview(gem)
+        layoutContainer.addSubview(gem)
         gem.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            gem.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            gem.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            gem.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            gem.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             gem.widthAnchor.constraint(equalToConstant: width),
             gem.heightAnchor.constraint(equalToConstant: height)
         ])
