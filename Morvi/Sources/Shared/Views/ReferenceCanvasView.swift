@@ -17,9 +17,12 @@ final class ReferenceCanvasView: UIView {
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var keyboardAvoidanceInputView: UIView?
     private weak var keyboardSyncedDialogueFlowListView: DialogueFlowListView?
+    private weak var dialogueFlowListView: DialogueFlowListView?
     private weak var overlayContentView: UIView?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
+    private var dialogueFlowBottomConstraint: NSLayoutConstraint?
+    private var dialogueFlowBottomBaseConstant: CGFloat = 0
     private var keyboardBaseContentInset: UIEdgeInsets?
     private var keyboardBaseIndicatorInsets: UIEdgeInsets?
     private var keyboardBaseContentOffset: CGPoint?
@@ -374,6 +377,7 @@ final class ReferenceCanvasView: UIView {
     @objc private func showVoiceInputPanel() {
         endEditing(true)
         viewWithTag(9206)?.removeFromSuperview()
+        resetVoicePanelAvoidance(animated: false)
 
         let overlayView = UIControl()
         overlayView.tag = 9206
@@ -423,21 +427,64 @@ final class ReferenceCanvasView: UIView {
         microphoneIcon.contentMode = .scaleAspectFit
         panel.addSubview(microphoneIcon)
         microphoneIcon.translatesAutoresizingMaskIntoConstraints = false
+
+        let durationLabel = UILabel()
+        durationLabel.text = "0s"
+        durationLabel.textColor = UIColor(red: 0.17, green: 0.22, blue: 0.18, alpha: 1)
+        durationLabel.font = AppFont.source(16, weight: .medium)
+        durationLabel.textAlignment = .center
+        panel.addSubview(durationLabel)
+        durationLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             gridIcon.leadingAnchor.constraint(equalTo: panel.leadingAnchor, constant: 20),
             gridIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 20),
             gridIcon.widthAnchor.constraint(equalToConstant: 24),
             gridIcon.heightAnchor.constraint(equalToConstant: 24),
 
+            durationLabel.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
+            durationLabel.bottomAnchor.constraint(equalTo: microphoneIcon.topAnchor, constant: -8),
+
             microphoneIcon.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             microphoneIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 57),
             microphoneIcon.widthAnchor.constraint(equalToConstant: 104),
             microphoneIcon.heightAnchor.constraint(equalToConstant: 104)
         ])
+        applyVoicePanelAvoidance(panelHeight: 226, gap: 10)
     }
 
     @objc private func hideVoiceInputPanel() {
         viewWithTag(9206)?.removeFromSuperview()
+        resetVoicePanelAvoidance(animated: true)
+    }
+
+    private func applyVoicePanelAvoidance(panelHeight: CGFloat, gap: CGFloat) {
+        guard
+            let bottomConstraint = dialogueFlowBottomConstraint,
+            let listView = dialogueFlowListView
+        else { return }
+        layoutIfNeeded()
+        let currentBottom = listView.convert(listView.bounds, to: self).maxY
+        let panelTop = bounds.maxY - panelHeight
+        let requiredOffset = max(0, currentBottom + gap - panelTop)
+        bottomConstraint.constant = dialogueFlowBottomBaseConstant - requiredOffset
+        UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseOut]) {
+            self.layoutIfNeeded()
+        } completion: { [weak self] _ in
+            self?.dialogueFlowListView?.scrollToEnd(animated: true)
+        }
+    }
+
+    private func resetVoicePanelAvoidance(animated: Bool) {
+        guard let bottomConstraint = dialogueFlowBottomConstraint else { return }
+        bottomConstraint.constant = dialogueFlowBottomBaseConstant
+        let updates = {
+            self.layoutIfNeeded()
+        }
+        if animated {
+            UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseOut], animations: updates)
+        } else {
+            updates()
+        }
     }
 
     private func addDialogueFlowList(
@@ -473,7 +520,11 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor, constant: top)
         ]
         if let bottomAnchor {
-            constraints.append(listView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -bottomSpacing))
+            let bottomConstraint = listView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -bottomSpacing)
+            constraints.append(bottomConstraint)
+            dialogueFlowListView = listView
+            dialogueFlowBottomConstraint = bottomConstraint
+            dialogueFlowBottomBaseConstant = -bottomSpacing
         } else if let bottom {
             constraints.append(listView.bottomAnchor.constraint(equalTo: topAnchor, constant: bottom))
         }
