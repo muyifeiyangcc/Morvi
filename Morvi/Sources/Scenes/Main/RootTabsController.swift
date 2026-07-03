@@ -119,7 +119,7 @@ final class RootTabsController: UIViewController {
                 HitArea(frame: CGRect(x: 244, y: 340, width: 100, height: 100)) { [weak self] in self?.selectMood(at: 2) },
                 HitArea(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in self?.showOverlay(.feelingEditor) },
                 HitArea(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in self?.show(.discover) },
-                HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.showOverlay(.spendConfirm) }
+                HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.showOverlay(.creditShortage) }
             ])
         case .discover:
             break
