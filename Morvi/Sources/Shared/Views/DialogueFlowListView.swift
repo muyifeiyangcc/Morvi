@@ -36,6 +36,16 @@ final class DialogueFlowListView: UIView {
         self.entries = entries
         tableView.reloadData()
     }
+
+    func scrollToEnd(animated: Bool) {
+        guard entries.isEmpty == false else { return }
+        tableView.layoutIfNeeded()
+        tableView.scrollToRow(
+            at: IndexPath(row: entries.count - 1, section: 0),
+            at: .bottom,
+            animated: animated
+        )
+    }
 }
 
 extension DialogueFlowListView: UITableViewDataSource, UITableViewDelegate {

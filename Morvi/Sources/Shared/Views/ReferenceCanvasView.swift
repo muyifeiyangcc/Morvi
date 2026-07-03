@@ -16,6 +16,7 @@ final class ReferenceCanvasView: UIView {
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var keyboardAvoidanceInputView: UIView?
+    private weak var keyboardSyncedDialogueFlowListView: DialogueFlowListView?
     private weak var overlayContentView: UIView?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
@@ -404,6 +405,9 @@ final class ReferenceCanvasView: UIView {
             constraints.append(listView.bottomAnchor.constraint(equalTo: topAnchor, constant: bottom))
         }
         NSLayoutConstraint.activate(constraints)
+        if bottomAnchor != nil {
+            keyboardSyncedDialogueFlowListView = listView
+        }
     }
 
     private func addInputToolbarIcons(top: CGFloat) {
@@ -2036,6 +2040,9 @@ final class ReferenceCanvasView: UIView {
         let options = UIView.AnimationOptions(rawValue: curveValue << 16)
         UIView.animate(withDuration: duration, delay: 0, options: options) {
             self.layoutIfNeeded()
+        } completion: { [weak self] _ in
+            guard let self = self, self.keyboardIsVisible else { return }
+            self.keyboardSyncedDialogueFlowListView?.scrollToEnd(animated: true)
         }
     }
 
