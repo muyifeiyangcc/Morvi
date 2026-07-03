@@ -423,8 +423,8 @@ final class ReferenceCanvasView: UIView {
 
         let gradient = CAGradientLayer()
         gradient.colors = [
-            UIColor(red: 0.78, green: 1.0, blue: 0.16, alpha: 1).cgColor,
-            UIColor(red: 0.86, green: 1.0, blue: 0.95, alpha: 1).cgColor
+            UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1).cgColor,
+            UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1).cgColor
         ]
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
