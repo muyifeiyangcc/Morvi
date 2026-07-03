@@ -7,6 +7,7 @@ final class CustomTopLayerView: UIView {
     private let trailingIconView = UIImageView()
     private let titleLabel = UILabel()
     private var navigationCenterYConstraint: NSLayoutConstraint?
+    private var titleLeadingConstraint: NSLayoutConstraint?
 
     var showsBackIcon = false {
         didSet {
@@ -39,7 +40,9 @@ final class CustomTopLayerView: UIView {
         backArea.translatesAutoresizingMaskIntoConstraints = false
         trailingArea.translatesAutoresizingMaskIntoConstraints = false
         let centerY = backIconView.centerYAnchor.constraint(equalTo: topAnchor, constant: 82)
+        let titleLeading = titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 96)
         navigationCenterYConstraint = centerY
+        titleLeadingConstraint = titleLeading
         NSLayoutConstraint.activate([
             backIconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             centerY,
@@ -51,7 +54,7 @@ final class CustomTopLayerView: UIView {
             trailingIconView.widthAnchor.constraint(equalToConstant: 58),
             trailingIconView.heightAnchor.constraint(equalToConstant: 58),
 
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 96),
+            titleLeading,
             titleLabel.centerYAnchor.constraint(equalTo: backIconView.centerYAnchor),
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -20),
 
@@ -75,7 +78,8 @@ final class CustomTopLayerView: UIView {
         title: String?,
         statusBarHeight: CGFloat,
         showsBackIcon: Bool,
-        trailingIconName: String? = nil
+        trailingIconName: String? = nil,
+        titleLeading: CGFloat = 96
     ) {
         self.showsBackIcon = showsBackIcon
         trailingIconView.image = trailingIconName.flatMap { UIImage(named: $0) }
@@ -84,6 +88,7 @@ final class CustomTopLayerView: UIView {
         titleLabel.isHidden = title == nil
         titleLabel.font = AppFont.fredoka(31)
         navigationCenterYConstraint?.constant = statusBarHeight + 38
+        titleLeadingConstraint?.constant = titleLeading
     }
 
     static func totalHeight(statusBarHeight: CGFloat) -> CGFloat {

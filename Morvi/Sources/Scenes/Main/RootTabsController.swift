@@ -77,7 +77,8 @@ final class RootTabsController: UIViewController {
         topLayer.configure(
             title: navigationTitleText(),
             statusBarHeight: statusBarHeight,
-            showsBackIcon: false
+            showsBackIcon: false,
+            titleLeading: currentPage == .dialogueList ? 20 : 96
         )
         surfaceView.contentView.addSubview(topLayer)
         topLayer.translatesAutoresizingMaskIntoConstraints = false
