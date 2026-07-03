@@ -3675,9 +3675,9 @@ final class ReferenceCanvasView: UIView {
         addText(name, size: 17, weight: .regular, top: top + 28, left: left + 64, color: dark ? .white : .black)
         addText("Hello! Nice to meet\nyou. Your work is\nwonderful!", size: 15, weight: .regular, top: top + 72, left: left + 16, color: dark ? .white : .darkGray)
         addAssetImage(
-            dark ? "dialogue_card_action_dark" : "dialogue_card_action_light",
-            top: top + 140,
-            left: left + 104,
+            dark ? "dialogue_card_action_light" : "dialogue_card_action_dark",
+            top: top + 142,
+            left: left + 88,
             width: 60,
             height: 28
         )
