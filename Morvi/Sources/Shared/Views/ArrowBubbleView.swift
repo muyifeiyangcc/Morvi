@@ -50,8 +50,17 @@ final class ArrowBubbleView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        let pointerInset: CGFloat = pointerSide == .none ? 24 : 31
+        textLabel.preferredMaxLayoutWidth = max(1, bounds.width - pointerInset)
         shapeLayer.frame = bounds
         shapeLayer.path = bubblePath(in: bounds).cgPath
+    }
+
+    override var intrinsicContentSize: CGSize {
+        let targetSize = CGSize(width: UIView.noIntrinsicMetric, height: UIView.layoutFittingCompressedSize.height)
+        let labelSize = textLabel.systemLayoutSizeFitting(targetSize)
+        let pointerWidth: CGFloat = pointerSide == .none ? 0 : 7
+        return CGSize(width: labelSize.width + 30 + pointerWidth, height: labelSize.height + 20)
     }
 
     private func bubblePath(in bounds: CGRect) -> UIBezierPath {

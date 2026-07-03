@@ -41,6 +41,8 @@ Provided full-page UI images are used as external references only and are not bu
 - Entries outside the current year show `MMM d, yyyy, h:mm a`.
 - Consecutive entries from the same side share one avatar only while they are in the same timeline group.
 - If the timeline group changes, show the avatar again even when the side is unchanged.
+- Dialogue content uses reusable list controls (`UITableView` or `UICollectionView`) rather than bare `UIScrollView`.
+- Dialogue lists are constrained between the custom navigation layer and the bottom input/tool area.
 
 ## Tabbar Icons
 - `画板 15@2x/@3x` -> `tab_home`

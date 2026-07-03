@@ -289,12 +289,7 @@ final class ReferenceCanvasView: UIView {
     private func renderConversation(title: String, mode: ConversationMode) {
         addPersonaRootGradient()
         addTopTitle(title)
-        addDialogueMomentTitle(top: 172)
-        addBubble("Nice to meet you, nice\nto meet you!", top: 222, left: 82, outgoing: true)
-        addProfileAvatar(top: 220, left: 306, size: 44, showsBorder: false, showsShadow: false)
-        addProfileAvatar(top: 322, left: 26, size: 44, showsBorder: false, showsShadow: false)
-        addBubble("Nice to meet you.", top: 326, left: 86, outgoing: false)
-        addPortraitMediaBlock(top: 382, edge: 86, outgoing: false, width: 160)
+        addDialogueFlowList(top: 136, bottom: 696)
         switch mode {
         case .text:
             addInputToolbarIcons(top: 704)
@@ -309,7 +304,7 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
-    private func addDialogueMomentTitle(top: CGFloat) {
+    private func addDialogueFlowList(top: CGFloat, bottom: CGFloat) {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "en_US_POSIX")
         let referenceDate = Date()
@@ -319,17 +314,20 @@ final class ReferenceCanvasView: UIView {
         let eventDate = calendar.date(from: components) ?? referenceDate.addingTimeInterval(-2 * 60 * 60)
         let adjustedDate = eventDate < referenceDate ? eventDate : referenceDate.addingTimeInterval(-2 * 60 * 60)
 
-        let label = UILabel()
-        label.text = DialogueMomentFormatter.title(for: adjustedDate, referenceDate: referenceDate, calendar: calendar)
-        label.textColor = UIColor.black.withAlphaComponent(0.36)
-        label.font = AppFont.source(12)
-        label.textAlignment = .center
-        addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
+        let listView = DialogueFlowListView()
+        listView.configure(entries: [
+            .moment(DialogueMomentFormatter.title(for: adjustedDate, referenceDate: referenceDate, calendar: calendar)),
+            .phrase(text: "Nice to meet you, nice\nto meet you!", side: .local, showsAvatar: true),
+            .phrase(text: "Nice to meet you.", side: .remote, showsAvatar: true),
+            .portraitAsset(name: "profile_avatar", side: .remote, showsAvatar: false)
+        ])
+        addSubview(listView)
+        listView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: centerXAnchor),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            label.heightAnchor.constraint(equalToConstant: 18)
+            listView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            listView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            listView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            listView.bottomAnchor.constraint(equalTo: topAnchor, constant: bottom)
         ])
     }
 

@@ -28,6 +28,8 @@
 - If a page has a fixed bottom button with its own visual background, scroll content may pass underneath that button; keep the button above the scroll view so it remains visually stable and tappable.
 - Dialogue timeline text must be English: `Just now`, `5 min ago`, `10 min ago`, `30 min ago`, same-day `h:mm a`, same-year `MMM d, h:mm a`, cross-year `MMM d, yyyy, h:mm a`.
 - Consecutive dialogue entries from the same side share one avatar only while they are in the same timeline group. If the timeline group changes, show the avatar again even when the side is unchanged.
+- Dialogue content must use a reusable list control such as `UITableView` or `UICollectionView`; do not build long dialogue streams with a bare `UIScrollView`.
+- Dialogue lists must be constrained between the custom navigation layer and the bottom input/tool area, without visually passing underneath either one.
 
 ## Navigation
 
