@@ -65,26 +65,21 @@ final class DialogueFlowCell: UITableViewCell {
 
         var constraints: [NSLayoutConstraint] = []
         if let title {
-            let titleLabel = UILabel()
-            titleLabel.text = title
-            titleLabel.numberOfLines = 0
-            titleLabel.textColor = UIColor(red: 0.11, green: 0.14, blue: 0.12, alpha: 1)
-            titleLabel.font = AppFont.source(20, weight: .regular)
-            contentView.addSubview(titleLabel)
-            titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            let titlePanel = IntroCopyPanelView(title: title)
+            contentView.addSubview(titlePanel)
+            titlePanel.translatesAutoresizingMaskIntoConstraints = false
             constraints.append(contentsOf: [
-                titleLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 32),
-                titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: imageView.trailingAnchor, constant: -24),
-                titleLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -34)
+                titlePanel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 16),
+                titlePanel.trailingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: -16),
+                titlePanel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -16)
             ])
         }
 
-        let ratio = (image?.size.height ?? 259) / max(image?.size.width ?? 335, 1)
         constraints.append(contentsOf: [
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: ratio),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 265 / 335),
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18)
         ])
         NSLayoutConstraint.activate(constraints)
