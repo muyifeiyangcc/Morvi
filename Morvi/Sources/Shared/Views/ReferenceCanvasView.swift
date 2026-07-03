@@ -293,7 +293,7 @@ final class ReferenceCanvasView: UIView {
         addProfileAvatar(top: 196, left: 306, size: 44, showsBorder: false, showsShadow: false)
         addProfileAvatar(top: 298, left: 26, size: 44, showsBorder: false, showsShadow: false)
         addBubble("Nice to meet you.", top: 302, left: 86, outgoing: false)
-        addPortraitMediaBlock(top: 358, left: 128, width: 160)
+        addPortraitMediaBlock(top: 358, edge: 288, outgoing: true, width: 160)
         switch mode {
         case .text:
             addInputToolbarIcons(top: 704)
@@ -334,7 +334,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addPortraitMediaBlock(top: CGFloat, left: CGFloat, width: CGFloat) {
+    private func addPortraitMediaBlock(top: CGFloat, edge: CGFloat, outgoing: Bool, width: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let image = UIImage(named: "profile_avatar")
         let ratio = (image?.size.height ?? width) / max(image?.size.width ?? width, 1)
@@ -356,8 +356,7 @@ final class ReferenceCanvasView: UIView {
         shadowHost.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activate([
-            shadowHost.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+        var constraints = [
             shadowHost.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             shadowHost.widthAnchor.constraint(equalToConstant: width),
             shadowHost.heightAnchor.constraint(equalToConstant: height),
@@ -366,7 +365,13 @@ final class ReferenceCanvasView: UIView {
             imageView.trailingAnchor.constraint(equalTo: shadowHost.trailingAnchor),
             imageView.topAnchor.constraint(equalTo: shadowHost.topAnchor),
             imageView.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
-        ])
+        ]
+        if outgoing {
+            constraints.append(shadowHost.trailingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: edge))
+        } else {
+            constraints.append(shadowHost.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: edge))
+        }
+        NSLayoutConstraint.activate(constraints)
     }
 
     private func renderAssistantDialogue() {
