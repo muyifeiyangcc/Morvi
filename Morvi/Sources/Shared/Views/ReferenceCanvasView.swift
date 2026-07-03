@@ -397,11 +397,16 @@ final class ReferenceCanvasView: UIView {
         let cellTop = buttonTop + 40 + 24
         let cellGap: CGFloat = 15
         let cellWidth: CGFloat = 160
+        let coverImageName = "discover_feed_cover"
+        let coverImageSize = UIImage(named: coverImageName)?.size ?? .zero
+        let cellHeight = coverImageSize.width > 0
+            ? ceil(cellWidth * coverImageSize.height / coverImageSize.width)
+            : cellWidth
         let columnLefts: [CGFloat] = [20, 195]
         let waterfallItems: [(height: CGFloat, tint: MediaTint)] = [
-            (174, .warm),
-            (150, .coast),
-            (150, .night)
+            (cellHeight, .warm),
+            (cellHeight, .coast),
+            (cellHeight, .night)
         ]
         var columnBottoms = [cellTop, cellTop]
         let cellPlacements = waterfallItems.map { item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, tint: MediaTint) in
@@ -447,7 +452,7 @@ final class ReferenceCanvasView: UIView {
                 title: "",
                 tint: placement.tint,
                 action: .play,
-                imageName: "discover_feed_cover",
+                imageName: coverImageName,
                 playIconName: "persona_media_play_icon",
                 playIconSize: 28
             )
