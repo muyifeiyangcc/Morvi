@@ -25,8 +25,8 @@ final class DialogueFlowCell: UITableViewCell {
         switch entry {
         case .moment(let title):
             configureMoment(title)
-        case .wideAsset(let name):
-            configureWideAsset(name: name)
+        case .wideAsset(let name, let title):
+            configureWideAsset(name: name, title: title)
         case .phrase(let text, let side, let showsAvatar):
             configurePhrase(text: text, side: side, showsAvatar: showsAvatar)
         case .roundedPhrase(let text, let side, let showsAvatar):
@@ -54,7 +54,7 @@ final class DialogueFlowCell: UITableViewCell {
         ])
     }
 
-    private func configureWideAsset(name: String) {
+    private func configureWideAsset(name: String, title: String?) {
         let image = UIImage(named: name)
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFill
@@ -63,14 +63,31 @@ final class DialogueFlowCell: UITableViewCell {
         contentView.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
 
+        var constraints: [NSLayoutConstraint] = []
+        if let title {
+            let titleLabel = UILabel()
+            titleLabel.text = title
+            titleLabel.numberOfLines = 0
+            titleLabel.textColor = UIColor(red: 0.11, green: 0.14, blue: 0.12, alpha: 1)
+            titleLabel.font = AppFont.source(20, weight: .regular)
+            contentView.addSubview(titleLabel)
+            titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            constraints.append(contentsOf: [
+                titleLabel.leadingAnchor.constraint(equalTo: imageView.leadingAnchor, constant: 32),
+                titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: imageView.trailingAnchor, constant: -24),
+                titleLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -34)
+            ])
+        }
+
         let ratio = (image?.size.height ?? 259) / max(image?.size.width ?? 335, 1)
-        NSLayoutConstraint.activate([
+        constraints.append(contentsOf: [
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: ratio),
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18)
         ])
+        NSLayoutConstraint.activate(constraints)
     }
 
     private func configurePhrase(text: String, side: DialogueFlowSide, showsAvatar: Bool) {
