@@ -3192,7 +3192,7 @@ final class ReferenceCanvasView: UIView {
             fill.bottomAnchor.constraint(equalTo: bg.bottomAnchor),
             fill.heightAnchor.constraint(equalToConstant: height)
         ])
-        addAssetIcon(iconName, top: 121 + (220 - height) - 30, left: left - 10, size: 60)
+        addAssetIcon(iconName, top: 121 + (220 - height) - 65, left: left - 10, size: 60)
         addText(day, size: 16, weight: .regular, top: 354, left: left + 3, color: .darkGray)
     }
 
