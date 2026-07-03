@@ -377,6 +377,7 @@ final class ReferenceCanvasView: UIView {
         addText("Amelia", size: 20, weight: .medium, top: 275, left: 36)
         addPersonaMetricLine(top: 311, left: 20)
         addAssetIcon("persona_settings_icon", top: 247, left: 214, size: 30)
+        addPersonaSettingsAction(top: 240, left: 204)
         addPersonaEditAction(top: 244, left: 256)
         cellPlacements.forEach { placement in
             addMediaBlock(
@@ -1082,6 +1083,25 @@ final class ReferenceCanvasView: UIView {
 
     @objc private func handlePersonaEditTap() {
         didRequestOverlayPage?(.profileEditor)
+    }
+
+    private func addPersonaSettingsAction(top: CGFloat, left: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let button = UIButton(type: .custom)
+        button.backgroundColor = .clear
+        button.addTarget(self, action: #selector(handlePersonaSettingsTap), for: .touchUpInside)
+        layoutContainer.addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            button.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            button.widthAnchor.constraint(equalToConstant: 50),
+            button.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+
+    @objc private func handlePersonaSettingsTap() {
+        didRequestPage?(.settings)
     }
 
     private func addPersonaMetricLine(top: CGFloat, left: CGFloat) {
