@@ -35,6 +35,9 @@ final class RootTabsController: UIViewController {
         newCanvasView.didRequestOverlayPage = { [weak self] page in
             self?.showOverlay(page)
         }
+        newCanvasView.didChooseMood = { [weak self] index in
+            self?.selectMood(at: index)
+        }
         view.addSubview(surfaceView)
         surfaceView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -115,9 +118,6 @@ final class RootTabsController: UIViewController {
         switch currentPage {
         case .home:
             installHitAreas([
-                HitArea(frame: CGRect(x: 20, y: 340, width: 100, height: 100)) { [weak self] in self?.selectMood(at: 0) },
-                HitArea(frame: CGRect(x: 132, y: 340, width: 100, height: 100)) { [weak self] in self?.selectMood(at: 1) },
-                HitArea(frame: CGRect(x: 244, y: 340, width: 100, height: 100)) { [weak self] in self?.selectMood(at: 2) },
                 HitArea(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in self?.showOverlay(.feelingEditor) },
                 HitArea(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in self?.show(.discover) },
                 HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.show(.assistantDialogue) }

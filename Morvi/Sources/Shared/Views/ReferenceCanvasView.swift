@@ -13,6 +13,7 @@ final class ReferenceCanvasView: UIView {
     var didTapOutsideContent: (() -> Void)?
     var didRequestPage: ((ScenePage) -> Void)?
     var didRequestOverlayPage: ((ScenePage) -> Void)?
+    var didChooseMood: ((Int) -> Void)?
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var keyboardAvoidanceInputView: UIView?
@@ -3264,8 +3265,21 @@ final class ReferenceCanvasView: UIView {
     private func addMoodRow(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let moodColor = UIColor(red: 1, green: 240 / 255, blue: 110 / 255, alpha: 1)
+        let scrollView = UIScrollView()
+        scrollView.backgroundColor = .clear
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.alwaysBounceHorizontal = true
+        layoutContainer.addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            scrollView.heightAnchor.constraint(equalToConstant: 100)
+        ])
+
         moodImageNames.enumerated().forEach { index, imageName in
-            let tile = UIView()
+            let tile = UIControl()
             let isSelected = index == selectedMoodIndex
             tile.backgroundColor = isSelected ? moodColor : .clear
             tile.layer.cornerRadius = 28
@@ -3285,16 +3299,33 @@ final class ReferenceCanvasView: UIView {
                 gradient.cornerRadius = 28
                 tile.layer.insertSublayer(gradient, at: 0)
             }
-            layoutContainer.addSubview(tile)
+            tile.addAction(UIAction { [weak self] _ in
+                self?.didChooseMood?(index)
+            }, for: .touchUpInside)
+            scrollView.addSubview(tile)
             tile.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                tile.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20 + CGFloat(index) * 112),
-                tile.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            var constraints = [
+                tile.leadingAnchor.constraint(
+                    equalTo: scrollView.contentLayoutGuide.leadingAnchor,
+                    constant: 20 + CGFloat(index) * 112
+                ),
+                tile.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+                tile.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
                 tile.widthAnchor.constraint(equalToConstant: 100),
                 tile.heightAnchor.constraint(equalToConstant: 100)
-            ])
+            ]
+            if index == moodImageNames.count - 1 {
+                constraints.append(
+                    tile.trailingAnchor.constraint(
+                        equalTo: scrollView.contentLayoutGuide.trailingAnchor,
+                        constant: -20
+                    )
+                )
+            }
+            NSLayoutConstraint.activate(constraints)
             let faceView = UIImageView(image: UIImage(named: imageName))
             faceView.contentMode = .scaleAspectFit
+            faceView.isUserInteractionEnabled = false
             tile.addSubview(faceView)
             faceView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
@@ -3304,10 +3335,33 @@ final class ReferenceCanvasView: UIView {
                 faceView.heightAnchor.constraint(equalToConstant: 72)
             ])
         }
+        let selectedCenterX = 20 + CGFloat(selectedMoodIndex) * 112 + 50
+        let contentWidth = 40 + CGFloat(moodImageNames.count) * 100
+            + CGFloat(max(0, moodImageNames.count - 1)) * 12
+        let selectedOffset = min(
+            max(0, selectedCenterX - DesignSurfaceView.baseSize.width / 2),
+            max(0, contentWidth - DesignSurfaceView.baseSize.width)
+        )
+        DispatchQueue.main.async {
+            scrollView.setContentOffset(CGPoint(x: selectedOffset, y: 0), animated: false)
+        }
     }
 
     private var moodImageNames: [String] {
-        ["home_mood_smile", "home_mood_happy", "home_mood_laugh"]
+        [
+            "home_mood_smile",
+            "home_mood_happy",
+            "home_mood_laugh",
+            "home_mood_playful",
+            "home_mood_surprised",
+            "home_mood_nervous",
+            "home_mood_beaming",
+            "home_mood_worried",
+            "home_mood_shocked",
+            "home_mood_sad",
+            "home_mood_calm",
+            "home_mood_distressed"
+        ]
     }
 
     private var selectedMoodImageName: String {
