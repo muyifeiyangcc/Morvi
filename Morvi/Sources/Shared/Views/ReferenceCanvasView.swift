@@ -3024,16 +3024,40 @@ final class ReferenceCanvasView: UIView {
     private func addStatsPanel(top: CGFloat) {
         let panel = addPanel(top: top, left: 20, width: 335, height: 80, alpha: 1)
         panel.layer.cornerRadius = 12
-        let values = [("66", "Works"), ("166", "Followers"), ("266", "Following")]
+        let statsEntries = [("66", "Works"), ("166", "Followers"), ("266", "Following")]
         let colors = [
             UIColor(red: 0.22, green: 0.78, blue: 0.10, alpha: 1),
             UIColor(red: 1.0, green: 0.60, blue: 0.00, alpha: 1),
             UIColor(red: 0.12, green: 0.55, blue: 1.0, alpha: 1)
         ]
-        for index in values.indices {
-            let x = CGFloat(55 + index * 112)
-            addText(values[index].0, size: 20, weight: .regular, top: top + 20, left: x, color: colors[index])
-            addText(values[index].1, size: 16, weight: .regular, top: top + 50, left: x - 10, color: .darkGray)
+        for index in statsEntries.indices {
+            let valueLabel = UILabel()
+            valueLabel.text = statsEntries[index].0
+            valueLabel.textColor = colors[index]
+            valueLabel.font = AppFont.source(20)
+            valueLabel.textAlignment = .center
+
+            let titleLabel = UILabel()
+            titleLabel.text = statsEntries[index].1
+            titleLabel.textColor = .darkGray
+            titleLabel.font = AppFont.source(16)
+            titleLabel.textAlignment = .center
+
+            panel.addSubview(valueLabel)
+            panel.addSubview(titleLabel)
+            valueLabel.translatesAutoresizingMaskIntoConstraints = false
+            titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+            let centerMultiplier = (CGFloat(index) * 2 + 1) / 3
+            NSLayoutConstraint.activate([
+                valueLabel.centerXAnchor.constraint(equalTo: panel.leadingAnchor, constant: 335 * centerMultiplier / 2),
+                valueLabel.topAnchor.constraint(equalTo: panel.topAnchor, constant: 15),
+                valueLabel.heightAnchor.constraint(equalToConstant: 24),
+
+                titleLabel.centerXAnchor.constraint(equalTo: valueLabel.centerXAnchor),
+                titleLabel.topAnchor.constraint(equalTo: valueLabel.bottomAnchor, constant: 6),
+                titleLabel.heightAnchor.constraint(equalToConstant: 20)
+            ])
         }
     }
 
