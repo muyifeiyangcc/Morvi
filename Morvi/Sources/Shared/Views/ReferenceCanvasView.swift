@@ -322,7 +322,7 @@ final class ReferenceCanvasView: UIView {
         scrollContent.translatesAutoresizingMaskIntoConstraints = false
         activeLayoutContainer = scrollContent
 
-        let cellTop: CGFloat = 364
+        let cellTop: CGFloat = 348
         let cellGap: CGFloat = 15
         let cellWidth: CGFloat = 160
         let coverImageName = "discover_feed_cover"
@@ -1069,6 +1069,7 @@ final class ReferenceCanvasView: UIView {
         button.backgroundColor = UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1)
         button.layer.cornerRadius = height / 2
         button.layer.masksToBounds = true
+        button.addTarget(self, action: #selector(handlePersonaEditTap), for: .touchUpInside)
         layoutContainer.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -1077,6 +1078,10 @@ final class ReferenceCanvasView: UIView {
             button.widthAnchor.constraint(equalToConstant: width),
             button.heightAnchor.constraint(equalToConstant: height)
         ])
+    }
+
+    @objc private func handlePersonaEditTap() {
+        didRequestOverlayPage?(.profileEditor)
     }
 
     private func addPersonaMetricLine(top: CGFloat, left: CGFloat) {
@@ -1906,27 +1911,106 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderProfileEditor() {
-        renderPersona()
-        let veil = UIView()
-        veil.backgroundColor = UIColor.black.withAlphaComponent(0.56)
-        addSubview(veil)
-        veil.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            veil.leadingAnchor.constraint(equalTo: leadingAnchor),
-            veil.trailingAnchor.constraint(equalTo: trailingAnchor),
-            veil.topAnchor.constraint(equalTo: topAnchor),
-            veil.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
+        backgroundColor = UIColor.black.withAlphaComponent(0.58)
 
-        let sheet = addPanel(top: 378, left: 0, width: 375, height: 434, alpha: 1)
+        let sheet = UIView()
         sheet.backgroundColor = .white
         sheet.layer.cornerRadius = 20
-        addText("Edit Profile", size: 31, weight: .black, top: 412, left: 20)
-        addCircle(text: "●\n◠", top: 494, left: 151, size: 74, color: UIColor(white: 0.95, alpha: 1))
-        addCircle(text: "⊙", top: 552, left: 213, size: 20, color: UIColor(red: 0.76, green: 1, blue: 0.20, alpha: 1))
-        addText("Username:", size: 16, weight: .regular, top: 626, left: 20)
-        addField("Enter username", top: 654)
-        addButton("Upload", top: 732, filled: true, usesOneFont: true)
+        sheet.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        addSubview(sheet)
+        sheet.translatesAutoresizingMaskIntoConstraints = false
+        let sheetBottomConstraint = sheet.bottomAnchor.constraint(equalTo: bottomAnchor)
+        NSLayoutConstraint.activate([
+            sheet.leadingAnchor.constraint(equalTo: leadingAnchor),
+            sheet.trailingAnchor.constraint(equalTo: trailingAnchor),
+            sheet.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 180),
+            sheetBottomConstraint
+        ])
+        overlayContentView = sheet
+
+        let grabber = UIView()
+        grabber.backgroundColor = .white
+        grabber.layer.cornerRadius = 2
+        addSubview(grabber)
+        grabber.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            grabber.centerXAnchor.constraint(equalTo: centerXAnchor),
+            grabber.bottomAnchor.constraint(equalTo: sheet.topAnchor, constant: -6),
+            grabber.widthAnchor.constraint(equalToConstant: 112),
+            grabber.heightAnchor.constraint(equalToConstant: 4)
+        ])
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Edit Profile"
+        titleLabel.font = AppFont.fredoka(31)
+        titleLabel.textColor = .black
+        sheet.addSubview(titleLabel)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 20),
+            titleLabel.topAnchor.constraint(equalTo: sheet.topAnchor, constant: 34)
+        ])
+
+        let avatarView = UIImageView(image: UIImage(named: "default_avatar"))
+        avatarView.backgroundColor = UIColor(white: 0.95, alpha: 1)
+        avatarView.contentMode = .scaleAspectFill
+        avatarView.clipsToBounds = true
+        avatarView.layer.cornerRadius = 37
+        sheet.addSubview(avatarView)
+        avatarView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            avatarView.centerXAnchor.constraint(equalTo: sheet.centerXAnchor),
+            avatarView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 44),
+            avatarView.widthAnchor.constraint(equalToConstant: 74),
+            avatarView.heightAnchor.constraint(equalToConstant: 74)
+        ])
+
+        let editMark = UIImageView(image: UIImage(named: "profile_avatar_edit_mark"))
+        editMark.backgroundColor = UIColor(red: 0.76, green: 1, blue: 0.20, alpha: 1)
+        editMark.contentMode = .scaleAspectFit
+        editMark.layer.cornerRadius = 12
+        editMark.clipsToBounds = true
+        sheet.addSubview(editMark)
+        editMark.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            editMark.trailingAnchor.constraint(equalTo: avatarView.trailingAnchor, constant: 4),
+            editMark.bottomAnchor.constraint(equalTo: avatarView.bottomAnchor, constant: 2),
+            editMark.widthAnchor.constraint(equalToConstant: 24),
+            editMark.heightAnchor.constraint(equalToConstant: 24)
+        ])
+
+        let nameLabel = UILabel()
+        nameLabel.text = "Username:"
+        nameLabel.font = AppFont.source(16)
+        nameLabel.textColor = .black
+        sheet.addSubview(nameLabel)
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            nameLabel.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 20),
+            nameLabel.topAnchor.constraint(equalTo: avatarView.bottomAnchor, constant: 34)
+        ])
+
+        activeLayoutContainer = sheet
+        let nameInput = addInputField("Enter username", top: 276)
+        let uploadButton = addButton(
+            "Upload",
+            top: nil,
+            bottom: 29,
+            trailing: 20,
+            filled: true,
+            usesOneFont: true,
+            cornerRadius: 12,
+            shadowOpacity: 0,
+            bottomPlateHeight: 3
+        )
+        activeLayoutContainer = nil
+
+        uploadButton.topAnchor.constraint(equalTo: nameInput.bottomAnchor, constant: 26).isActive = true
+        keyboardAvoidanceBottomConstraint = sheetBottomConstraint
+        keyboardAvoidanceBaseBottomConstant = 0
+        keyboardAvoidanceInputView = nameInput
+        installKeyboardAvoidance()
+        installBlankAreaKeyboardDismissal()
     }
 
     private func renderRepliesPanel() {

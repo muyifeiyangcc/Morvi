@@ -129,7 +129,7 @@ final class RootTabsController: UIViewController {
             break
         case .persona:
             installHitAreas([
-                HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { [weak self] in self?.show(.profileEditor) },
+                HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { [weak self] in self?.showOverlay(.profileEditor) },
                 HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { [weak self] in self?.show(.settings) }
             ])
         default:
@@ -209,7 +209,8 @@ final class RootTabsController: UIViewController {
             || page == .uploadFilled
             || page == .restrictPanel
             || page == .reportPanel
-            || page == .repliesPanel {
+            || page == .repliesPanel
+            || page == .profileEditor {
             overlayView.didTapOutsideContent = { [weak self] in
                 self?.dismissActiveOverlay()
             }
