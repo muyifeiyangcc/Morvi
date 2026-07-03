@@ -30,7 +30,7 @@ final class DialogueCardListView: UIView {
 
     override init(frame: CGRect) {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 164, height: 186)
+        layout.itemSize = CGSize(width: 164, height: 198)
         layout.minimumInteritemSpacing = 8
         layout.minimumLineSpacing = 10
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 10, right: 19)

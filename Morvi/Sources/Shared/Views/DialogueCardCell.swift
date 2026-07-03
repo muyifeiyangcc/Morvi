@@ -54,7 +54,8 @@ final class DialogueCardCell: UICollectionViewCell {
 
             previewLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             previewLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            previewLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 72),
+            previewLabel.topAnchor.constraint(equalTo: avatarView.bottomAnchor, constant: 12),
+            previewLabel.bottomAnchor.constraint(lessThanOrEqualTo: actionView.topAnchor, constant: -12),
 
             actionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             actionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
