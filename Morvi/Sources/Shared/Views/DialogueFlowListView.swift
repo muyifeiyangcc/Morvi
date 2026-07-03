@@ -35,6 +35,9 @@ final class DialogueFlowListView: UIView {
     func configure(entries: [DialogueFlowEntry]) {
         self.entries = entries
         tableView.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            self?.scrollToEnd(animated: false)
+        }
     }
 
     func scrollToEnd(animated: Bool) {
