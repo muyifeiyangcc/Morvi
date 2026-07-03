@@ -285,7 +285,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             listView.leadingAnchor.constraint(equalTo: leadingAnchor),
             listView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            listView.topAnchor.constraint(equalTo: topAnchor, constant: statusBarHeight + 76 + 26),
+            listView.topAnchor.constraint(equalTo: topAnchor, constant: statusBarHeight + 76),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
