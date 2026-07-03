@@ -32,6 +32,16 @@ Provided full-page UI images are used as external references only and are not bu
 - Check every implemented page against its reference for text, spacing, rounded corners, borders, shadows, gradients, blur, and tab/navigation placement.
 - Shared visual effects live in UIKit/CoreAnimation helpers inside `ReferenceCanvasView` and `FloatingDockView`.
 
+## Dialogue Timeline
+- Dialogue timeline text must be English.
+- Within 1 minute, show `Just now`.
+- After that, use the coarse buckets `5 min ago`, `10 min ago`, and `30 min ago` before switching to clock time.
+- Same-day older entries show time as `h:mm a`.
+- Entries outside the current day but inside the current year show `MMM d, h:mm a`.
+- Entries outside the current year show `MMM d, yyyy, h:mm a`.
+- Consecutive entries from the same side share one avatar only while they are in the same timeline group.
+- If the timeline group changes, show the avatar again even when the side is unchanged.
+
 ## Tabbar Icons
 - `画板 15@2x/@3x` -> `tab_home`
 - `画板 13@2x/@3x` -> `tab_discover`

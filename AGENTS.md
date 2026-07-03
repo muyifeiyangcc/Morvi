@@ -26,6 +26,8 @@
 - Blank-space keyboard dismissal should use a non-intercepting gesture (`cancelsTouchesInView = false`) and explicitly avoid handling touches from `UIControl`, text input views, navigation controls, buttons, and links.
 - For small-screen input pages, wrap the main content in a `UIScrollView`, listen to keyboard frame changes, adjust the scroll view bottom inset, and scroll the active input into view.
 - If a page has a fixed bottom button with its own visual background, scroll content may pass underneath that button; keep the button above the scroll view so it remains visually stable and tappable.
+- Dialogue timeline text must be English: `Just now`, `5 min ago`, `10 min ago`, `30 min ago`, same-day `h:mm a`, same-year `MMM d, h:mm a`, cross-year `MMM d, yyyy, h:mm a`.
+- Consecutive dialogue entries from the same side share one avatar only while they are in the same timeline group. If the timeline group changes, show the avatar again even when the side is unchanged.
 
 ## Navigation
 
