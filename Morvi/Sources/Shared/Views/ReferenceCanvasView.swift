@@ -1684,8 +1684,9 @@ final class ReferenceCanvasView: UIView {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
         scrollView.contentInsetAdjustmentBehavior = .never
-        scrollView.contentInset.bottom = 124
-        scrollView.verticalScrollIndicatorInsets.bottom = 124
+        let dockCoveredHeight: CGFloat = 104
+        scrollView.contentInset.bottom = dockCoveredHeight
+        scrollView.verticalScrollIndicatorInsets.bottom = dockCoveredHeight
         addSubview(scrollView)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -1693,6 +1694,7 @@ final class ReferenceCanvasView: UIView {
         contentView.backgroundColor = .clear
         scrollView.addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        let contentHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: 0)
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -1703,7 +1705,7 @@ final class ReferenceCanvasView: UIView {
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            contentView.heightAnchor.constraint(equalToConstant: 820)
+            contentHeightConstraint
         ])
 
         let previousContainer = activeLayoutContainer
@@ -1730,7 +1732,9 @@ final class ReferenceCanvasView: UIView {
             addFeelingBar(day: days[index], iconName: icons[index], height: heights[index], top: barTop, left: x)
         }
         let firstCardHeight = addFeelingCard(top: 401, style: .lime)
-        _ = addFeelingCard(top: 401 + firstCardHeight + 24, style: .aqua)
+        let secondCardTop = 401 + firstCardHeight + 24
+        let secondCardHeight = addFeelingCard(top: secondCardTop, style: .aqua)
+        contentHeightConstraint.constant = secondCardTop + secondCardHeight + 10
     }
 
     private func renderProfileEditor() {
