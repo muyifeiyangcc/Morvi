@@ -442,7 +442,8 @@ final class ReferenceCanvasView: UIView {
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: nameTop, centered: true)
         addStatsPanel(top: statsTop)
-        addPillButton("Chat", top: buttonTop, left: 20, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        let dialogueButton = addPillButton("Chat", top: buttonTop, left: 20, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        dialogueButton.addTarget(self, action: #selector(handlePersonaDialogueTap), for: .touchUpInside)
         addPillButton("Follow", top: buttonTop, left: 195, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         cellPlacements.forEach { placement in
             addMediaBlock(
@@ -459,6 +460,10 @@ final class ReferenceCanvasView: UIView {
             )
         }
         activeLayoutContainer = nil
+    }
+
+    @objc private func handlePersonaDialogueTap() {
+        didRequestPage?(.directDialogue)
     }
 
     private func addPersonaRootGradient() {
