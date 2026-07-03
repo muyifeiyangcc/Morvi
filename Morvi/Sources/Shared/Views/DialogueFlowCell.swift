@@ -27,6 +27,8 @@ final class DialogueFlowCell: UITableViewCell {
             configureMoment(title)
         case .phrase(let text, let side, let showsAvatar):
             configurePhrase(text: text, side: side, showsAvatar: showsAvatar)
+        case .audioClip(let durationText, let side, let showsAvatar):
+            configureAudioClip(durationText: durationText, side: side, showsAvatar: showsAvatar)
         case .portraitAsset(let name, let side, let showsAvatar):
             configurePortraitAsset(name: name, side: side, showsAvatar: showsAvatar)
         }
@@ -77,6 +79,37 @@ final class DialogueFlowCell: UITableViewCell {
         }
 
         NSLayoutConstraint.activate(constraints)
+    }
+
+    private func configureAudioClip(durationText: String, side: DialogueFlowSide, showsAvatar: Bool) {
+        let bubble = AudioClipBubbleView(
+            durationText: durationText,
+            pointerSide: side == .local ? .right : .left,
+            fillColor: side == .local
+                ? UIColor(red: 0.92, green: 1, blue: 0.78, alpha: 1)
+                : UIColor(red: 0.96, green: 0.99, blue: 1, alpha: 1),
+            strokeColor: side == .local
+                ? UIColor(red: 0.56, green: 0.78, blue: 0.22, alpha: 1)
+                : UIColor.systemBlue.withAlphaComponent(0.4)
+        )
+        contentView.addSubview(bubble)
+        bubble.translatesAutoresizingMaskIntoConstraints = false
+
+        var constraints = [
+            bubble.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            bubble.widthAnchor.constraint(equalToConstant: 71),
+            bubble.heightAnchor.constraint(equalToConstant: 36),
+            bubble.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18)
+        ]
+
+        if side == .local {
+            constraints.append(bubble.trailingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 288))
+        } else {
+            constraints.append(bubble.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 86))
+        }
+
+        NSLayoutConstraint.activate(constraints)
+        addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
     }
 
     private func configurePortraitAsset(name: String, side: DialogueFlowSide, showsAvatar: Bool) {

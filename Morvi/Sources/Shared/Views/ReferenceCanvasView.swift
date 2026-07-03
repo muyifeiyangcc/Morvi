@@ -459,6 +459,7 @@ final class ReferenceCanvasView: UIView {
         listView.configure(entries: [
             .moment(DialogueMomentFormatter.title(for: adjustedDate, referenceDate: referenceDate, calendar: calendar)),
             .phrase(text: "Nice to meet you, nice\nto meet you!", side: .local, showsAvatar: true),
+            .audioClip(durationText: "5s", side: .local, showsAvatar: false),
             .phrase(text: "Nice to meet you.", side: .remote, showsAvatar: true),
             .portraitAsset(name: "profile_avatar", side: .remote, showsAvatar: false)
         ])
