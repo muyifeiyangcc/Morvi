@@ -287,7 +287,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderConversation(title: String, mode: ConversationMode) {
-        addPersonaRootGradient()
+        addDecorativeBackground()
         addTopTitle(title)
         addDialogueFlowList(top: 136, bottom: 696)
         switch mode {
@@ -302,6 +302,18 @@ final class ReferenceCanvasView: UIView {
             addText("▦", size: 24, weight: .regular, top: 606, left: 20)
             addCircle(text: "♬", top: 650, left: 138, size: 100, color: UIColor(red: 0.82, green: 1, blue: 0.78, alpha: 1))
         }
+    }
+
+    private func addDecorativeBackground() {
+        let backgroundView = DecorativeGradientView()
+        insertSubview(backgroundView, at: 0)
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            backgroundView.topAnchor.constraint(equalTo: topAnchor),
+            backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 
     private func addDialogueFlowList(top: CGFloat, bottom: CGFloat) {
