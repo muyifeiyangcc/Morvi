@@ -61,7 +61,7 @@ final class ReferenceCanvasView: UIView {
 
     private var usesDecorativeBackground: Bool {
         switch page {
-        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover:
+        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet:
             return true
         default:
             return false
