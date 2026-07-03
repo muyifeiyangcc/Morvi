@@ -429,8 +429,8 @@ final class ReferenceCanvasView: UIView {
         microphoneIcon.translatesAutoresizingMaskIntoConstraints = false
 
         let microphoneRing = GradientRingView(colors: [
-            UIColor(red: 1, green: 0, blue: 0, alpha: 1),
-            UIColor(red: 1, green: 0.55, blue: 0, alpha: 1)
+            UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1),
+            UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1)
         ], ringWidth: 1)
         panel.addSubview(microphoneRing)
         microphoneRing.translatesAutoresizingMaskIntoConstraints = false
@@ -453,8 +453,8 @@ final class ReferenceCanvasView: UIView {
 
             microphoneRing.centerXAnchor.constraint(equalTo: microphoneIcon.centerXAnchor),
             microphoneRing.centerYAnchor.constraint(equalTo: microphoneIcon.centerYAnchor),
-            microphoneRing.widthAnchor.constraint(equalToConstant: 104),
-            microphoneRing.heightAnchor.constraint(equalToConstant: 104),
+            microphoneRing.widthAnchor.constraint(equalToConstant: 124),
+            microphoneRing.heightAnchor.constraint(equalToConstant: 124),
 
             microphoneIcon.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             microphoneIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 57),
