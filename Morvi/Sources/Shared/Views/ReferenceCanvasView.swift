@@ -293,7 +293,7 @@ final class ReferenceCanvasView: UIView {
         addProfileAvatar(top: 196, left: 306, size: 44, showsBorder: false, showsShadow: false)
         addProfileAvatar(top: 298, left: 26, size: 44, showsBorder: false, showsShadow: false)
         addBubble("Nice to meet you.", top: 302, left: 86, outgoing: false)
-        addPortraitMediaBlock(top: 358, edge: 288, outgoing: true, width: 160)
+        addPortraitMediaBlock(top: 358, edge: 86, outgoing: false, width: 160)
         switch mode {
         case .text:
             addInputToolbarIcons(top: 704)
