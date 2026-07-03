@@ -1791,6 +1791,10 @@ final class ReferenceCanvasView: UIView {
         let confirmButton = addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, fontWeight: .medium)
         if page == .accessGate {
             confirmButton.addTarget(self, action: #selector(openSignInFromPopup), for: .touchUpInside)
+        } else if page == .spendConfirm {
+            confirmButton.addTarget(self, action: #selector(showCreditShortagePopup), for: .touchUpInside)
+        } else if page == .creditShortage {
+            confirmButton.addTarget(self, action: #selector(openWalletFromPopup), for: .touchUpInside)
         }
     }
 
@@ -1805,6 +1809,16 @@ final class ReferenceCanvasView: UIView {
         authFlow.modalPresentationStyle = .fullScreen
         authFlow.modalTransitionStyle = .coverVertical
         controller?.present(authFlow, animated: true)
+    }
+
+    @objc private func showCreditShortagePopup() {
+        didRequestOverlayPage?(.creditShortage)
+    }
+
+    @objc private func openWalletFromPopup() {
+        let controller = owningController()
+        removeFromSuperview()
+        controller?.navigationController?.pushViewController(RouteFactory.controller(for: .wallet), animated: true)
     }
 
     private func owningController() -> UIViewController? {
