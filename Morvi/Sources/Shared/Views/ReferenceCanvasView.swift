@@ -334,6 +334,7 @@ final class ReferenceCanvasView: UIView {
         let voiceButton = UIButton(type: .custom)
         voiceButton.setImage(UIImage(named: "input_voice_icon"), for: .normal)
         voiceButton.imageView?.contentMode = .scaleAspectFit
+        voiceButton.addTarget(self, action: #selector(showVoiceInputPanel), for: .touchUpInside)
         dockView.addSubview(voiceButton)
         voiceButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -368,6 +369,58 @@ final class ReferenceCanvasView: UIView {
         installKeyboardAvoidance()
         installBlankAreaKeyboardDismissal()
         return dockView
+    }
+
+    @objc private func showVoiceInputPanel() {
+        endEditing(true)
+        viewWithTag(9206)?.removeFromSuperview()
+
+        let overlayView = UIView()
+        overlayView.tag = 9206
+        overlayView.backgroundColor = .clear
+        addSubview(overlayView)
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            overlayView.topAnchor.constraint(equalTo: topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let panel = UIView()
+        panel.backgroundColor = UIColor(red: 1, green: 0.76, blue: 0.02, alpha: 1)
+        panel.layer.cornerRadius = 18
+        panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        panel.layer.masksToBounds = true
+        overlayView.addSubview(panel)
+        panel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            panel.leadingAnchor.constraint(equalTo: overlayView.leadingAnchor),
+            panel.trailingAnchor.constraint(equalTo: overlayView.trailingAnchor),
+            panel.bottomAnchor.constraint(equalTo: overlayView.bottomAnchor),
+            panel.heightAnchor.constraint(equalToConstant: 226)
+        ])
+
+        let gridIcon = UIImageView(image: UIImage(named: "voice_panel_grid"))
+        gridIcon.contentMode = .scaleAspectFit
+        panel.addSubview(gridIcon)
+        gridIcon.translatesAutoresizingMaskIntoConstraints = false
+
+        let microphoneIcon = UIImageView(image: UIImage(named: "voice_panel_microphone"))
+        microphoneIcon.contentMode = .scaleAspectFit
+        panel.addSubview(microphoneIcon)
+        microphoneIcon.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            gridIcon.leadingAnchor.constraint(equalTo: panel.leadingAnchor, constant: 20),
+            gridIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 20),
+            gridIcon.widthAnchor.constraint(equalToConstant: 24),
+            gridIcon.heightAnchor.constraint(equalToConstant: 24),
+
+            microphoneIcon.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
+            microphoneIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 57),
+            microphoneIcon.widthAnchor.constraint(equalToConstant: 104),
+            microphoneIcon.heightAnchor.constraint(equalToConstant: 104)
+        ])
     }
 
     private func addDialogueFlowList(

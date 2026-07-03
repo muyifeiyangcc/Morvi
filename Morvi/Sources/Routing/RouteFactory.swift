@@ -63,7 +63,6 @@ enum RouteFactory {
         case .directDialogue:
             return ReferencePageController(page: .directDialogue) { scene in
                 [
-                    HitArea(frame: CGRect(x: 20, y: 680, width: 60, height: 52)) { scene.push(.voiceDialogue) },
                     HitArea(frame: CGRect(x: 294, y: 60, width: 70, height: 70)) { scene.push(.restrictPanel) }
                 ]
             }
