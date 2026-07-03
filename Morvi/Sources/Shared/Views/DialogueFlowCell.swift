@@ -75,11 +75,12 @@ final class DialogueFlowCell: UITableViewCell {
             ])
         }
 
+        let ratio = (image?.size.height ?? 265) / max(image?.size.width ?? 335, 1)
         constraints.append(contentsOf: [
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: 265 / 335),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: ratio),
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18)
         ])
         NSLayoutConstraint.activate(constraints)
