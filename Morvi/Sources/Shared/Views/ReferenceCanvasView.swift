@@ -91,7 +91,7 @@ final class ReferenceCanvasView: UIView {
         case .persona:
             renderPersona()
         case .settings:
-            renderList(title: "Settings", sections: [["Wallet", "Blacklist", "Privacy Policy", "User Agreement"], ["Delete account", "Log out"]])
+            renderSettings()
         case .wallet:
             renderWallet()
         case .directDialogue:
@@ -1633,6 +1633,93 @@ final class ReferenceCanvasView: UIView {
             }
             top += height + 28
         }
+    }
+
+    private func renderSettings() {
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 812)
+        ])
+
+        activeLayoutContainer = scrollContent
+        addSettingsCard(top: 140, height: 276, rows: ["Wallet", "Blacklist", "Privacy Policy", "User Agreement"])
+        addSettingsCard(top: 443, height: 150, rows: ["Delete account", "Log out"])
+        activeLayoutContainer = nil
+    }
+
+    private func addSettingsCard(top: CGFloat, height: CGFloat, rows: [String]) {
+        let card = addPanel(top: top, left: 20, width: 335, height: height, alpha: 1)
+        card.layer.cornerRadius = 20
+        card.layer.borderWidth = 1
+        card.layer.borderColor = UIColor(white: 0.93, alpha: 1).cgColor
+        card.layer.shadowOpacity = 0.08
+        card.layer.shadowOffset = CGSize(width: 0, height: 4)
+        card.layer.shadowRadius = 12
+
+        rows.enumerated().forEach { index, text in
+            addSettingsItem(text, top: top + 17 + CGFloat(index) * 64)
+        }
+    }
+
+    private func addSettingsItem(_ text: String, top: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let itemView = AdaptiveInputView(
+            backgroundColor: UIColor(red: 212 / 255, green: 1, blue: 59 / 255, alpha: 0.3),
+            cornerRadius: 10
+        )
+        layoutContainer.addSubview(itemView)
+        itemView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            itemView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 36),
+            itemView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -36),
+            itemView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            itemView.heightAnchor.constraint(equalToConstant: 52)
+        ])
+
+        let titleLabel = UILabel()
+        titleLabel.text = text
+        titleLabel.font = AppFont.source(16)
+        titleLabel.textColor = UIColor.black.withAlphaComponent(0.85)
+        itemView.addSubview(titleLabel)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        let nextIconView = UIImageView(image: UIImage(named: "next_step_icon"))
+        nextIconView.contentMode = .scaleAspectFit
+        itemView.addSubview(nextIconView)
+        nextIconView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: itemView.leadingAnchor, constant: 16),
+            titleLabel.centerYAnchor.constraint(equalTo: itemView.centerYAnchor),
+
+            nextIconView.trailingAnchor.constraint(equalTo: itemView.trailingAnchor, constant: -15),
+            nextIconView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
+            nextIconView.widthAnchor.constraint(equalToConstant: 20),
+            nextIconView.heightAnchor.constraint(equalToConstant: 20)
+        ])
     }
 
     private func renderPersonalDetail() {
