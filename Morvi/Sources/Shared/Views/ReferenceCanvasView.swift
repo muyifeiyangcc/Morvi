@@ -40,6 +40,7 @@ final class ReferenceCanvasView: UIView {
     private var personaBackdropBaseHeight: CGFloat = 0
     private var personaBackdropHeightConstraint: NSLayoutConstraint?
     private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
+    private var selectedUploadThemes: Set<String> = ["Travel"]
 
     init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
@@ -1633,14 +1634,7 @@ final class ReferenceCanvasView: UIView {
         addText("Title of work:", size: 17, weight: .regular, top: 0, left: 20)
         addInputField("Enter the title", top: 32)
         addText("Theme:", size: 17, weight: .regular, top: 99, left: 20)
-        if filled {
-            addSmallField("Theme", top: 131, left: 20, width: 70)
-            addSmallField(nil, imageName: "theme_add_icon", top: 131, left: 108, width: 76)
-        } else {
-            addSmallField(nil, imageName: "theme_add_icon", top: 131, left: 20, width: 78) { [weak self] in
-                self?.didRequestOverlayPage?(.uploadFilled)
-            }
-        }
+        addUploadThemeChoices(top: 131)
         addText("Description:", size: 17, weight: .regular, top: 190, left: 20)
         addLargeField("Say something", top: 222)
         addUploadBox(top: 337)
@@ -3346,6 +3340,69 @@ final class ReferenceCanvasView: UIView {
                 actionButton.bottomAnchor.constraint(equalTo: field.bottomAnchor)
             ])
         }
+    }
+
+    private func addUploadThemeChoices(top: CGFloat) {
+        let themes = ["Travel", "Food", "Family", "Friends", "Lifestyle"]
+        var left: CGFloat = 20
+
+        for theme in themes {
+            let textWidth = ceil(
+                (theme as NSString).size(withAttributes: [.font: AppFont.source(14)]).width
+            )
+            let fieldWidth = textWidth + 20
+            addSelectableUploadTheme(theme, top: top, left: left, width: fieldWidth)
+            left += fieldWidth + 8
+        }
+    }
+
+    private func addSelectableUploadTheme(
+        _ theme: String,
+        top: CGFloat,
+        left: CGFloat,
+        width: CGFloat
+    ) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let field = AdaptiveInputView(backgroundColor: .clear)
+        field.applySelectionAppearance(isSelected: selectedUploadThemes.contains(theme))
+        layoutContainer.addSubview(field)
+        field.translatesAutoresizingMaskIntoConstraints = false
+
+        let label = UILabel()
+        label.text = theme
+        label.textAlignment = .center
+        label.textColor = .darkGray
+        label.font = AppFont.source(14)
+        field.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        let actionButton = UIButton(type: .custom)
+        actionButton.addAction(UIAction { [weak self, weak field] _ in
+            guard let self, let field else { return }
+            if self.selectedUploadThemes.contains(theme) {
+                self.selectedUploadThemes.remove(theme)
+            } else {
+                self.selectedUploadThemes.insert(theme)
+            }
+            field.applySelectionAppearance(isSelected: self.selectedUploadThemes.contains(theme))
+        }, for: .touchUpInside)
+        field.addSubview(actionButton)
+        actionButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            field.widthAnchor.constraint(equalToConstant: width),
+            field.heightAnchor.constraint(equalToConstant: 45),
+            label.leadingAnchor.constraint(equalTo: field.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: field.trailingAnchor),
+            label.topAnchor.constraint(equalTo: field.topAnchor),
+            label.bottomAnchor.constraint(equalTo: field.bottomAnchor),
+            actionButton.leadingAnchor.constraint(equalTo: field.leadingAnchor),
+            actionButton.trailingAnchor.constraint(equalTo: field.trailingAnchor),
+            actionButton.topAnchor.constraint(equalTo: field.topAnchor),
+            actionButton.bottomAnchor.constraint(equalTo: field.bottomAnchor)
+        ])
     }
 
     @discardableResult
