@@ -1099,20 +1099,46 @@ final class ReferenceCanvasView: UIView {
 
     private func renderWallet() {
         addTopTitle("Wallet")
-        addNotchedPanel(top: 156, left: 20, width: 335, height: 122)
-        addText("My balance", size: 20, weight: .regular, top: 194, left: 36, color: .white)
-        addText("1000", size: 34, weight: .black, top: 224, left: 36, color: UIColor(red: 0.79, green: 1, blue: 0.18, alpha: 1))
-        addGem(assetName: "balance_gem_mark", top: 96, left: 144, width: 180, height: 182)
+        let scrollView = UIScrollView()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.backgroundColor = .clear
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        let scrollContent = UIView()
+        scrollContent.backgroundColor = .clear
+        scrollView.addSubview(scrollContent)
+        scrollContent.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            scrollContent.heightAnchor.constraint(equalToConstant: 760)
+        ])
+
+        activeLayoutContainer = scrollContent
+        addNotchedPanel(top: 36, left: 20, width: 335, height: 122)
+        addWalletBalanceTextGroup(parent: scrollContent, cardTop: 36)
         let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900"]
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99"]
         for index in amounts.indices {
-            let top = CGFloat(288 + index * 80)
-            _ = addPanel(top: top, left: 15, width: 345, height: 68, alpha: 1)
-            addGem(assetName: "wallet_item_gem_mark", top: top + 16, left: 30, width: 40, height: 36)
-            addText(amounts[index], size: 24, weight: .regular, top: top + 22, left: 80)
-            addText(prices[index], size: 20, weight: .regular, top: top + 24, left: 290, color: .darkGray)
-            addLine(top: top + 50, left: 290, width: 54, color: UIColor(red: 0.76, green: 1, blue: 0.20, alpha: 1))
+            let top = CGFloat(168 + index * 80)
+            addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index])
         }
+        activeLayoutContainer = nil
+        addGem(assetName: "balance_gem_mark", top: 96, left: 144, width: 180, height: 182)
     }
 
     private func addNotchedPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat) {
@@ -1125,6 +1151,105 @@ final class ReferenceCanvasView: UIView {
             panel.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             panel.widthAnchor.constraint(equalToConstant: width),
             panel.heightAnchor.constraint(equalToConstant: height)
+        ])
+    }
+
+    private func addWalletBalanceTextGroup(parent: UIView, cardTop: CGFloat) {
+        let group = UIView()
+        group.backgroundColor = .clear
+        parent.addSubview(group)
+        group.translatesAutoresizingMaskIntoConstraints = false
+
+        let titleLabel = UILabel()
+        titleLabel.text = "My balance"
+        titleLabel.textColor = .white
+        titleLabel.font = AppFont.source(20, weight: .medium)
+
+        let amountLabel = UILabel()
+        amountLabel.text = "1000"
+        amountLabel.textColor = UIColor(red: 0.79, green: 1, blue: 0.18, alpha: 1)
+        amountLabel.font = AppFont.fredoka(36)
+
+        group.addSubview(titleLabel)
+        group.addSubview(amountLabel)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        amountLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            group.leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: 36),
+            group.centerYAnchor.constraint(equalTo: parent.topAnchor, constant: cardTop + 61),
+            group.heightAnchor.constraint(equalToConstant: 78),
+
+            titleLabel.leadingAnchor.constraint(equalTo: group.leadingAnchor),
+            titleLabel.topAnchor.constraint(equalTo: group.topAnchor),
+
+            amountLabel.leadingAnchor.constraint(equalTo: group.leadingAnchor),
+            amountLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 3),
+            amountLabel.bottomAnchor.constraint(equalTo: group.bottomAnchor)
+        ])
+    }
+
+    private func addWalletListRow(parent: UIView, top: CGFloat, amount: String, price: String) {
+        let cell = UIView()
+        cell.backgroundColor = .white
+        cell.layer.cornerRadius = 12
+        cell.layer.masksToBounds = false
+        cell.layer.shadowColor = UIColor.black.cgColor
+        cell.layer.shadowOpacity = 0.10
+        cell.layer.shadowOffset = CGSize(width: 0, height: 4)
+        cell.layer.shadowRadius = 14
+        parent.addSubview(cell)
+        cell.translatesAutoresizingMaskIntoConstraints = false
+
+        let iconView = UIImageView(image: UIImage(named: "wallet_item_gem_mark"))
+        iconView.contentMode = .scaleAspectFit
+        iconView.layer.shadowColor = UIColor.green.cgColor
+        iconView.layer.shadowOpacity = 0.28
+        iconView.layer.shadowRadius = 8
+        iconView.layer.shadowOffset = CGSize(width: 0, height: 4)
+
+        let amountLabel = UILabel()
+        amountLabel.text = amount
+        amountLabel.textColor = .black
+        amountLabel.font = AppFont.source(24, weight: .medium)
+
+        let priceLabel = UILabel()
+        priceLabel.text = price
+        priceLabel.textColor = UIColor.black.withAlphaComponent(0.8)
+        priceLabel.font = AppFont.source(20, weight: .regular)
+
+        let underline = FadeUnderlineView()
+
+        cell.addSubview(iconView)
+        cell.addSubview(amountLabel)
+        cell.addSubview(underline)
+        cell.addSubview(priceLabel)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        amountLabel.translatesAutoresizingMaskIntoConstraints = false
+        priceLabel.translatesAutoresizingMaskIntoConstraints = false
+        underline.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            cell.leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: 15),
+            cell.topAnchor.constraint(equalTo: parent.topAnchor, constant: top),
+            cell.widthAnchor.constraint(equalToConstant: 345),
+            cell.heightAnchor.constraint(equalToConstant: 68),
+
+            iconView.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 15),
+            iconView.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 40),
+            iconView.heightAnchor.constraint(equalToConstant: 36),
+
+            amountLabel.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 65),
+            amountLabel.centerYAnchor.constraint(equalTo: iconView.centerYAnchor),
+
+            priceLabel.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -16),
+            priceLabel.centerYAnchor.constraint(equalTo: iconView.centerYAnchor),
+
+            underline.leadingAnchor.constraint(equalTo: priceLabel.leadingAnchor),
+            underline.trailingAnchor.constraint(equalTo: priceLabel.trailingAnchor),
+            underline.bottomAnchor.constraint(equalTo: priceLabel.bottomAnchor),
+            underline.heightAnchor.constraint(equalToConstant: 4)
         ])
     }
 
