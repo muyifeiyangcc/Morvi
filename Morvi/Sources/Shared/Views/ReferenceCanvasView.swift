@@ -476,7 +476,7 @@ final class ReferenceCanvasView: UIView {
         case .began:
             rippleView?.startAnimating()
             UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut]) {
-                microphoneIcon.transform = CGAffineTransform(scaleX: 60 / 104, y: 60 / 104)
+                microphoneIcon.transform = CGAffineTransform(scaleX: 80 / 104, y: 80 / 104)
             }
         case .ended, .cancelled, .failed:
             rippleView?.stopAnimating()
