@@ -375,9 +375,10 @@ final class ReferenceCanvasView: UIView {
         endEditing(true)
         viewWithTag(9206)?.removeFromSuperview()
 
-        let overlayView = UIView()
+        let overlayView = UIControl()
         overlayView.tag = 9206
         overlayView.backgroundColor = .clear
+        overlayView.addTarget(self, action: #selector(hideVoiceInputPanel), for: .touchUpInside)
         addSubview(overlayView)
         overlayView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -411,8 +412,10 @@ final class ReferenceCanvasView: UIView {
             panel.heightAnchor.constraint(equalToConstant: 226)
         ])
 
-        let gridIcon = UIImageView(image: UIImage(named: "voice_panel_grid"))
-        gridIcon.contentMode = .scaleAspectFit
+        let gridIcon = UIButton(type: .custom)
+        gridIcon.setImage(UIImage(named: "voice_panel_grid"), for: .normal)
+        gridIcon.imageView?.contentMode = .scaleAspectFit
+        gridIcon.addTarget(self, action: #selector(hideVoiceInputPanel), for: .touchUpInside)
         panel.addSubview(gridIcon)
         gridIcon.translatesAutoresizingMaskIntoConstraints = false
 
@@ -431,6 +434,10 @@ final class ReferenceCanvasView: UIView {
             microphoneIcon.widthAnchor.constraint(equalToConstant: 104),
             microphoneIcon.heightAnchor.constraint(equalToConstant: 104)
         ])
+    }
+
+    @objc private func hideVoiceInputPanel() {
+        viewWithTag(9206)?.removeFromSuperview()
     }
 
     private func addDialogueFlowList(
