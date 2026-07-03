@@ -293,7 +293,7 @@ final class ReferenceCanvasView: UIView {
         addProfileAvatar(top: 196, left: 306, size: 44, showsBorder: false, showsShadow: false)
         addProfileAvatar(top: 298, left: 26, size: 44, showsBorder: false, showsShadow: false)
         addBubble("Nice to meet you.", top: 302, left: 86, outgoing: false)
-        addMediaBlock(top: 358, left: 82, width: 160, height: 160, title: "", tint: .warm)
+        addPortraitMediaBlock(top: 358, left: 128, width: 160)
         switch mode {
         case .text:
             addInputToolbarIcons(top: 704)
@@ -331,6 +331,41 @@ final class ReferenceCanvasView: UIView {
             photoButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
             photoButton.widthAnchor.constraint(equalToConstant: 24),
             photoButton.heightAnchor.constraint(equalToConstant: 24)
+        ])
+    }
+
+    private func addPortraitMediaBlock(top: CGFloat, left: CGFloat, width: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let image = UIImage(named: "profile_avatar")
+        let ratio = (image?.size.height ?? width) / max(image?.size.width ?? width, 1)
+        let height = width * ratio
+
+        let shadowHost = UIView()
+        shadowHost.backgroundColor = .clear
+        shadowHost.layer.shadowColor = UIColor.black.cgColor
+        shadowHost.layer.shadowOpacity = 0.18
+        shadowHost.layer.shadowOffset = CGSize(width: 0, height: 5)
+        shadowHost.layer.shadowRadius = 12
+        layoutContainer.addSubview(shadowHost)
+        shadowHost.translatesAutoresizingMaskIntoConstraints = false
+
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 10
+        shadowHost.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            shadowHost.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            shadowHost.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            shadowHost.widthAnchor.constraint(equalToConstant: width),
+            shadowHost.heightAnchor.constraint(equalToConstant: height),
+
+            imageView.leadingAnchor.constraint(equalTo: shadowHost.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: shadowHost.trailingAnchor),
+            imageView.topAnchor.constraint(equalTo: shadowHost.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
         ])
     }
 
@@ -3233,23 +3268,31 @@ final class ReferenceCanvasView: UIView {
         width: CGFloat = 206,
         height: CGFloat? = nil
     ) {
-        let label = UILabel()
-        label.text = text
-        label.numberOfLines = 0
-        label.font = AppFont.source(16)
-        label.backgroundColor = outgoing ? UIColor(red: 0.92, green: 1, blue: 0.78, alpha: 1) : UIColor(red: 0.96, green: 0.99, blue: 1, alpha: 1)
-        label.layer.cornerRadius = 6
-        label.layer.borderWidth = 1
-        label.layer.borderColor = (outgoing ? UIColor.systemGreen : UIColor.systemBlue).withAlphaComponent(0.4).cgColor
-        label.layer.masksToBounds = true
-        addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            label.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            label.widthAnchor.constraint(equalToConstant: width),
-            label.heightAnchor.constraint(equalToConstant: height ?? (outgoing ? 66 : (text.count > 80 ? 194 : 42)))
-        ])
+        let bubble = ArrowBubbleView(
+            text: text,
+            pointerSide: outgoing ? .right : .left,
+            fillColor: outgoing
+                ? UIColor(red: 0.92, green: 1, blue: 0.78, alpha: 1)
+                : UIColor(red: 0.96, green: 0.99, blue: 1, alpha: 1),
+            strokeColor: outgoing
+                ? UIColor(red: 0.56, green: 0.78, blue: 0.22, alpha: 1)
+                : UIColor.systemBlue.withAlphaComponent(0.4)
+        )
+        addSubview(bubble)
+        bubble.translatesAutoresizingMaskIntoConstraints = false
+        var constraints = [
+            bubble.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            bubble.widthAnchor.constraint(lessThanOrEqualToConstant: width)
+        ]
+        if outgoing {
+            constraints.append(bubble.trailingAnchor.constraint(equalTo: leadingAnchor, constant: left + width))
+        } else {
+            constraints.append(bubble.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left))
+        }
+        if let height {
+            constraints.append(bubble.heightAnchor.constraint(equalToConstant: height))
+        }
+        NSLayoutConstraint.activate(constraints)
     }
 
     private func addTopTitle(_ title: String) {
