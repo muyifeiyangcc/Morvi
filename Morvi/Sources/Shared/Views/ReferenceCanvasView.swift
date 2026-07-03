@@ -368,9 +368,10 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersonaDetail(title: String) {
-        addMediaBlock(top: 0, left: 0, width: 375, height: 364, title: "", tint: .forest, imageName: "discover_feed_cover")
+        addPersonaBackdrop()
         let base = addPanel(top: 328, left: 0, width: 375, height: 484, alpha: 1)
-        base.backgroundColor = UIColor(red: 0.90, green: 1.0, blue: 0.78, alpha: 1)
+        addThemeGradientBackground(to: base, width: 375, height: 484, cornerRadius: 20)
+        base.backgroundColor = .clear
         base.layer.borderWidth = 0
         base.layer.cornerRadius = 20
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
@@ -381,6 +382,54 @@ final class ReferenceCanvasView: UIView {
         addMediaBlock(top: 599, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
         addMediaBlock(top: 599, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
         addMediaBlock(top: 775, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
+    }
+
+    private func addPersonaBackdrop() {
+        let coverImage = UIImage(named: "discover_feed_cover")
+        let coverView = UIImageView(image: coverImage)
+        coverView.contentMode = .scaleAspectFill
+        coverView.clipsToBounds = true
+        addSubview(coverView)
+        coverView.translatesAutoresizingMaskIntoConstraints = false
+
+        var constraints = [
+            coverView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            coverView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            coverView.topAnchor.constraint(equalTo: topAnchor)
+        ]
+        if let coverImage, coverImage.size.width > 0 {
+            constraints.append(coverView.heightAnchor.constraint(
+                equalTo: coverView.widthAnchor,
+                multiplier: coverImage.size.height / coverImage.size.width
+            ))
+        } else {
+            constraints.append(coverView.heightAnchor.constraint(equalToConstant: 403))
+        }
+        NSLayoutConstraint.activate(constraints)
+    }
+
+    private func addThemeGradientBackground(to view: UIView, width: CGFloat, height: CGFloat, cornerRadius: CGFloat) {
+        let backgroundView = UIView()
+        backgroundView.layer.cornerRadius = cornerRadius
+        backgroundView.layer.masksToBounds = true
+        view.insertSubview(backgroundView, at: 0)
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundView.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        let gradient = CAGradientLayer()
+        gradient.colors = [
+            UIColor(red: 0.78, green: 1.0, blue: 0.16, alpha: 1).cgColor,
+            UIColor(red: 0.86, green: 1.0, blue: 0.95, alpha: 1).cgColor
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        backgroundView.layer.insertSublayer(gradient, at: 0)
     }
 
     private func renderSignIn() {
