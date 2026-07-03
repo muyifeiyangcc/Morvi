@@ -1632,7 +1632,17 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = formView
         addText("Title of work:", size: 17, weight: .regular, top: 0, left: 20)
-        addInputField("Enter the title", top: 32)
+        addInputField(
+            "Enter the title",
+            top: 32,
+            fieldBackgroundColor: UIColor(
+                red: 212 / 255,
+                green: 1,
+                blue: 59 / 255,
+                alpha: 0.3
+            ),
+            usesGradient: false
+        )
         addText("Theme:", size: 17, weight: .regular, top: 99, left: 20)
         addUploadThemeChoices(top: 131)
         addText("Description:", size: 17, weight: .regular, top: 190, left: 20)
