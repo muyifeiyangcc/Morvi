@@ -442,7 +442,7 @@ final class ReferenceCanvasView: UIView {
             gridIcon.heightAnchor.constraint(equalToConstant: 24),
 
             durationLabel.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
-            durationLabel.bottomAnchor.constraint(equalTo: microphoneIcon.topAnchor, constant: -8),
+            durationLabel.centerYAnchor.constraint(equalTo: gridIcon.centerYAnchor),
 
             microphoneIcon.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             microphoneIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 57),
