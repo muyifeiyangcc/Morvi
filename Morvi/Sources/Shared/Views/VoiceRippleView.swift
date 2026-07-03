@@ -7,7 +7,7 @@ final class VoiceRippleView: UIView {
     private let ringViews: [GradientRingView]
 
     init(colors: [UIColor]) {
-        ringViews = (0..<5).map { _ in
+        ringViews = (0..<3).map { _ in
             GradientRingView(colors: colors, ringWidth: 1)
         }
         super.init(frame: .zero)
