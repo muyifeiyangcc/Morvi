@@ -66,7 +66,7 @@ final class ReferenceCanvasView: UIView {
 
     private var usesDecorativeBackground: Bool {
         switch page {
-        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet, .assistantDialogue, .settings:
+        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet, .assistantDialogue, .settings, .restrictedList:
             return true
         default:
             return false
@@ -1807,17 +1807,15 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderRestrictedList() {
-        addTopTitle("Blacklist")
-        let names = ["Victoria", "Rowan", "Jasper", "Sophia"]
-        for index in names.indices {
-            let left: CGFloat = index % 2 == 0 ? 20 : 192
-            let top: CGFloat = index < 2 ? 146 : 342
-            let card = addPanel(top: top, left: left, width: 164, height: 186, alpha: 1)
-            card.layer.cornerRadius = 12
-            addPortrait(top: top + 27, left: left + 50, size: 64, tint: index.isMultiple(of: 2) ? .warm : .cool)
-            addText(names[index], size: 17, weight: .regular, top: top + 101, left: left + 52)
-            addCapsuleSymbol("↶", top: top + 140, left: left + 86, dark: false)
-        }
+        let listView = RestrictedRosterListView()
+        addSubview(listView)
+        listView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            listView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            listView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            listView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
+            listView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 
     private func renderAgreement() {
