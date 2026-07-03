@@ -125,12 +125,7 @@ final class RootTabsController: UIViewController {
         case .discover:
             break
         case .dialogueList:
-            installHitAreas([
-                HitArea(frame: CGRect(x: 20, y: 146, width: 164, height: 186)) { [weak self] in self?.show(.directDialogue) },
-                HitArea(frame: CGRect(x: 192, y: 146, width: 164, height: 186)) { [weak self] in self?.show(.directDialogue) },
-                HitArea(frame: CGRect(x: 20, y: 342, width: 164, height: 186)) { [weak self] in self?.show(.directDialogue) },
-                HitArea(frame: CGRect(x: 192, y: 342, width: 164, height: 186)) { [weak self] in self?.show(.directDialogue) }
-            ])
+            break
         case .persona:
             installHitAreas([
                 HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { [weak self] in self?.show(.profileEditor) },

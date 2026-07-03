@@ -275,12 +275,19 @@ final class ReferenceCanvasView: UIView {
     private func renderDialogueList() {
         addDecorativeBackground()
         addTopTitle("Chat")
-        let names = ["Victoria", "Rowan", "Jasper", "Sophia"]
-        for index in 0..<names.count {
-            let left: CGFloat = index % 2 == 0 ? 20 : 192
-            let top: CGFloat = index < 2 ? 146 : 342
-            addDialogueCard(name: names[index], top: top, left: left, dark: index == 1 || index == 2)
+        let statusBarHeight: CGFloat = UIScreen.main.bounds.height >= 812 ? 44 : 20
+        let listView = DialogueCardListView()
+        listView.didSelectEntry = { [weak self] in
+            self?.didRequestPage?(.directDialogue)
         }
+        addSubview(listView)
+        listView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            listView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            listView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            listView.topAnchor.constraint(equalTo: topAnchor, constant: statusBarHeight + 76 + 26),
+            listView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 
     private func renderPersona() {
@@ -3668,21 +3675,6 @@ final class ReferenceCanvasView: UIView {
         return rowCount * tagRowHeight + max(0, rowCount - 1) * tagRowSpacing
     }
 
-    private func addDialogueCard(name: String, top: CGFloat, left: CGFloat, dark: Bool) {
-        let panel = addPanel(top: top, left: left, width: 164, height: 186, alpha: 1)
-        panel.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
-        addAssetAvatar("profile_avatar", top: top + 18, left: left + 16, size: 44)
-        addText(name, size: 17, weight: .regular, top: top + 28, left: left + 64, color: dark ? .white : .black)
-        addText("Hello! Nice to meet\nyou. Your work is\nwonderful!", size: 15, weight: .regular, top: top + 72, left: left + 16, color: dark ? .white : .darkGray)
-        addAssetImage(
-            dark ? "dialogue_card_action_light" : "dialogue_card_action_dark",
-            top: top + 142,
-            left: left + 88,
-            width: 60,
-            height: 28
-        )
-    }
-
     private func addMediaGrid(top: CGFloat) {
         addMediaBlock(top: top, left: 20, width: 162, height: 200, title: "", tint: .coast, action: .play)
         addMediaBlock(top: top, left: 192, width: 164, height: 164, title: "", tint: .warm, action: .play)
@@ -3962,25 +3954,6 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addAssetImage(
-        _ imageName: String,
-        top: CGFloat,
-        left: CGFloat,
-        width: CGFloat,
-        height: CGFloat
-    ) {
-        let layoutContainer = activeLayoutContainer ?? self
-        let imageView = UIImageView(image: UIImage(named: imageName))
-        imageView.contentMode = .scaleAspectFit
-        layoutContainer.addSubview(imageView)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            imageView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            imageView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            imageView.widthAnchor.constraint(equalToConstant: width),
-            imageView.heightAnchor.constraint(equalToConstant: height)
-        ])
-    }
 
     private func addMediaAccent(in block: UIView, tint: MediaTint) {
         let wash = UIView()
