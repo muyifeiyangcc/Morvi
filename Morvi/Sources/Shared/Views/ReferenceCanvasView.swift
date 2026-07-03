@@ -1102,7 +1102,7 @@ final class ReferenceCanvasView: UIView {
         addNotchedPanel(top: 156, left: 20, width: 335, height: 122)
         addText("My balance", size: 20, weight: .regular, top: 194, left: 36, color: .white)
         addText("1000", size: 34, weight: .black, top: 224, left: 36, color: UIColor(red: 0.79, green: 1, blue: 0.18, alpha: 1))
-        addGem(assetName: "balance_gem_mark", top: 91, left: 164, width: 180, height: 182)
+        addGem(assetName: "balance_gem_mark", top: 101, left: 144, width: 180, height: 182)
         let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900"]
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99"]
         for index in amounts.indices {
