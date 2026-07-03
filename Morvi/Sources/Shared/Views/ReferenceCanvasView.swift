@@ -423,6 +423,14 @@ final class ReferenceCanvasView: UIView {
         panel.addSubview(gridIcon)
         gridIcon.translatesAutoresizingMaskIntoConstraints = false
 
+        let microphoneRing = UIView()
+        microphoneRing.backgroundColor = .clear
+        microphoneRing.layer.borderWidth = 1
+        microphoneRing.layer.borderColor = UIColor.red.cgColor
+        microphoneRing.layer.cornerRadius = 58
+        panel.addSubview(microphoneRing)
+        microphoneRing.translatesAutoresizingMaskIntoConstraints = false
+
         let microphoneIcon = UIImageView(image: UIImage(named: "voice_panel_microphone"))
         microphoneIcon.contentMode = .scaleAspectFit
         panel.addSubview(microphoneIcon)
@@ -443,6 +451,11 @@ final class ReferenceCanvasView: UIView {
 
             durationLabel.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             durationLabel.centerYAnchor.constraint(equalTo: gridIcon.centerYAnchor),
+
+            microphoneRing.centerXAnchor.constraint(equalTo: microphoneIcon.centerXAnchor),
+            microphoneRing.centerYAnchor.constraint(equalTo: microphoneIcon.centerYAnchor),
+            microphoneRing.widthAnchor.constraint(equalToConstant: 116),
+            microphoneRing.heightAnchor.constraint(equalToConstant: 116),
 
             microphoneIcon.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
             microphoneIcon.topAnchor.constraint(equalTo: panel.topAnchor, constant: 57),
