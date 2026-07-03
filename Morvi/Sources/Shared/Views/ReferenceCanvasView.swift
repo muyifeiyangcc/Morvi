@@ -1902,10 +1902,10 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = sheet
         addText("Report or block", size: 31, weight: .black, top: 28, left: 20, usesOneFont: true)
-        addOptionTile(iconName: "restrict_report_icon", top: 81, left: 48, width: 130) { [weak self] in
+        addOptionTile(iconName: "restrict_report_icon", top: 81, left: 20, width: 158) { [weak self] in
             self?.didRequestOverlayPage?(.reportPanel)
         }
-        addOptionTile(iconName: "restrict_block_icon", top: 81, left: 197, width: 130) { [weak self] in
+        addOptionTile(iconName: "restrict_block_icon", top: 81, left: 197, width: 158) { [weak self] in
             self?.didRequestOverlayPage?(.restrictConfirm)
         }
         activeLayoutContainer = nil
