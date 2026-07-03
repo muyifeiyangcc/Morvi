@@ -388,10 +388,20 @@ final class ReferenceCanvasView: UIView {
         ])
 
         let panel = UIView()
-        panel.backgroundColor = UIColor(red: 1, green: 0.76, blue: 0.02, alpha: 1)
+        panel.backgroundColor = .clear
         panel.layer.cornerRadius = 18
         panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         panel.layer.masksToBounds = true
+        let gradient = CAGradientLayer()
+        gradient.colors = [
+            UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1).cgColor,
+            UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1).cgColor
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 226)
+        gradient.cornerRadius = 18
+        panel.layer.insertSublayer(gradient, at: 0)
         overlayView.addSubview(panel)
         panel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
