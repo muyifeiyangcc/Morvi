@@ -362,7 +362,7 @@ final class ReferenceCanvasView: UIView {
         addText("Amelia", size: 21, weight: .regular, top: 290, left: 36)
         addText("77 Followers    99 Following", size: 14, weight: .regular, top: 328, left: 20, color: .darkGray)
         addAssetIcon("persona_settings_icon", top: 247, left: 214, size: 30)
-        addPersonaEditAction(top: 244, left: 250)
+        addPersonaEditAction(top: 244, left: 256)
         cellPlacements.forEach { placement in
             addMediaBlock(
                 top: placement.top,
