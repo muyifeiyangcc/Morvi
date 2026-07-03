@@ -76,8 +76,8 @@ final class RestrictedRosterCell: UICollectionViewCell {
         contentView.addSubview(actionIconView)
         actionIconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            actionIconView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            actionIconView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 140),
+            actionIconView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            actionIconView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             actionIconView.widthAnchor.constraint(equalToConstant: 60),
             actionIconView.heightAnchor.constraint(equalToConstant: 28)
         ])
