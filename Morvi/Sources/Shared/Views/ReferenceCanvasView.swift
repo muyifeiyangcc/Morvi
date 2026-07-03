@@ -475,11 +475,21 @@ final class ReferenceCanvasView: UIView {
         switch recognizer.state {
         case .began:
             rippleView?.startAnimating()
-            UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut]) {
+            UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut], animations: {
                 microphoneIcon.transform = CGAffineTransform(scaleX: 80 / 104, y: 80 / 104)
-            }
+            }, completion: { _ in
+                UIView.animate(
+                    withDuration: 0.7,
+                    delay: 0,
+                    options: [.autoreverse, .repeat, .allowUserInteraction, .curveEaseInOut],
+                    animations: {
+                        microphoneIcon.transform = CGAffineTransform(scaleX: 88 / 104, y: 88 / 104)
+                    }
+                )
+            })
         case .ended, .cancelled, .failed:
             rippleView?.stopAnimating()
+            microphoneIcon.layer.removeAllAnimations()
             UIView.animate(withDuration: 0.18, delay: 0, options: [.curveEaseOut]) {
                 microphoneIcon.transform = .identity
             }
