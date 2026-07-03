@@ -1679,7 +1679,35 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderWeeklyFeeling() {
-        addText("This week's feelings", size: 25, weight: .black, top: 68, left: 20)
+        let scrollView = UIScrollView()
+        scrollView.backgroundColor = .clear
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = true
+        addSubview(scrollView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+
+        let contentView = UIView()
+        contentView.backgroundColor = .clear
+        scrollView.addSubview(contentView)
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            contentView.heightAnchor.constraint(equalToConstant: 820)
+        ])
+
+        let previousContainer = activeLayoutContainer
+        activeLayoutContainer = contentView
+        defer { activeLayoutContainer = previousContainer }
+
+        addText("This week's feelings", size: 25, weight: .black, top: 68, left: 20, usesOneFont: true)
         let days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
         let faces = ["😃", "😟", "☹️", "😭", "😆", "😌", "😎"]
         let heights: [CGFloat] = [200, 148, 118, 82, 104, 156, 198]
@@ -1687,8 +1715,8 @@ final class ReferenceCanvasView: UIView {
             let x = CGFloat(20 + index * 49)
             addFeelingBar(day: days[index], face: faces[index], height: heights[index], left: x)
         }
-        addFeelingCard(top: 401, color: UIColor(red: 0.87, green: 1, blue: 0.61, alpha: 1))
-        addFeelingCard(top: 573, color: UIColor(red: 0.86, green: 0.98, blue: 1, alpha: 1))
+        addFeelingCard(top: 401)
+        addFeelingCard(top: 573)
     }
 
     private func renderProfileEditor() {
@@ -3125,21 +3153,22 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addFeelingBar(day: String, face: String, height: CGFloat, left: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let bg = UIView()
         bg.backgroundColor = UIColor(red: 1, green: 0.94, blue: 0.62, alpha: 1)
         bg.layer.cornerRadius = 19
-        addSubview(bg)
+        layoutContainer.addSubview(bg)
         bg.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            bg.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            bg.topAnchor.constraint(equalTo: topAnchor, constant: 121),
+            bg.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            bg.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: 121),
             bg.widthAnchor.constraint(equalToConstant: 40),
             bg.heightAnchor.constraint(equalToConstant: 220)
         ])
         let fill = UIView()
         fill.backgroundColor = UIColor(red: 1, green: 0.83, blue: 0.08, alpha: 1)
         fill.layer.cornerRadius = 19
-        addSubview(fill)
+        layoutContainer.addSubview(fill)
         fill.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             fill.leadingAnchor.constraint(equalTo: bg.leadingAnchor),
@@ -3151,15 +3180,29 @@ final class ReferenceCanvasView: UIView {
         addText(day, size: 16, weight: .regular, top: 354, left: left + 3, color: .darkGray)
     }
 
-    private func addFeelingCard(top: CGFloat, color: UIColor) {
+    private func addFeelingCard(top: CGFloat) {
         let card = addPanel(top: top, left: 20, width: 335, height: 140, alpha: 1)
-        card.backgroundColor = color
+        let gradient = CAGradientLayer()
+        gradient.colors = [
+            UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1).cgColor,
+            UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1).cgColor
+        ]
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        gradient.frame = CGRect(x: 0, y: 0, width: 335, height: 140)
+        card.layer.insertSublayer(gradient, at: 0)
+        card.backgroundColor = .clear
         card.layer.borderWidth = 0
-        addText("Happy", size: 31, weight: .regular, top: top + 28, left: 40, color: .darkGray)
+        card.layer.cornerRadius = 20
+        card.layer.masksToBounds = true
+        addText("Happy", size: 31, weight: .regular, top: top + 28, left: 40, color: .darkGray, usesOneFont: true)
         let note = addPanel(top: top + 68, left: 40, width: 198, height: 58, alpha: 1)
+        note.backgroundColor = UIColor.white.withAlphaComponent(0.72)
+        note.layer.borderWidth = 0
+        note.layer.cornerRadius = 10
         note.layer.shadowOpacity = 0.04
         addText("Two pieces of good news\ncame today!", size: 15, weight: .regular, top: top + 82, left: 56, color: .darkGray)
-        addPortrait(top: top + 26, left: 291, size: 40, tint: .warm)
+        addAssetAvatar("profile_avatar", top: top + 26, left: 291, size: 40)
         addText("23 June 2026\n5 : 30PM", size: 12, weight: .regular, top: top + 74, left: 256, color: .darkGray)
     }
 
