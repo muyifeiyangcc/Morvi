@@ -54,7 +54,7 @@ class BaseSceneController: UIViewController {
     }
 
     private func installFullScreenBackdropIfNeeded() {
-        guard page == .galleryDetail else { return }
+        guard page == .galleryDetail || page == .publicPersona else { return }
         let image = UIImage(named: "discover_feed_cover")
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFill
@@ -62,21 +62,36 @@ class BaseSceneController: UIViewController {
         surfaceView.insertSubview(imageView, belowSubview: surfaceView.contentView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
 
-        var constraints = [
-            imageView.topAnchor.constraint(equalTo: surfaceView.topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: surfaceView.bottomAnchor),
-            imageView.centerXAnchor.constraint(equalTo: surfaceView.centerXAnchor)
-        ]
-        if let image, image.size.height > 0 {
-            constraints.append(imageView.widthAnchor.constraint(
-                equalTo: imageView.heightAnchor,
-                multiplier: image.size.width / image.size.height
-            ))
-        } else {
-            constraints.append(contentsOf: [
+        var constraints: [NSLayoutConstraint]
+        if page == .publicPersona {
+            constraints = [
                 imageView.leadingAnchor.constraint(equalTo: surfaceView.leadingAnchor),
-                imageView.trailingAnchor.constraint(equalTo: surfaceView.trailingAnchor)
-            ])
+                imageView.trailingAnchor.constraint(equalTo: surfaceView.trailingAnchor),
+                imageView.topAnchor.constraint(equalTo: surfaceView.topAnchor, constant: -2)
+            ]
+            if let image, image.size.width > 0 {
+                constraints.append(imageView.heightAnchor.constraint(
+                    equalTo: imageView.widthAnchor,
+                    multiplier: image.size.height / image.size.width
+                ))
+            }
+        } else {
+            constraints = [
+                imageView.topAnchor.constraint(equalTo: surfaceView.topAnchor),
+                imageView.bottomAnchor.constraint(equalTo: surfaceView.bottomAnchor),
+                imageView.centerXAnchor.constraint(equalTo: surfaceView.centerXAnchor)
+            ]
+            if let image, image.size.height > 0 {
+                constraints.append(imageView.widthAnchor.constraint(
+                    equalTo: imageView.heightAnchor,
+                    multiplier: image.size.width / image.size.height
+                ))
+            } else {
+                constraints.append(contentsOf: [
+                    imageView.leadingAnchor.constraint(equalTo: surfaceView.leadingAnchor),
+                    imageView.trailingAnchor.constraint(equalTo: surfaceView.trailingAnchor)
+                ])
+            }
         }
         NSLayoutConstraint.activate(constraints)
     }

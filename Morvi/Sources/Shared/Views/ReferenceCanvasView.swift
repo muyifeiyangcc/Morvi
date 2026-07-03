@@ -395,7 +395,7 @@ final class ReferenceCanvasView: UIView {
         var constraints = [
             coverView.leadingAnchor.constraint(equalTo: leadingAnchor),
             coverView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            coverView.topAnchor.constraint(equalTo: topAnchor)
+            coverView.topAnchor.constraint(equalTo: topAnchor, constant: -2)
         ]
         if let coverImage, coverImage.size.width > 0 {
             constraints.append(coverView.heightAnchor.constraint(
