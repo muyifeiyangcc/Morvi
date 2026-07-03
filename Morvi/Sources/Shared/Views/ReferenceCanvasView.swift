@@ -1205,6 +1205,28 @@ final class ReferenceCanvasView: UIView {
             self?.keyboardAvoidanceBottomConstraint = bottomConstraint
             self?.keyboardAvoidanceBaseBottomConstant = -29
         }
+        let voiceButton = UIButton(type: .custom)
+        voiceButton.setImage(UIImage(named: "input_voice_icon"), for: .normal)
+        voiceButton.imageView?.contentMode = .scaleAspectFit
+        sheet.addSubview(voiceButton)
+        voiceButton.translatesAutoresizingMaskIntoConstraints = false
+
+        let photoButton = UIButton(type: .custom)
+        photoButton.setImage(UIImage(named: "input_photo_icon"), for: .normal)
+        photoButton.imageView?.contentMode = .scaleAspectFit
+        sheet.addSubview(photoButton)
+        photoButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            voiceButton.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 28),
+            voiceButton.bottomAnchor.constraint(equalTo: sheet.bottomAnchor, constant: -86),
+            voiceButton.widthAnchor.constraint(equalToConstant: 24),
+            voiceButton.heightAnchor.constraint(equalToConstant: 24),
+
+            photoButton.leadingAnchor.constraint(equalTo: voiceButton.trailingAnchor, constant: 12),
+            photoButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
+            photoButton.widthAnchor.constraint(equalToConstant: 24),
+            photoButton.heightAnchor.constraint(equalToConstant: 24)
+        ])
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
@@ -1220,7 +1242,7 @@ final class ReferenceCanvasView: UIView {
             tableView.leadingAnchor.constraint(equalTo: sheet.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: sheet.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: sheet.topAnchor, constant: 15),
-            tableView.bottomAnchor.constraint(equalTo: sheet.bottomAnchor, constant: -94)
+            tableView.bottomAnchor.constraint(equalTo: voiceButton.topAnchor, constant: -15)
         ])
         replyListDataSource.apply([
             ReplyListItem(name: "Jasper", text: "The video content is great! Keep going!The\nvideo content is great! Keep going!"),
@@ -2409,8 +2431,9 @@ final class ReferenceCanvasView: UIView {
         prompt.returnKeyType = .send
         inputSurface.addSubview(prompt)
         prompt.translatesAutoresizingMaskIntoConstraints = false
+        let usesSendIcon = trailing.isEmpty || trailing == "➤"
         let action: UIView
-        if trailing.isEmpty {
+        if usesSendIcon {
             let iconView = UIImageView(image: UIImage(named: "reply_send_icon"))
             iconView.contentMode = .scaleAspectFit
             action = iconView
@@ -2429,8 +2452,8 @@ final class ReferenceCanvasView: UIView {
             prompt.centerYAnchor.constraint(equalTo: inputSurface.centerYAnchor),
             action.trailingAnchor.constraint(equalTo: inputSurface.trailingAnchor, constant: -16),
             action.centerYAnchor.constraint(equalTo: inputSurface.centerYAnchor),
-            action.widthAnchor.constraint(equalToConstant: trailing.isEmpty ? 28 : 24),
-            action.heightAnchor.constraint(equalToConstant: trailing.isEmpty ? 28 : 28)
+            action.widthAnchor.constraint(equalToConstant: usesSendIcon ? 28 : 24),
+            action.heightAnchor.constraint(equalToConstant: 28)
         ])
         return bar
     }
