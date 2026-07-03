@@ -238,6 +238,15 @@ final class ReferenceCanvasView: UIView {
         )
         addFeatureCard(title: "Discover", top: 536, left: 20, tint: .forest, imageName: "home_discover")
         addFeatureCard(title: "Recot Bot", top: 536, left: 192, tint: .night, imageName: "home_recot_bot")
+        addHomeActionButton(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in
+            self?.didRequestOverlayPage?(.feelingEditor)
+        }
+        addHomeActionButton(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in
+            self?.didRequestPage?(.discover)
+        }
+        addHomeActionButton(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in
+            self?.didRequestPage?(.assistantDialogue)
+        }
         activeLayoutContainer = nil
     }
 
@@ -1399,7 +1408,15 @@ final class ReferenceCanvasView: UIView {
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99"]
         for index in amounts.indices {
             let top = CGFloat(188 + index * 80)
-            addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index])
+            let rowAction: (() -> Void)?
+            if index == 0 {
+                rowAction = { [weak self] in self?.didRequestOverlayPage?(.spendConfirm) }
+            } else if index == 1 {
+                rowAction = { [weak self] in self?.didRequestOverlayPage?(.creditShortage) }
+            } else {
+                rowAction = nil
+            }
+            addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index], action: rowAction)
         }
         addGem(assetName: "balance_gem_mark", top: -4, left: 144, width: 180, height: 182)
         activeLayoutContainer = nil
@@ -1453,7 +1470,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addWalletListRow(parent: UIView, top: CGFloat, amount: String, price: String) {
+    private func addWalletListRow(parent: UIView, top: CGFloat, amount: String, price: String, action: (() -> Void)? = nil) {
         let cell = UIView()
         cell.backgroundColor = .white
         cell.layer.cornerRadius = 12
@@ -1515,6 +1532,18 @@ final class ReferenceCanvasView: UIView {
             underline.bottomAnchor.constraint(equalTo: priceLabel.bottomAnchor),
             underline.heightAnchor.constraint(equalToConstant: 4)
         ])
+
+        if let action {
+            let button = ClearTapButton(frame: .zero, action: action)
+            cell.addSubview(button)
+            button.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                button.leadingAnchor.constraint(equalTo: cell.leadingAnchor),
+                button.trailingAnchor.constraint(equalTo: cell.trailingAnchor),
+                button.topAnchor.constraint(equalTo: cell.topAnchor),
+                button.bottomAnchor.constraint(equalTo: cell.bottomAnchor)
+            ])
+        }
     }
 
     private func renderUpload(filled: Bool) {
@@ -4065,6 +4094,12 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addDiscoverActionButton(frame: CGRect, action: @escaping () -> Void) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let button = ClearTapButton(frame: frame, action: action)
+        layoutContainer.addSubview(button)
+    }
+
+    private func addHomeActionButton(frame: CGRect, action: @escaping () -> Void) {
         let layoutContainer = activeLayoutContainer ?? self
         let button = ClearTapButton(frame: frame, action: action)
         layoutContainer.addSubview(button)

@@ -118,20 +118,13 @@ final class RootTabsController: UIViewController {
     private func installPageAreas() {
         switch currentPage {
         case .home:
-            installHitAreas([
-                HitArea(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in self?.showOverlay(.feelingEditor) },
-                HitArea(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in self?.show(.discover) },
-                HitArea(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in self?.show(.assistantDialogue) }
-            ])
+            break
         case .discover:
             break
         case .dialogueList:
             break
         case .persona:
-            installHitAreas([
-                HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { [weak self] in self?.showOverlay(.profileEditor) },
-                HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { [weak self] in self?.show(.settings) }
-            ])
+            break
         default:
             break
         }

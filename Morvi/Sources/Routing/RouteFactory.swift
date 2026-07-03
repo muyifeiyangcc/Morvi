@@ -10,21 +10,9 @@ enum RouteFactory {
         case .discover:
             return ReferencePageController(page: .discover)
         case .dialogueList:
-            return ReferencePageController(page: .dialogueList) { scene in
-                [
-                    HitArea(frame: CGRect(x: 20, y: 146, width: 164, height: 186)) { scene.push(.directDialogue) },
-                    HitArea(frame: CGRect(x: 192, y: 146, width: 164, height: 186)) { scene.push(.directDialogue) },
-                    HitArea(frame: CGRect(x: 20, y: 342, width: 164, height: 186)) { scene.push(.directDialogue) },
-                    HitArea(frame: CGRect(x: 192, y: 342, width: 164, height: 186)) { scene.push(.directDialogue) }
-                ]
-            }
+            return ReferencePageController(page: .dialogueList)
         case .persona:
-            return ReferencePageController(page: .persona) { scene in
-                [
-                    HitArea(frame: CGRect(x: 252, y: 245, width: 106, height: 44)) { scene.push(.profileEditor) },
-                    HitArea(frame: CGRect(x: 205, y: 245, width: 42, height: 44)) { scene.push(.settings) }
-                ]
-            }
+            return ReferencePageController(page: .persona)
         case .signIn:
             return AuthSceneController(page: .signIn) { scene in
                 [
@@ -57,12 +45,7 @@ enum RouteFactory {
         case .assistantDialogue:
             return ReferencePageController(page: .assistantDialogue)
         case .wallet:
-            return ReferencePageController(page: .wallet) { scene in
-                [
-                    HitArea(frame: CGRect(x: 30, y: 500, width: 315, height: 58)) { scene.showOverlay(.spendConfirm) },
-                    HitArea(frame: CGRect(x: 30, y: 570, width: 315, height: 58)) { scene.showOverlay(.creditShortage) }
-                ]
-            }
+            return ReferencePageController(page: .wallet)
         case .publicPersona:
             return ReferencePageController(page: .publicPersona) { scene in
                 []
