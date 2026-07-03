@@ -42,6 +42,7 @@
 		100000000000000000000133 /* AudioClipBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000046 /* AudioClipBubbleView.swift */; };
 		100000000000000000000134 /* GradientRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000047 /* GradientRingView.swift */; };
 		100000000000000000000135 /* VoiceRippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000048 /* VoiceRippleView.swift */; };
+		100000000000000000000136 /* MorviToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000049 /* MorviToastView.swift */; };
 		100000000000000000000201 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000021 /* Assets.xcassets */; };
 		100000000000000000000202 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* LaunchScreen.storyboard */; };
 		100000000000000000000203 /* SourceHanSansSC-ExtraLight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000030 /* SourceHanSansSC-ExtraLight.otf */; };
@@ -94,6 +95,7 @@
 		100000000000000000000046 /* AudioClipBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioClipBubbleView.swift; sourceTree = "<group>"; };
 		100000000000000000000047 /* GradientRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientRingView.swift; sourceTree = "<group>"; };
 		100000000000000000000048 /* VoiceRippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRippleView.swift; sourceTree = "<group>"; };
+		100000000000000000000049 /* MorviToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorviToastView.swift; sourceTree = "<group>"; };
 		100000000000000000000030 /* SourceHanSansSC-ExtraLight.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-ExtraLight.otf"; sourceTree = "<group>"; };
 		100000000000000000000031 /* SourceHanSansSC-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-Light.otf"; sourceTree = "<group>"; };
 		100000000000000000000032 /* SourceHanSansSC-Normal.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-Normal.otf"; sourceTree = "<group>"; };
@@ -252,6 +254,7 @@
 				100000000000000000000045 /* DialogueFlowListView.swift */,
 				100000000000000000000047 /* GradientRingView.swift */,
 				100000000000000000000048 /* VoiceRippleView.swift */,
+				100000000000000000000049 /* MorviToastView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -401,6 +404,7 @@
 				100000000000000000000133 /* AudioClipBubbleView.swift in Sources */,
 				100000000000000000000134 /* GradientRingView.swift in Sources */,
 				100000000000000000000135 /* VoiceRippleView.swift in Sources */,
+				100000000000000000000136 /* MorviToastView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

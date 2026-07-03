@@ -446,7 +446,7 @@ final class ReferenceCanvasView: UIView {
         microphoneIcon.addGestureRecognizer(pressGesture)
 
         let durationLabel = UILabel()
-        durationLabel.text = "0s"
+        durationLabel.text = nil
         durationLabel.textColor = UIColor(red: 0.17, green: 0.22, blue: 0.18, alpha: 1)
         durationLabel.font = AppFont.source(16, weight: .medium)
         durationLabel.textAlignment = .center
@@ -485,6 +485,7 @@ final class ReferenceCanvasView: UIView {
             UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut], animations: {
                 microphoneIcon.transform = CGAffineTransform(scaleX: 80 / 104, y: 80 / 104)
             }, completion: { _ in
+                guard self.activeVoiceIconView === microphoneIcon else { return }
                 UIView.animate(
                     withDuration: 0.7,
                     delay: 0,
@@ -495,6 +496,9 @@ final class ReferenceCanvasView: UIView {
                 )
             })
         case .ended, .cancelled, .failed:
+            if voiceTimer != nil && voiceElapsedSeconds < 1 {
+                MorviToastView.show("Audio is too short", in: self)
+            }
             stopVoiceCapture()
         default:
             break
