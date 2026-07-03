@@ -1099,9 +1099,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderWallet() {
         addTopTitle("Wallet")
-        let balance = addPanel(top: 156, left: 20, width: 335, height: 122, alpha: 1)
-        balance.backgroundColor = UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1)
-        balance.layer.borderWidth = 0
+        addNotchedPanel(top: 156, left: 20, width: 335, height: 122)
         addText("My balance", size: 20, weight: .regular, top: 194, left: 36, color: .white)
         addText("1000", size: 34, weight: .black, top: 224, left: 36, color: UIColor(red: 0.79, green: 1, blue: 0.18, alpha: 1))
         addGem(assetName: "balance_gem_mark", top: 91, left: 164, width: 180, height: 182)
@@ -1115,6 +1113,19 @@ final class ReferenceCanvasView: UIView {
             addText(prices[index], size: 20, weight: .regular, top: top + 24, left: 290, color: .darkGray)
             addLine(top: top + 50, left: 290, width: 54, color: UIColor(red: 0.76, green: 1, blue: 0.20, alpha: 1))
         }
+    }
+
+    private func addNotchedPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let panel = NotchedPanelView()
+        layoutContainer.addSubview(panel)
+        panel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            panel.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            panel.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            panel.widthAnchor.constraint(equalToConstant: width),
+            panel.heightAnchor.constraint(equalToConstant: height)
+        ])
     }
 
     private func renderUpload(filled: Bool) {
