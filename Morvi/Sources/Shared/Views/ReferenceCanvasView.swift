@@ -292,8 +292,7 @@ final class ReferenceCanvasView: UIView {
         addDialogueFlowList(top: 136, bottom: 696)
         switch mode {
         case .text:
-            addInputToolbarIcons(top: 704)
-            addInputBar(top: 740, text: "Say something", trailing: "➤")
+            addDialogueInputDock()
         case .voice:
             addVoiceClip(top: 552)
             let panel = addPanel(top: 586, left: 0, width: 375, height: 226, alpha: 1)
@@ -314,6 +313,57 @@ final class ReferenceCanvasView: UIView {
             backgroundView.topAnchor.constraint(equalTo: topAnchor),
             backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func addDialogueInputDock() {
+        let dockView = UIView()
+        dockView.backgroundColor = .clear
+        addSubview(dockView)
+        dockView.translatesAutoresizingMaskIntoConstraints = false
+        let bottomConstraint = dockView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -27)
+        NSLayoutConstraint.activate([
+            dockView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            dockView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            dockView.heightAnchor.constraint(equalToConstant: 81),
+            bottomConstraint
+        ])
+
+        let voiceButton = UIButton(type: .custom)
+        voiceButton.setImage(UIImage(named: "input_voice_icon"), for: .normal)
+        voiceButton.imageView?.contentMode = .scaleAspectFit
+        dockView.addSubview(voiceButton)
+        voiceButton.translatesAutoresizingMaskIntoConstraints = false
+
+        let photoButton = UIButton(type: .custom)
+        photoButton.setImage(UIImage(named: "input_photo_icon"), for: .normal)
+        photoButton.imageView?.contentMode = .scaleAspectFit
+        dockView.addSubview(photoButton)
+        photoButton.translatesAutoresizingMaskIntoConstraints = false
+
+        let inputBar = addInputBar(
+            bottom: 0,
+            text: "Say something",
+            trailing: "➤",
+            in: dockView
+        )
+        NSLayoutConstraint.activate([
+            voiceButton.leadingAnchor.constraint(equalTo: dockView.leadingAnchor, constant: 24),
+            voiceButton.topAnchor.constraint(equalTo: dockView.topAnchor),
+            voiceButton.widthAnchor.constraint(equalToConstant: 24),
+            voiceButton.heightAnchor.constraint(equalToConstant: 24),
+
+            photoButton.leadingAnchor.constraint(equalTo: voiceButton.trailingAnchor, constant: 12),
+            photoButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
+            photoButton.widthAnchor.constraint(equalToConstant: 24),
+            photoButton.heightAnchor.constraint(equalToConstant: 24),
+
+            inputBar.topAnchor.constraint(equalTo: dockView.topAnchor, constant: 36)
+        ])
+        keyboardAvoidanceInputView = dockView
+        keyboardAvoidanceBottomConstraint = bottomConstraint
+        keyboardAvoidanceBaseBottomConstant = -27
+        installKeyboardAvoidance()
+        installBlankAreaKeyboardDismissal()
     }
 
     private func addDialogueFlowList(top: CGFloat, bottom: CGFloat) {
