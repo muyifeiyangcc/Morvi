@@ -591,7 +591,8 @@ final class ReferenceCanvasView: UIView {
         top: CGFloat,
         bottom: CGFloat? = nil,
         bottomAnchor: NSLayoutYAxisAnchor? = nil,
-        bottomSpacing: CGFloat = 0
+        bottomSpacing: CGFloat = 0,
+        entries: [DialogueFlowEntry]? = nil
     ) {
         var calendar = Calendar.current
         calendar.locale = Locale(identifier: "en_US_POSIX")
@@ -603,7 +604,7 @@ final class ReferenceCanvasView: UIView {
         let adjustedDate = eventDate < referenceDate ? eventDate : referenceDate.addingTimeInterval(-2 * 60 * 60)
 
         let listView = DialogueFlowListView()
-        listView.configure(entries: [
+        let defaultEntries: [DialogueFlowEntry] = [
             .moment(DialogueMomentFormatter.title(for: adjustedDate, referenceDate: referenceDate, calendar: calendar)),
             .phrase(text: "Nice to meet you, nice\nto meet you!", side: .local, showsAvatar: true),
             .audioClip(durationText: "5s", side: .remote, showsAvatar: true),
@@ -611,7 +612,8 @@ final class ReferenceCanvasView: UIView {
             .phrase(text: "Nice to meet you.", side: .remote, showsAvatar: true),
             .audioClip(durationText: "5s", side: .local, showsAvatar: true),
             .portraitAsset(name: "profile_avatar", side: .remote, showsAvatar: true)
-        ])
+        ]
+        listView.configure(entries: entries ?? defaultEntries)
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
         var constraints = [
@@ -632,6 +634,18 @@ final class ReferenceCanvasView: UIView {
         if bottomAnchor != nil {
             keyboardSyncedDialogueFlowListView = listView
         }
+    }
+
+    private func assistantDialogueEntries() -> [DialogueFlowEntry] {
+        [
+            .wideAsset(name: "assistant_intro_card_background"),
+            .roundedPhrase(text: "How to develop self-discipline?", side: .local, showsAvatar: true),
+            .roundedPhrase(
+                text: "Cultivating self-discipline is a\nprocess that requires patience,\nstrategy and continuous practice. It\nis not achieved overnight but\nthrough gradually adjusting habits,\nstrengthening willpower and\nestablishing a support system.",
+                side: .remote,
+                showsAvatar: true
+            )
+        ]
     }
 
     private func addInputToolbarIcons(top: CGFloat) {
@@ -701,15 +715,16 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderAssistantDialogue() {
+        addDecorativeBackground()
         addTopTitle("Recot Bot")
-        addMediaBlock(top: 136, left: 20, width: 335, height: 265, title: "AI", tint: .night)
-        let intro = addPanel(top: 296, left: 36, width: 303, height: 86, alpha: 1)
-        intro.backgroundColor = UIColor(red: 0.88, green: 1, blue: 0.74, alpha: 1)
-        intro.layer.borderWidth = 0
-        addText("Hello!\nHow can I help you?", size: 20, weight: .regular, top: 318, left: 52)
-        addBubble("How to develop self-discipline?", top: 430, left: 88, outgoing: true, width: 267, height: 56)
-        addBubble("Cultivating self-discipline is a\nprocess that requires patience,\nstrategy and continuous practice. It\nis not achieved overnight but\nthrough gradually adjusting habits,\nstrengthening willpower and\nestablishing a support system.", top: 506, left: 20, outgoing: false)
-        addInputBar(top: 740, text: "Say something", trailing: "➤")
+        let dockView = addDialogueInputDock()
+        addDialogueFlowList(
+            top: 136,
+            bottomAnchor: dockView.topAnchor,
+            bottomSpacing: 8,
+            entries: assistantDialogueEntries()
+        )
+        bringSubviewToFront(dockView)
     }
 
     private func renderGalleryDetail() {

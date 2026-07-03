@@ -25,8 +25,12 @@ final class DialogueFlowCell: UITableViewCell {
         switch entry {
         case .moment(let title):
             configureMoment(title)
+        case .wideAsset(let name):
+            configureWideAsset(name: name)
         case .phrase(let text, let side, let showsAvatar):
             configurePhrase(text: text, side: side, showsAvatar: showsAvatar)
+        case .roundedPhrase(let text, let side, let showsAvatar):
+            configureRoundedPhrase(text: text, side: side, showsAvatar: showsAvatar)
         case .audioClip(let durationText, let side, let showsAvatar):
             configureAudioClip(durationText: durationText, side: side, showsAvatar: showsAvatar)
         case .portraitAsset(let name, let side, let showsAvatar):
@@ -47,6 +51,25 @@ final class DialogueFlowCell: UITableViewCell {
             label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             label.heightAnchor.constraint(equalToConstant: 18),
             label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -22)
+        ])
+    }
+
+    private func configureWideAsset(name: String) {
+        let image = UIImage(named: name)
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 18
+        contentView.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+
+        let ratio = (image?.size.height ?? 259) / max(image?.size.width ?? 335, 1)
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, multiplier: ratio),
+            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18)
         ])
     }
 
@@ -79,6 +102,51 @@ final class DialogueFlowCell: UITableViewCell {
         }
 
         NSLayoutConstraint.activate(constraints)
+    }
+
+    private func configureRoundedPhrase(text: String, side: DialogueFlowSide, showsAvatar: Bool) {
+        let bubble = UIView()
+        bubble.backgroundColor = side == .local
+            ? UIColor(red: 0.92, green: 1, blue: 0.78, alpha: 1)
+            : UIColor(red: 0.96, green: 0.99, blue: 1, alpha: 1)
+        bubble.layer.cornerRadius = 15
+        bubble.layer.borderWidth = 1
+        bubble.layer.borderColor = (side == .local
+            ? UIColor(red: 0.56, green: 0.78, blue: 0.22, alpha: 1)
+            : UIColor.systemBlue.withAlphaComponent(0.4)).cgColor
+        bubble.layer.maskedCorners = side == .local
+            ? [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner]
+            : [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+        bubble.layer.masksToBounds = true
+        contentView.addSubview(bubble)
+        bubble.translatesAutoresizingMaskIntoConstraints = false
+
+        let label = UILabel()
+        label.text = text
+        label.numberOfLines = 0
+        label.textColor = UIColor(red: 0.17, green: 0.22, blue: 0.18, alpha: 1)
+        label.font = AppFont.source(16)
+        bubble.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        var constraints = [
+            bubble.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            bubble.widthAnchor.constraint(lessThanOrEqualToConstant: 267),
+            bubble.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18),
+            label.leadingAnchor.constraint(equalTo: bubble.leadingAnchor, constant: 14),
+            label.trailingAnchor.constraint(equalTo: bubble.trailingAnchor, constant: -14),
+            label.topAnchor.constraint(equalTo: bubble.topAnchor, constant: 10),
+            label.bottomAnchor.constraint(equalTo: bubble.bottomAnchor, constant: -10)
+        ]
+
+        if side == .local {
+            constraints.append(bubble.trailingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 288))
+        } else {
+            constraints.append(bubble.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 86))
+        }
+
+        NSLayoutConstraint.activate(constraints)
+        addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
     }
 
     private func configureAudioClip(durationText: String, side: DialogueFlowSide, showsAvatar: Bool) {
