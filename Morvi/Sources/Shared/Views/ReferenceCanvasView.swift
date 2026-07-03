@@ -447,7 +447,9 @@ final class ReferenceCanvasView: UIView {
                 title: "",
                 tint: placement.tint,
                 action: .play,
-                imageName: "discover_feed_cover"
+                imageName: "discover_feed_cover",
+                playIconName: "persona_media_play_icon",
+                playIconSize: 28
             )
         }
         activeLayoutContainer = nil
@@ -2640,7 +2642,7 @@ final class ReferenceCanvasView: UIView {
         fontWeight: UIFont.Weight = .regular,
         parent: UIView? = nil
     ) -> UIButton {
-        let layoutContainer = parent ?? self
+        let layoutContainer = parent ?? activeLayoutContainer ?? self
         let button = UIButton(type: .custom)
         button.setTitle(text, for: .normal)
         button.titleLabel?.font = usesOneFont ? AppFont.fredoka(fontSize) : AppFont.source(fontSize, weight: fontWeight)
@@ -2781,7 +2783,9 @@ final class ReferenceCanvasView: UIView {
         cornerRadius: CGFloat = 14,
         titleSize: CGFloat = 24,
         titleTop: CGFloat = 18,
-        titleUsesOneFont: Bool = false
+        titleUsesOneFont: Bool = false,
+        playIconName: String = "video_play_icon",
+        playIconSize: CGFloat = 40
     ) {
         let layoutContainer = activeLayoutContainer ?? self
         let shadowHost = UIView()
@@ -2854,22 +2858,22 @@ final class ReferenceCanvasView: UIView {
         case .arrow:
             addCardArrowIcon(in: block, right: 14, bottom: 14)
         case .play:
-            addVideoPlayIcon(in: block)
+            addVideoPlayIcon(in: block, assetName: playIconName, size: playIconSize)
         case .none:
             break
         }
     }
 
-    private func addVideoPlayIcon(in view: UIView) {
-        let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
+    private func addVideoPlayIcon(in view: UIView, assetName: String = "video_play_icon", size: CGFloat = 40) {
+        let iconView = UIImageView(image: UIImage(named: assetName))
         iconView.contentMode = .scaleAspectFit
         view.addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             iconView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             iconView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            iconView.widthAnchor.constraint(equalToConstant: 40),
-            iconView.heightAnchor.constraint(equalToConstant: 40)
+            iconView.widthAnchor.constraint(equalToConstant: size),
+            iconView.heightAnchor.constraint(equalToConstant: size)
         ])
     }
 
