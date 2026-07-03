@@ -379,6 +379,7 @@ final class ReferenceCanvasView: UIView {
         let statsTop = nameTop + nameHeight + 15
         let buttonTop = statsTop + 80 + 22
         let cellTop = buttonTop + 40 + 24
+        let cellGap: CGFloat = 15
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: nameTop, centered: true)
         addStatsPanel(top: statsTop)
@@ -386,7 +387,7 @@ final class ReferenceCanvasView: UIView {
         addPillButton("Follow", top: buttonTop, left: 195, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         addMediaBlock(top: cellTop, left: 20, width: 160, height: 174, title: "", tint: .warm, action: .play, imageName: "discover_feed_cover")
         addMediaBlock(top: cellTop, left: 195, width: 160, height: 150, title: "", tint: .coast, action: .play, imageName: "discover_feed_cover")
-        addMediaBlock(top: cellTop + 176, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
+        addMediaBlock(top: cellTop + 150 + cellGap, left: 195, width: 160, height: 150, title: "", tint: .night, action: .play, imageName: "discover_feed_cover")
     }
 
     private func addPersonaBackdrop() {
