@@ -273,6 +273,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderDialogueList() {
+        addDecorativeBackground()
         addTopTitle("Chat")
         let names = ["Victoria", "Rowan", "Jasper", "Sophia"]
         for index in 0..<names.count {
@@ -3670,10 +3671,16 @@ final class ReferenceCanvasView: UIView {
     private func addDialogueCard(name: String, top: CGFloat, left: CGFloat, dark: Bool) {
         let panel = addPanel(top: top, left: left, width: 164, height: 186, alpha: 1)
         panel.backgroundColor = dark ? UIColor(red: 0.04, green: 0.05, blue: 0.04, alpha: 1) : .white
-        addPortrait(top: top + 18, left: left + 16, size: 44, tint: dark ? .cool : .warm)
+        addAssetAvatar("profile_avatar", top: top + 18, left: left + 16, size: 44)
         addText(name, size: 17, weight: .regular, top: top + 28, left: left + 64, color: dark ? .white : .black)
         addText("Hello! Nice to meet\nyou. Your work is\nwonderful!", size: 15, weight: .regular, top: top + 72, left: left + 16, color: dark ? .white : .darkGray)
-        addCapsuleSymbol("☵", top: top + 140, left: left + 106, dark: !dark)
+        addAssetImage(
+            dark ? "dialogue_card_action_dark" : "dialogue_card_action_light",
+            top: top + 140,
+            left: left + 104,
+            width: 60,
+            height: 28
+        )
     }
 
     private func addMediaGrid(top: CGFloat) {
@@ -3952,6 +3959,26 @@ final class ReferenceCanvasView: UIView {
             imageView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             imageView.widthAnchor.constraint(equalToConstant: size),
             imageView.heightAnchor.constraint(equalToConstant: size)
+        ])
+    }
+
+    private func addAssetImage(
+        _ imageName: String,
+        top: CGFloat,
+        left: CGFloat,
+        width: CGFloat,
+        height: CGFloat
+    ) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let imageView = UIImageView(image: UIImage(named: imageName))
+        imageView.contentMode = .scaleAspectFit
+        layoutContainer.addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            imageView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            imageView.widthAnchor.constraint(equalToConstant: width),
+            imageView.heightAnchor.constraint(equalToConstant: height)
         ])
     }
 
