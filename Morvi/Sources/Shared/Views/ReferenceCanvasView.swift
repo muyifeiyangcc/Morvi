@@ -1104,13 +1104,13 @@ final class ReferenceCanvasView: UIView {
         balance.layer.borderWidth = 0
         addText("My balance", size: 20, weight: .regular, top: 194, left: 36, color: .white)
         addText("1000", size: 34, weight: .black, top: 224, left: 36, color: UIColor(red: 0.79, green: 1, blue: 0.18, alpha: 1))
-        addGem(top: 118, left: 190, size: 128)
+        addGem(assetName: "balance_gem_mark", top: 91, left: 164, width: 180, height: 182)
         let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900"]
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99"]
         for index in amounts.indices {
             let top = CGFloat(288 + index * 80)
             _ = addPanel(top: top, left: 15, width: 345, height: 68, alpha: 1)
-            addGem(top: top + 20, left: 34, size: 32)
+            addGem(assetName: "wallet_item_gem_mark", top: top + 16, left: 30, width: 40, height: 36)
             addText(amounts[index], size: 24, weight: .regular, top: top + 22, left: 80)
             addText(prices[index], size: 20, weight: .regular, top: top + 24, left: 290, color: .darkGray)
             addLine(top: top + 50, left: 290, width: 54, color: UIColor(red: 0.76, green: 1, blue: 0.20, alpha: 1))
@@ -2930,12 +2930,9 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addGem(top: CGFloat, left: CGFloat, size: CGFloat) {
-        let gem = UILabel()
-        gem.text = "◆"
-        gem.textAlignment = .center
-        gem.font = AppFont.source(size, weight: .black)
-        gem.textColor = UIColor(red: 0.04, green: 0.82, blue: 0.12, alpha: 1)
+    private func addGem(assetName: String, top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat) {
+        let gem = UIImageView(image: UIImage(named: assetName))
+        gem.contentMode = .scaleAspectFit
         gem.layer.shadowColor = UIColor.green.cgColor
         gem.layer.shadowOpacity = 0.28
         gem.layer.shadowRadius = 8
@@ -2945,8 +2942,8 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             gem.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
             gem.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            gem.widthAnchor.constraint(equalToConstant: size),
-            gem.heightAnchor.constraint(equalToConstant: size)
+            gem.widthAnchor.constraint(equalToConstant: width),
+            gem.heightAnchor.constraint(equalToConstant: height)
         ])
     }
 
