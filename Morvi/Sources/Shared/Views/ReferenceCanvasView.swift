@@ -289,11 +289,12 @@ final class ReferenceCanvasView: UIView {
     private func renderConversation(title: String, mode: ConversationMode) {
         addPersonaRootGradient()
         addTopTitle(title)
-        addBubble("Nice to meet you, nice\nto meet you!", top: 198, left: 82, outgoing: true)
-        addProfileAvatar(top: 196, left: 306, size: 44, showsBorder: false, showsShadow: false)
-        addProfileAvatar(top: 298, left: 26, size: 44, showsBorder: false, showsShadow: false)
-        addBubble("Nice to meet you.", top: 302, left: 86, outgoing: false)
-        addPortraitMediaBlock(top: 358, edge: 86, outgoing: false, width: 160)
+        addDialogueMomentTitle(top: 172)
+        addBubble("Nice to meet you, nice\nto meet you!", top: 222, left: 82, outgoing: true)
+        addProfileAvatar(top: 220, left: 306, size: 44, showsBorder: false, showsShadow: false)
+        addProfileAvatar(top: 322, left: 26, size: 44, showsBorder: false, showsShadow: false)
+        addBubble("Nice to meet you.", top: 326, left: 86, outgoing: false)
+        addPortraitMediaBlock(top: 382, edge: 86, outgoing: false, width: 160)
         switch mode {
         case .text:
             addInputToolbarIcons(top: 704)
@@ -306,6 +307,30 @@ final class ReferenceCanvasView: UIView {
             addText("▦", size: 24, weight: .regular, top: 606, left: 20)
             addCircle(text: "♬", top: 650, left: 138, size: 100, color: UIColor(red: 0.82, green: 1, blue: 0.78, alpha: 1))
         }
+    }
+
+    private func addDialogueMomentTitle(top: CGFloat) {
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: "en_US_POSIX")
+        let referenceDate = Date()
+        var components = calendar.dateComponents([.year, .month, .day], from: referenceDate)
+        components.hour = 9
+        components.minute = 41
+        let eventDate = calendar.date(from: components) ?? referenceDate.addingTimeInterval(-2 * 60 * 60)
+        let adjustedDate = eventDate < referenceDate ? eventDate : referenceDate.addingTimeInterval(-2 * 60 * 60)
+
+        let label = UILabel()
+        label.text = DialogueMomentFormatter.title(for: adjustedDate, referenceDate: referenceDate, calendar: calendar)
+        label.textColor = UIColor.black.withAlphaComponent(0.36)
+        label.font = AppFont.source(12)
+        label.textAlignment = .center
+        addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: centerXAnchor),
+            label.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            label.heightAnchor.constraint(equalToConstant: 18)
+        ])
     }
 
     private func addInputToolbarIcons(top: CGFloat) {
