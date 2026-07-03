@@ -506,8 +506,8 @@ final class ReferenceCanvasView: UIView {
         activeVoiceRippleView = rippleView
         activeVoiceIconView = iconView
         voiceElapsedSeconds = 0
-        voiceDurationLabel?.text = "0s"
-        voiceDurationLabel?.isHidden = false
+        voiceDurationLabel?.text = nil
+        voiceDurationLabel?.isHidden = true
         rippleView?.startAnimating()
         voiceTimer = Timer.scheduledTimer(
             timeInterval: 1,
@@ -522,6 +522,7 @@ final class ReferenceCanvasView: UIView {
     @objc private func handleVoiceTimerTick() {
         voiceElapsedSeconds += 1
         voiceDurationLabel?.text = "\(voiceElapsedSeconds)s"
+        voiceDurationLabel?.isHidden = false
         if voiceElapsedSeconds >= 60 {
             stopVoiceCapture()
         }
