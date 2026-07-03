@@ -1727,8 +1727,8 @@ final class ReferenceCanvasView: UIView {
             let x = CGFloat(20 + index * 49)
             addFeelingBar(day: days[index], iconName: icons[index], height: heights[index], top: barTop, left: x)
         }
-        addFeelingCard(top: 401)
-        addFeelingCard(top: 573)
+        let firstCardHeight = addFeelingCard(top: 401, style: .lime)
+        _ = addFeelingCard(top: 401 + firstCardHeight + 24, style: .aqua)
     }
 
     private func renderProfileEditor() {
@@ -3192,30 +3192,72 @@ final class ReferenceCanvasView: UIView {
         addText(day, size: 16, weight: .regular, top: top + 233, left: left + 3, color: .darkGray)
     }
 
-    private func addFeelingCard(top: CGFloat) {
-        let card = addPanel(top: top, left: 20, width: 335, height: 140, alpha: 1)
+    private enum WeeklyFeelingCardStyle {
+        case lime
+        case aqua
+
+        var tintColor: UIColor {
+            switch self {
+            case .lime:
+                return UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1)
+            case .aqua:
+                return UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1)
+            }
+        }
+    }
+
+    private func addFeelingCard(top: CGFloat, style: WeeklyFeelingCardStyle) -> CGFloat {
+        let noteText = "Two pieces of good news\ncame today!"
+        let noteFont = AppFont.source(15, weight: .regular)
+        let noteSize = noteText.boundingRect(
+            with: CGSize(width: 240, height: CGFloat.greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: noteFont],
+            context: nil
+        ).integral.size
+        let noteWidth = min(295, noteSize.width + 32)
+        let noteHeight = noteSize.height + 24
+        let titleTop: CGFloat = 16
+        let titleHeight = ceil(AppFont.source(30, weight: .medium).lineHeight)
+        let noteTop = titleTop + titleHeight + 8
+        let cardHeight = max(noteTop + noteHeight + 16, 74 + ceil(AppFont.source(12, weight: .regular).lineHeight * 2) + 16)
+        let card = addPanel(top: top, left: 20, width: 335, height: cardHeight, alpha: 1)
         let gradient = CAGradientLayer()
+        let tintColor = style.tintColor
         gradient.colors = [
-            UIColor(red: 235 / 255, green: 254 / 255, blue: 175 / 255, alpha: 1).cgColor,
-            UIColor(red: 224 / 255, green: 251 / 255, blue: 252 / 255, alpha: 1).cgColor
+            tintColor.cgColor,
+            tintColor.withAlphaComponent(0).cgColor
         ]
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
-        gradient.frame = CGRect(x: 0, y: 0, width: 335, height: 140)
+        gradient.frame = CGRect(x: 0, y: 0, width: 335, height: cardHeight)
         card.layer.insertSublayer(gradient, at: 0)
-        card.backgroundColor = .clear
+        card.backgroundColor = UIColor.clear
         card.layer.borderWidth = 0
         card.layer.cornerRadius = 20
         card.layer.masksToBounds = true
-        addText("Happy", size: 30, weight: .medium, top: top + 16, left: 40, color: .darkGray)
-        let note = addPanel(top: top + 68, left: 40, width: 198, height: 58, alpha: 1)
+        addText("Happy", size: 30, weight: .medium, top: top + titleTop, left: 40, color: .darkGray)
+        let note = addPanel(top: top + noteTop, left: 40, width: noteWidth, height: noteHeight, alpha: 1)
         note.backgroundColor = UIColor.white.withAlphaComponent(0.72)
         note.layer.borderWidth = 0
-        note.layer.cornerRadius = 10
+        note.layer.cornerRadius = 12
         note.layer.shadowOpacity = 0.04
-        addText("Two pieces of good news\ncame today!", size: 15, weight: .regular, top: top + 82, left: 56, color: .darkGray)
+        let noteLabel = UILabel()
+        noteLabel.text = noteText
+        noteLabel.numberOfLines = 0
+        noteLabel.textColor = .darkGray
+        noteLabel.font = noteFont
+        note.addSubview(noteLabel)
+        noteLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            noteLabel.leadingAnchor.constraint(equalTo: note.leadingAnchor, constant: 16),
+            noteLabel.trailingAnchor.constraint(equalTo: note.trailingAnchor, constant: -16),
+            noteLabel.topAnchor.constraint(equalTo: note.topAnchor, constant: 12),
+            noteLabel.bottomAnchor.constraint(equalTo: note.bottomAnchor, constant: -12)
+        ])
         addAssetAvatar("profile_avatar", top: top + 26, left: 291, size: 40)
         addText("23 June 2026\n5 : 30PM", size: 12, weight: .regular, top: top + 74, left: 256, color: .darkGray)
+        return cardHeight
     }
 
 
