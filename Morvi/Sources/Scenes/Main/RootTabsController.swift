@@ -205,7 +205,7 @@ final class RootTabsController: UIViewController {
     }
 
     private func requiresSignedInForDockItem(_ item: FloatingDockView.Item) -> Bool {
-        item == .discover || item == .dialogue || item == .persona
+        item == .discover || item == .dialogue
     }
 
     private func switchTo(_ page: ScenePage) {
