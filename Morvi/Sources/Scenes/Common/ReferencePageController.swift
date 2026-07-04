@@ -45,7 +45,7 @@ class ReferencePageController: BaseSceneController {
 
     override func makeDecorativeLayer() -> UIView? {
         switch page {
-        case .discover, .wallet, .assistantDialogue, .settings, .restrictedList:
+        case .discover, .wallet, .assistantDialogue, .settings, .restrictedList, .outboundConnectionRoster, .inboundConnectionRoster:
             return DecorativeGradientView(palette: .topLeftGlow)
         default:
             return nil

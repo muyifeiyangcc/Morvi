@@ -1,4 +1,5 @@
 import UIKit
+import ImageIO
 
 final class RestrictedRosterCell: UICollectionViewCell {
     static let reuseIdentifier = "RestrictedRosterCell"
@@ -25,9 +26,9 @@ final class RestrictedRosterCell: UICollectionViewCell {
         nameLabel.text = nil
     }
 
-    func configure(name: String, avatarAsset: String) {
+    func configure(name: String, avatarAsset: String?) {
         nameLabel.text = name
-        avatarView.image = UIImage(named: avatarAsset)
+        avatarView.image = resolveAvatarImage(avatarAsset) ?? UIImage(named: "default_avatar")
     }
 
     private func configureCell() {
@@ -81,5 +82,34 @@ final class RestrictedRosterCell: UICollectionViewCell {
             actionIconView.widthAnchor.constraint(equalToConstant: 60),
             actionIconView.heightAnchor.constraint(equalToConstant: 28)
         ])
+    }
+
+    private func resolveAvatarImage(_ asset: String?) -> UIImage? {
+        guard let asset, asset.isEmpty == false else { return nil }
+        guard asset.hasPrefix("local-avatar/") else {
+            return UIImage(named: asset)
+        }
+        let fileName = String(asset.dropFirst("local-avatar/".count))
+        guard fileName.isEmpty == false,
+              let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+              ) else {
+            return nil
+        }
+        let fileURL = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("Avatars", isDirectory: true)
+            .appendingPathComponent(fileName)
+        guard let imageSource = CGImageSourceCreateWithURL(fileURL as CFURL, nil) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 480
+        ]
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) else { return nil }
+        return UIImage(cgImage: cgImage)
     }
 }

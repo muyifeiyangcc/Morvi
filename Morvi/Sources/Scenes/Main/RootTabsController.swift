@@ -9,6 +9,7 @@ final class RootTabsController: UIViewController {
     private let dockView = FloatingDockView()
     private var surfaceView = DesignSurfaceView()
     private weak var activeProfileEditOverlayView: ReferenceCanvasView?
+    private var isOpeningSecondaryPage = false
 
     init(initialPage: ScenePage = .home) {
         self.currentPage = initialPage
@@ -250,6 +251,7 @@ final class RootTabsController: UIViewController {
     }
 
     private func show(_ page: ScenePage, restrictionSubjectKey: String? = nil) {
+        guard isOpeningSecondaryPage == false else { return }
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
             showOverlay(.accessGate)
@@ -275,7 +277,12 @@ final class RootTabsController: UIViewController {
         if let restrictionSubjectKey {
             RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
+        guard navigationController?.topViewController === self else { return }
+        isOpeningSecondaryPage = true
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { [weak self] in
+            self?.isOpeningSecondaryPage = false
+        }
     }
 
     private func showOverlay(_ page: ScenePage, restrictionSubjectKey: String? = nil) {

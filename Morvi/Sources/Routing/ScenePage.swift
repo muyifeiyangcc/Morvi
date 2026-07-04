@@ -34,4 +34,6 @@ enum ScenePage: String, CaseIterable {
     case wallet = "钱包"
     case home = "首页"
     case restrictedList = "黑名单"
+    case outboundConnectionRoster = "我关注的人"
+    case inboundConnectionRoster = "关注我的人"
 }

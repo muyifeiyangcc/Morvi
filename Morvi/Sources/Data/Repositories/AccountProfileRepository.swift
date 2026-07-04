@@ -6,6 +6,12 @@ struct SafetyProfileRecord {
     let avatarAsset: String?
 }
 
+struct RelationRosterRecord {
+    let stableKey: String
+    let displayName: String
+    let avatarAsset: String?
+}
+
 protocol AccountProfileRepository {
     func save(_ record: AccountProfileRecord) throws
     func register(_ record: AccountProfileRecord, secretText: String) throws
@@ -23,6 +29,9 @@ protocol AccountProfileRepository {
     func removeConnection(originKey: String, subjectKey: String) throws
     func hasConnection(originKey: String, subjectKey: String) throws -> Bool
     func hasMutualConnection(firstKey: String, secondKey: String) throws -> Bool
+    func restrictedRoster(ownerKey: String) throws -> [RelationRosterRecord]
+    func outboundConnectionRoster(originKey: String) throws -> [RelationRosterRecord]
+    func inboundConnectionRoster(targetKey: String) throws -> [RelationRosterRecord]
     func remove(stableKey: String) throws -> String?
     func count() throws -> Int
 }
@@ -299,6 +308,64 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
         let firstToSecond = try hasConnection(originKey: firstKey, subjectKey: secondKey)
         let secondToFirst = try hasConnection(originKey: secondKey, subjectKey: firstKey)
         return firstToSecond && secondToFirst
+    }
+
+    func restrictedRoster(ownerKey: String) throws -> [RelationRosterRecord] {
+        try rosterRecords(
+            """
+            SELECT p.stable_key, p.display_name, p.avatar_asset
+            FROM restricted_relation rr
+            JOIN account_profile p ON p.stable_key = rr.target_account_key
+            WHERE rr.owner_account_key = ?
+            ORDER BY rr.created_at DESC, rr.id DESC;
+            """,
+            bindings: [.text(ownerKey)]
+        )
+    }
+
+    func outboundConnectionRoster(originKey: String) throws -> [RelationRosterRecord] {
+        try rosterRecords(
+            """
+            SELECT p.stable_key, p.display_name, p.avatar_asset
+            FROM account_relation ar
+            JOIN account_profile p ON p.stable_key = ar.target_account_key
+            WHERE ar.origin_account_key = ?
+            ORDER BY ar.created_at DESC, ar.id DESC;
+            """,
+            bindings: [.text(originKey)]
+        )
+    }
+
+    func inboundConnectionRoster(targetKey: String) throws -> [RelationRosterRecord] {
+        try rosterRecords(
+            """
+            SELECT p.stable_key, p.display_name, p.avatar_asset
+            FROM account_relation ar
+            JOIN account_profile p ON p.stable_key = ar.origin_account_key
+            WHERE ar.target_account_key = ?
+            ORDER BY ar.created_at DESC, ar.id DESC;
+            """,
+            bindings: [.text(targetKey)]
+        )
+    }
+
+    private func rosterRecords(
+        _ query: String,
+        bindings: [LocalStoreValue]
+    ) throws -> [RelationRosterRecord] {
+        let rows = try store.readRows(query, bindings: bindings)
+        return rows.compactMap { row in
+            guard row.count >= 3,
+                  let key = row[0].textValue,
+                  let name = row[1].textValue else {
+                return nil
+            }
+            return RelationRosterRecord(
+                stableKey: key,
+                displayName: name,
+                avatarAsset: row[2].textValue
+            )
+        }
     }
 
     func remove(stableKey: String) throws -> String? {

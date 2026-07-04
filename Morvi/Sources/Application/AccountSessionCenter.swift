@@ -106,6 +106,27 @@ final class AccountSessionCenter {
         )) ?? false
     }
 
+    func restrictedRoster() -> [RelationRosterRecord] {
+        guard let activeKey = activeAccountKey else {
+            return []
+        }
+        return (try? profileRepository.restrictedRoster(ownerKey: activeKey)) ?? []
+    }
+
+    func outboundConnectionRoster() -> [RelationRosterRecord] {
+        guard let activeKey = activeAccountKey else {
+            return []
+        }
+        return (try? profileRepository.outboundConnectionRoster(originKey: activeKey)) ?? []
+    }
+
+    func inboundConnectionRoster() -> [RelationRosterRecord] {
+        guard let activeKey = activeAccountKey else {
+            return []
+        }
+        return (try? profileRepository.inboundConnectionRoster(targetKey: activeKey)) ?? []
+    }
+
     func toggleConnectionToAccount(accountKey: String) throws -> Bool? {
         guard let activeKey = activeAccountKey,
               activeKey != accountKey else {
@@ -322,6 +343,8 @@ final class AccountSessionCenter {
              .uploadEmpty,
              .uploadFilled,
              .profileEditor,
+             .outboundConnectionRoster,
+             .inboundConnectionRoster,
              .restrictPanel,
              .restrictConfirm,
              .reportPanel,

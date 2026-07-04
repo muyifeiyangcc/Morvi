@@ -1,28 +1,26 @@
 import UIKit
 
 final class RestrictedRosterListView: UIView {
-    private struct Entry {
+    struct Entry {
+        let accountKey: String
         let name: String
-        let avatarAsset: String
+        let avatarAsset: String?
     }
 
-    private let entries: [Entry] = [
-        Entry(name: "Victoria", avatarAsset: "profile_avatar"),
-        Entry(name: "Rowan", avatarAsset: "profile_avatar"),
-        Entry(name: "Jasper", avatarAsset: "profile_avatar"),
-        Entry(name: "Sophia", avatarAsset: "profile_avatar")
-    ]
+    private let entries: [Entry]
+    var didSelectEntry: ((Entry) -> Void)?
 
     private let collectionView: UICollectionView
 
-    override init(frame: CGRect) {
+    init(entries: [Entry]) {
+        self.entries = entries
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 8
         layout.minimumLineSpacing = 12
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 28, right: 20)
         collectionView = CancelFriendlyCollectionView(frame: .zero, collectionViewLayout: layout)
-        super.init(frame: frame)
+        super.init(frame: .zero)
         configureCollectionView()
     }
 
@@ -65,6 +63,10 @@ extension RestrictedRosterListView: UICollectionViewDataSource, UICollectionView
         let entry = entries[indexPath.item]
         cell.configure(name: entry.name, avatarAsset: entry.avatarAsset)
         return cell
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        didSelectEntry?(entries[indexPath.item])
     }
 
     func collectionView(

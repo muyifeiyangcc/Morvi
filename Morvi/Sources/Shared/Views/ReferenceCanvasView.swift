@@ -158,7 +158,7 @@ final class ReferenceCanvasView: UIView {
 
     private var usesDecorativeBackground: Bool {
         switch page {
-        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet, .assistantDialogue, .settings, .restrictedList:
+        case .entry, .signIn, .signUp, .resetAccess, .agreement, .personalDetail, .home, .discover, .wallet, .assistantDialogue, .settings, .restrictedList, .outboundConnectionRoster, .inboundConnectionRoster:
             return true
         default:
             return false
@@ -255,6 +255,10 @@ final class ReferenceCanvasView: UIView {
             renderRestrictPanel()
         case .restrictedList:
             renderRestrictedList()
+        case .outboundConnectionRoster:
+            renderConnectionRoster(kind: .outbound)
+        case .inboundConnectionRoster:
+            renderConnectionRoster(kind: .inbound)
         case .agreement:
             renderAgreement()
         case .accessGate:
@@ -1784,6 +1788,28 @@ final class ReferenceCanvasView: UIView {
             secondText.centerYAnchor.constraint(equalTo: worksValue.centerYAnchor),
             secondText.trailingAnchor.constraint(lessThanOrEqualTo: layoutContainer.trailingAnchor, constant: -20)
         ])
+
+        let inboundButton = ClearTapButton(frame: .zero) { [weak self] in
+            self?.didRequestPage?(.inboundConnectionRoster)
+        }
+        let outboundButton = ClearTapButton(frame: .zero) { [weak self] in
+            self?.didRequestPage?(.outboundConnectionRoster)
+        }
+        [inboundButton, outboundButton].forEach {
+            layoutContainer.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        NSLayoutConstraint.activate([
+            inboundButton.leadingAnchor.constraint(equalTo: firstValue.leadingAnchor, constant: -8),
+            inboundButton.trailingAnchor.constraint(equalTo: firstText.trailingAnchor, constant: 8),
+            inboundButton.centerYAnchor.constraint(equalTo: firstValue.centerYAnchor),
+            inboundButton.heightAnchor.constraint(equalToConstant: 44),
+
+            outboundButton.leadingAnchor.constraint(equalTo: secondValue.leadingAnchor, constant: -8),
+            outboundButton.trailingAnchor.constraint(equalTo: secondText.trailingAnchor, constant: 8),
+            outboundButton.centerYAnchor.constraint(equalTo: secondValue.centerYAnchor),
+            outboundButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
     }
 
     private func addThemeGradientBackground(
@@ -2597,8 +2623,46 @@ final class ReferenceCanvasView: UIView {
         )
     }
 
+    private enum ConnectionRosterKind {
+        case outbound
+        case inbound
+    }
+
     private func renderRestrictedList() {
-        let listView = RestrictedRosterListView()
+        renderRosterList(
+            title: "Blacklist",
+            entries: AccountSessionCenter.shared.restrictedRoster()
+        )
+    }
+
+    private func renderConnectionRoster(kind: ConnectionRosterKind) {
+        switch kind {
+        case .outbound:
+            renderRosterList(
+                title: "Following",
+                entries: AccountSessionCenter.shared.outboundConnectionRoster()
+            )
+        case .inbound:
+            renderRosterList(
+                title: "Followers",
+                entries: AccountSessionCenter.shared.inboundConnectionRoster()
+            )
+        }
+    }
+
+    private func renderRosterList(title: String, entries: [RelationRosterRecord]) {
+        addTopTitle(title)
+        let listEntries = entries.map {
+            RestrictedRosterListView.Entry(
+                accountKey: $0.stableKey,
+                name: $0.displayName,
+                avatarAsset: $0.avatarAsset
+            )
+        }
+        let listView = RestrictedRosterListView(entries: listEntries)
+        listView.didSelectEntry = { [weak self] entry in
+            self?.requestPublicPersona(subjectKey: entry.accountKey)
+        }
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
