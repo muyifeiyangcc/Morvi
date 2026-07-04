@@ -210,7 +210,7 @@ class BaseSceneController: UIViewController {
     @objc private func handleTrailingNavigationTap() {
         switch page {
         case .galleryDetail, .publicPersona, .directDialogue, .voiceDialogue:
-            showCanvasOverlay(.restrictPanel, restrictionSubjectKey: "acct-local-victoria")
+            showCanvasOverlay(.restrictPanel, restrictionSubjectKey: RouteContextStore.currentTargetAccountKey() ?? "acct-local-victoria")
         default:
             break
         }
@@ -228,6 +228,9 @@ class BaseSceneController: UIViewController {
             MorviToastView.show("This profile is unavailable.", in: view)
             return
         }
+        if let restrictionSubjectKey {
+            RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
+        }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
@@ -236,6 +239,9 @@ class BaseSceneController: UIViewController {
            AccountSessionCenter.shared.isSignedIn == false {
             showCanvasOverlay(.accessGate)
             return
+        }
+        if let restrictionSubjectKey {
+            RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
         let overlayView = ReferenceCanvasView(page: page, restrictionSubjectKey: restrictionSubjectKey)
         overlayView.tag = 9102

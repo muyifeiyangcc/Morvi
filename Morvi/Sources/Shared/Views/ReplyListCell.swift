@@ -21,7 +21,7 @@ final class ReplyListCell: UITableViewCell {
     }
 
     func configure(with item: ReplyListItem, showsDivider: Bool) {
-        avatarView.image = UIImage(named: "profile_avatar")
+        avatarView.image = UIImage(named: item.avatarAsset) ?? UIImage(named: "default_avatar")
         nameLabel.text = item.name
         bodyLabel.text = item.text
         dividerView.isHidden = !showsDivider

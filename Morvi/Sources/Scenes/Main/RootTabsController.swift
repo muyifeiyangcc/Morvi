@@ -233,6 +233,9 @@ final class RootTabsController: UIViewController {
             MorviToastView.show("This profile is unavailable.", in: view)
             return
         }
+        if let restrictionSubjectKey {
+            RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
+        }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
@@ -241,6 +244,9 @@ final class RootTabsController: UIViewController {
            AccountSessionCenter.shared.isSignedIn == false {
             showOverlay(.accessGate)
             return
+        }
+        if let restrictionSubjectKey {
+            RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
         let overlayView = ReferenceCanvasView(
             page: page,

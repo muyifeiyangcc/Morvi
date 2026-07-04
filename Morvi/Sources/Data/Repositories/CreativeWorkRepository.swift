@@ -11,13 +11,33 @@ struct DiscoveryWorkEntry {
     let accountKey: String
     let displayName: String
     let avatarAsset: String
+    let coverAssetForAccount: String?
     let title: String
     let bodyText: String
     let mediaKind: Int
     let coverAsset: String
+    let mediaWidth: Double?
+    let mediaHeight: Double?
     let themes: [String]
     let reactionCount: Int
     let replyCount: Int
+}
+
+struct PersonaDetailEntry {
+    let accountKey: String
+    let displayName: String
+    let avatarAsset: String
+    let coverAsset: String
+    let followersText: String
+    let followingText: String
+}
+
+struct WorkReplyEntry {
+    let stableKey: String
+    let accountKey: String
+    let displayName: String
+    let avatarAsset: String
+    let bodyText: String
 }
 
 protocol CreativeWorkRepository {
@@ -26,6 +46,11 @@ protocol CreativeWorkRepository {
     func count() throws -> Int
     func discoveryProfiles(limit: Int) throws -> [DiscoveryProfileEntry]
     func discoveryWorks(limit: Int) throws -> [DiscoveryWorkEntry]
+    func workDetail(stableKey: String) throws -> DiscoveryWorkEntry?
+    func works(ownerAccountKey: String, limit: Int) throws -> [DiscoveryWorkEntry]
+    func personaDetail(accountKey: String) throws -> PersonaDetailEntry?
+    func replies(workKey: String) throws -> [WorkReplyEntry]
+    func addReply(workKey: String, accountKey: String, bodyText: String) throws
 }
 
 final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
@@ -143,10 +168,13 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 w.owner_account_key,
                 p.display_name,
                 COALESCE(p.avatar_asset, 'default_avatar'),
+                p.cover_asset,
                 w.title,
                 COALESCE(w.body_text, ''),
                 w.media_kind,
                 COALESCE(w.cover_asset, 'discover_feed_cover'),
+                w.media_width,
+                w.media_height,
                 (
                     SELECT COUNT(*)
                     FROM work_reaction wr
@@ -169,14 +197,14 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
         )
 
         return try rows.compactMap { row in
-            guard row.count >= 10,
+            guard row.count >= 13,
                   let stableKey = row[0].textValue,
                   let accountKey = row[1].textValue,
                   let displayName = row[2].textValue,
                   let avatarAsset = row[3].textValue,
-                  let title = row[4].textValue,
-                  let bodyText = row[5].textValue,
-                  let coverAsset = row[7].textValue else {
+                  let title = row[5].textValue,
+                  let bodyText = row[6].textValue,
+                  let coverAsset = row[8].textValue else {
                 return nil
             }
             let themes = try themesForWork(stableKey: stableKey)
@@ -185,13 +213,195 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 accountKey: accountKey,
                 displayName: displayName,
                 avatarAsset: avatarAsset,
+                coverAssetForAccount: row[4].textValue,
                 title: title,
                 bodyText: bodyText,
-                mediaKind: row[6].intValue,
+                mediaKind: row[7].intValue,
                 coverAsset: coverAsset,
+                mediaWidth: row[9].doubleValue,
+                mediaHeight: row[10].doubleValue,
                 themes: themes,
-                reactionCount: max(row[8].intValue, 666),
-                replyCount: max(row[9].intValue, 777)
+                reactionCount: max(row[11].intValue, 666),
+                replyCount: max(row[12].intValue, 777)
+            )
+        }
+    }
+
+    func workDetail(stableKey: String) throws -> DiscoveryWorkEntry? {
+        try works(whereClause: "w.stable_key = ?", bindings: [.text(stableKey)], limit: 1).first
+    }
+
+    func works(ownerAccountKey: String, limit: Int) throws -> [DiscoveryWorkEntry] {
+        try works(
+            whereClause: "w.owner_account_key = ? AND w.removed_at IS NULL AND w.visibility_code = 0",
+            bindings: [.text(ownerAccountKey)],
+            limit: limit
+        )
+    }
+
+    func personaDetail(accountKey: String) throws -> PersonaDetailEntry? {
+        let rows = try store.readRows(
+            """
+            SELECT
+                stable_key,
+                display_name,
+                COALESCE(avatar_asset, 'default_avatar'),
+                COALESCE(cover_asset, avatar_asset, 'discover_feed_cover'),
+                (
+                    SELECT COUNT(*)
+                    FROM account_relation ar
+                    WHERE ar.target_account_key = account_profile.stable_key
+                ),
+                (
+                    SELECT COUNT(*)
+                    FROM account_relation ar
+                    WHERE ar.origin_account_key = account_profile.stable_key
+                )
+            FROM account_profile
+            WHERE stable_key = ?
+            LIMIT 1;
+            """,
+            bindings: [.text(accountKey)]
+        )
+        guard let row = rows.first,
+              row.count >= 6,
+              let key = row[0].textValue,
+              let displayName = row[1].textValue,
+              let avatarAsset = row[2].textValue,
+              let coverAsset = row[3].textValue else {
+            return nil
+        }
+        return PersonaDetailEntry(
+            accountKey: key,
+            displayName: displayName,
+            avatarAsset: avatarAsset,
+            coverAsset: coverAsset,
+            followersText: "\(max(row[4].intValue, 77))",
+            followingText: "\(max(row[5].intValue, 99))"
+        )
+    }
+
+    func replies(workKey: String) throws -> [WorkReplyEntry] {
+        try store.readRows(
+            """
+            SELECT
+                rp.stable_key,
+                rp.author_account_key,
+                p.display_name,
+                COALESCE(p.avatar_asset, 'default_avatar'),
+                rp.body_text
+            FROM work_reply rp
+            JOIN account_profile p ON p.stable_key = rp.author_account_key
+            WHERE rp.work_key = ?
+                AND rp.removed_at IS NULL
+            ORDER BY rp.created_at ASC, rp.id ASC;
+            """,
+            bindings: [.text(workKey)]
+        ).compactMap { row in
+            guard row.count >= 5,
+                  let stableKey = row[0].textValue,
+                  let accountKey = row[1].textValue,
+                  let displayName = row[2].textValue,
+                  let avatarAsset = row[3].textValue,
+                  let bodyText = row[4].textValue else {
+                return nil
+            }
+            return WorkReplyEntry(
+                stableKey: stableKey,
+                accountKey: accountKey,
+                displayName: displayName,
+                avatarAsset: avatarAsset,
+                bodyText: bodyText
+            )
+        }
+    }
+
+    func addReply(workKey: String, accountKey: String, bodyText: String) throws {
+        let now = LocalDateText.now()
+        try store.write(
+            """
+            INSERT INTO work_reply (
+                stable_key, work_key, author_account_key, parent_reply_key,
+                body_text, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?);
+            """,
+            bindings: [
+                .text("reply-local-\(UUID().uuidString.lowercased())"),
+                .text(workKey),
+                .text(accountKey),
+                .null,
+                .text(bodyText),
+                .text(now),
+                .text(now)
+            ]
+        )
+    }
+
+    private func works(
+        whereClause: String,
+        bindings: [LocalStoreValue],
+        limit: Int
+    ) throws -> [DiscoveryWorkEntry] {
+        let rows = try store.readRows(
+            """
+            SELECT
+                w.stable_key,
+                w.owner_account_key,
+                p.display_name,
+                COALESCE(p.avatar_asset, 'default_avatar'),
+                p.cover_asset,
+                w.title,
+                COALESCE(w.body_text, ''),
+                w.media_kind,
+                COALESCE(w.cover_asset, 'discover_feed_cover'),
+                w.media_width,
+                w.media_height,
+                (
+                    SELECT COUNT(*)
+                    FROM work_reaction wr
+                    WHERE wr.work_key = w.stable_key
+                ),
+                (
+                    SELECT COUNT(*)
+                    FROM work_reply rp
+                    WHERE rp.work_key = w.stable_key
+                        AND rp.removed_at IS NULL
+                )
+            FROM creative_work w
+            JOIN account_profile p ON p.stable_key = w.owner_account_key
+            WHERE \(whereClause)
+            ORDER BY w.created_at DESC, w.id DESC
+            LIMIT ?;
+            """,
+            bindings: bindings + [.int(limit)]
+        )
+
+        return try rows.compactMap { row in
+            guard row.count >= 13,
+                  let stableKey = row[0].textValue,
+                  let accountKey = row[1].textValue,
+                  let displayName = row[2].textValue,
+                  let avatarAsset = row[3].textValue,
+                  let title = row[5].textValue,
+                  let bodyText = row[6].textValue,
+                  let coverAsset = row[8].textValue else {
+                return nil
+            }
+            return DiscoveryWorkEntry(
+                stableKey: stableKey,
+                accountKey: accountKey,
+                displayName: displayName,
+                avatarAsset: avatarAsset,
+                coverAssetForAccount: row[4].textValue,
+                title: title,
+                bodyText: bodyText,
+                mediaKind: row[7].intValue,
+                coverAsset: coverAsset,
+                mediaWidth: row[9].doubleValue,
+                mediaHeight: row[10].doubleValue,
+                themes: try themesForWork(stableKey: stableKey),
+                reactionCount: max(row[11].intValue, 666),
+                replyCount: max(row[12].intValue, 777)
             )
         }
     }
@@ -225,5 +435,16 @@ private extension LocalStoreValue {
             return value
         }
         return 0
+    }
+
+    var doubleValue: Double? {
+        switch self {
+        case .double(let value):
+            return value
+        case .int(let value):
+            return Double(value)
+        default:
+            return nil
+        }
     }
 }

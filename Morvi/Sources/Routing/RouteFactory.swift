@@ -1,5 +1,26 @@
 import UIKit
 
+enum RouteContextStore {
+    private static var targetAccountKey: String?
+    private static var targetWorkKey: String?
+
+    static func setTargetAccountKey(_ key: String?) {
+        targetAccountKey = key
+    }
+
+    static func setTargetWorkKey(_ key: String?) {
+        targetWorkKey = key
+    }
+
+    static func currentTargetAccountKey() -> String? {
+        targetAccountKey
+    }
+
+    static func currentTargetWorkKey() -> String? {
+        targetWorkKey
+    }
+}
+
 enum RouteFactory {
     static func controller(for page: ScenePage) -> UIViewController {
         switch page {

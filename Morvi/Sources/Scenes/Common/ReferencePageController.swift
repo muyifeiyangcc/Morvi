@@ -503,6 +503,9 @@ class ReferencePageController: BaseSceneController {
             showOverlay(.accessGate)
             return
         }
+        if let restrictionSubjectKey {
+            RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
+        }
         let overlayView = ReferenceCanvasView(page: page, restrictionSubjectKey: restrictionSubjectKey)
         overlayView.tag = 9102
         view.viewWithTag(9102)?.removeFromSuperview()
@@ -558,6 +561,9 @@ class ReferencePageController: BaseSceneController {
            AccountSessionCenter.shared.canOpenPublicPersona(accountKey: restrictionSubjectKey) == false {
             MorviToastView.show("This profile is unavailable.", in: view)
             return
+        }
+        if let restrictionSubjectKey {
+            RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }

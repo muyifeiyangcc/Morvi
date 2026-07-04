@@ -83,12 +83,14 @@ final class ReferenceCanvasView: UIView {
     private var voiceElapsedSeconds = 0
     private var voiceTimer: Timer?
     private var personaMediaFrames: [CGRect] = []
+    private var personaMediaTargets: [(frame: CGRect, workKey: String, accountKey: String)] = []
     private var personaBackdropBaseHeight: CGFloat = 0
     private var personaBackdropHeightConstraint: NSLayoutConstraint?
     private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
     private var animatedAssistantEntryKeys: Set<String> = []
     private let restrictionSubjectKey: String?
     private var selectedSafetyReasonIndex = 0
+    private weak var replyInputField: UITextField?
 
     init(page: ScenePage, selectedMoodIndex: Int = 0, restrictionSubjectKey: String? = nil) {
         self.page = page
@@ -190,7 +192,7 @@ final class ReferenceCanvasView: UIView {
         case .galleryDetail:
             renderGalleryDetail()
         case .publicPersona:
-            renderPersonaDetail(title: "Victoria")
+            renderPersonaDetail()
         case .personalDetail:
             renderPersonalDetail()
         case .profileEditor:
@@ -416,10 +418,13 @@ final class ReferenceCanvasView: UIView {
                     accountKey: "acct-local-victoria",
                     displayName: "Victoria",
                     avatarAsset: "builtin_avatar_victoria",
+                    coverAssetForAccount: "builtin_avatar_victoria",
                     title: "Moments Matter",
                     bodyText: "Capturing today's happiness. Saving it for tomorrow's memories.",
                     mediaKind: 1,
                     coverAsset: "discover_feed_cover",
+                    mediaWidth: nil,
+                    mediaHeight: nil,
                     themes: tagTexts,
                     reactionCount: 666,
                     replyCount: 777
@@ -455,8 +460,11 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersona() {
+        let accountKey = AccountSessionCenter.shared.activeAccountKey ?? "acct-local-amelia"
+        let detail = resolvedPersonaDetail(accountKey: accountKey, fallbackName: "Amelia")
+        let workEntries = resolvedPersonaWorks(accountKey: accountKey)
         addPersonaRootGradient()
-        addPersonaBackdrop()
+        addPersonaBackdrop(imageName: detail.coverAsset)
         let scrollView = CancelFriendlyScrollView()
         scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
@@ -484,29 +492,29 @@ final class ReferenceCanvasView: UIView {
         let cellGap: CGFloat = 15
         let waterfallLayout = adaptivePairLayout(gap: cellGap)
         let cellWidth = waterfallLayout.width
-        let coverImageName = "discover_feed_cover"
-        func proportionalCellHeight(for imageName: String, width: CGFloat) -> CGFloat {
-            let imageSize = UIImage(named: imageName)?.size ?? .zero
-            return imageSize.width > 0 ? ceil(width * imageSize.height / imageSize.width) : width
-        }
         var columnBottoms = [cellTop, cellTop]
         let columnLefts: [CGFloat] = [20, waterfallLayout.secondLeft]
-        let waterfallItems: [(imageName: String, tint: MediaTint)] = [
-            ("profile_avatar", .warm),
-            (coverImageName, .coast),
-            (coverImageName, .night)
-        ]
-        let cellPlacements = waterfallItems.map { item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, imageName: String, tint: MediaTint) in
+        let cellPlacements = workEntries.enumerated().map { index, item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, item: DiscoveryWorkEntry, tint: MediaTint) in
             let columnIndex = columnBottoms[0] <= columnBottoms[1] ? 0 : 1
             let left = columnLefts[columnIndex]
             let width = cellWidth
-            let height = proportionalCellHeight(for: item.imageName, width: width)
-            let placement = (top: columnBottoms[columnIndex], left: left, width: width, height: height, imageName: item.imageName, tint: item.tint)
+            let height = proportionalCellHeight(for: item, width: width)
+            let placement = (
+                top: columnBottoms[columnIndex],
+                left: left,
+                width: width,
+                height: height,
+                item: item,
+                tint: index.isMultiple(of: 2) ? MediaTint.coast : MediaTint.night
+            )
             columnBottoms[columnIndex] += height + cellGap
             return placement
         }
         personaMediaFrames = cellPlacements.map {
             CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height)
+        }
+        personaMediaTargets = cellPlacements.map {
+            (CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height), $0.item.stableKey, $0.item.accountKey)
         }
         let contentHeight = max(adaptiveLayoutHeight, (columnBottoms.max() ?? adaptiveLayoutHeight) - cellGap + 10)
         NSLayoutConstraint.activate([
@@ -532,9 +540,9 @@ final class ReferenceCanvasView: UIView {
         base.layer.shadowOpacity = 0
         base.layer.cornerRadius = 20
         base.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        addProfileAvatar(top: 198, left: 36, size: 74, showsBorder: false, showsShadow: false)
-        addText("Amelia", size: 20, weight: .medium, top: 275, left: 36)
-        addPersonaMetricLine(top: 311, left: 20)
+        addProfileAvatar(image: resolveAccountAvatar(detail.avatarAsset), top: 198, left: 36, size: 74, showsBorder: false, showsShadow: false)
+        addText(detail.displayName, size: 20, weight: .medium, top: 275, left: 36)
+        addPersonaMetricLine(top: 311, left: 20, followersText: detail.followersText, followingText: detail.followingText)
         addAssetIcon("persona_settings_icon", top: 247, left: 214, size: 30)
         addPersonaSettingsAction(top: 240, left: 204)
         addPersonaEditAction(top: 244, left: 256)
@@ -546,8 +554,8 @@ final class ReferenceCanvasView: UIView {
                 height: placement.height,
                 title: "",
                 tint: placement.tint,
-                action: .play,
-                imageName: placement.imageName,
+                action: placement.item.mediaKind == 1 ? .play : .none,
+                imageName: placement.item.coverAsset,
                 playIconName: "persona_media_play_icon",
                 playIconSize: 28,
                 shadowOpacity: 0
@@ -555,6 +563,36 @@ final class ReferenceCanvasView: UIView {
         }
         addPersonaMediaContainerSelection(to: scrollContent)
         activeLayoutContainer = nil
+    }
+
+    private func resolvedPersonaDetail(accountKey: String, fallbackName: String) -> PersonaDetailEntry {
+        if let detail = try? creativeRepository.personaDetail(accountKey: accountKey) {
+            return detail
+        }
+        return PersonaDetailEntry(
+            accountKey: accountKey,
+            displayName: fallbackName,
+            avatarAsset: "default_avatar",
+            coverAsset: "discover_feed_cover",
+            followersText: "77",
+            followingText: "99"
+        )
+    }
+
+    private func resolvedPersonaWorks(accountKey: String) -> [DiscoveryWorkEntry] {
+        if let items = try? creativeRepository.works(ownerAccountKey: accountKey, limit: 30),
+           items.isEmpty == false {
+            return items
+        }
+        return [fallbackWorkEntry()]
+    }
+
+    private func proportionalCellHeight(for item: DiscoveryWorkEntry, width: CGFloat) -> CGFloat {
+        if let mediaWidth = item.mediaWidth, let mediaHeight = item.mediaHeight, mediaWidth > 0 {
+            return ceil(width * CGFloat(mediaHeight / mediaWidth))
+        }
+        let imageSize = resolveVisualAsset(item.coverAsset)?.size ?? .zero
+        return imageSize.width > 0 ? ceil(width * imageSize.height / imageSize.width) : width
     }
 
     private func renderConversation(title: String, mode: ConversationMode) {
@@ -1128,10 +1166,11 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderGalleryDetail() {
-        addFullscreenGalleryCover()
+        let item = resolvedGalleryWork()
+        addFullscreenGalleryCover(item: item)
         let panelTop: CGFloat = 586
         let tagsTop: CGFloat = 718
-        let tagsHeight = measuredTagsHeight(left: 20, right: 20)
+        let tagsHeight = measuredTagsHeight(left: 20, right: 20, items: item.themes)
         let reactionsTop = tagsTop + tagsHeight + 22
         let panelHeight = reactionsTop + 18 + 28 - panelTop
         let panel = addGlassPanel(
@@ -1142,19 +1181,31 @@ final class ReferenceCanvasView: UIView {
             radius: 14,
             fillAlpha: 0.4,
             blurRadius: 16,
-            backdropAssetName: "discover_feed_cover",
+            backdropAssetName: item.coverAsset,
             trailing: 0
         )
         panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        addAssetAvatar("profile_avatar", top: 609, left: 20, size: 36)
-        addText("Victoria", size: 17, weight: .bold, top: 617, left: 68)
-        addText("Capturing today's happiness. Saving it for\ntomorrow's memories.", size: 16, weight: .regular, top: 664, left: 20)
-        addTags(top: tagsTop, left: 20, right: 20)
-        addText("♡ 666 Likes       ☵ 777 Comments", size: 13, weight: .regular, top: reactionsTop, left: 22, color: .darkGray)
+        addAssetAvatar(item.avatarAsset, top: 609, left: 20, size: 36)
+        addText(item.displayName, size: 17, weight: .bold, top: 617, left: 68)
+        addText(item.bodyText, size: 16, weight: .regular, top: 664, left: 20)
+        addTags(top: tagsTop, left: 20, right: 20, items: item.themes)
+        addText(
+            "♡ \(max(item.reactionCount, 666)) Likes       ☵ \(max(item.replyCount, 777)) Comments",
+            size: 13,
+            weight: .regular,
+            top: reactionsTop,
+            left: 22,
+            color: .darkGray
+        )
+        addDiscoverActionButton(frame: CGRect(x: 20, y: reactionsTop - 12, width: 240, height: 44)) { [weak self] in
+            RouteContextStore.setTargetWorkKey(item.stableKey)
+            RouteContextStore.setTargetAccountKey(item.accountKey)
+            self?.didRequestOverlayPage?(.repliesPanel)
+        }
     }
 
-    private func addFullscreenGalleryCover() {
-        let coverImage = UIImage(named: "discover_feed_cover")
+    private func addFullscreenGalleryCover(item: DiscoveryWorkEntry) {
+        let coverImage = resolveVisualAsset(item.coverAsset)
         let coverContainer = UIView()
         coverContainer.clipsToBounds = true
         addSubview(coverContainer)
@@ -1173,21 +1224,28 @@ final class ReferenceCanvasView: UIView {
         coverView.translatesAutoresizingMaskIntoConstraints = false
         pinFullHeightImageView(coverView, image: coverImage, in: coverContainer)
 
-        let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
-        iconView.contentMode = .scaleAspectFit
-        coverContainer.addSubview(iconView)
-        iconView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            iconView.centerXAnchor.constraint(equalTo: coverContainer.centerXAnchor),
-            iconView.centerYAnchor.constraint(equalTo: coverContainer.centerYAnchor),
-            iconView.widthAnchor.constraint(equalToConstant: 40),
-            iconView.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        if item.mediaKind == 1 {
+            let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
+            iconView.contentMode = .scaleAspectFit
+            coverContainer.addSubview(iconView)
+            iconView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                iconView.centerXAnchor.constraint(equalTo: coverContainer.centerXAnchor),
+                iconView.centerYAnchor.constraint(equalTo: coverContainer.centerYAnchor),
+                iconView.widthAnchor.constraint(equalToConstant: 40),
+                iconView.heightAnchor.constraint(equalToConstant: 40)
+            ])
+        }
     }
 
-    private func renderPersonaDetail(title: String) {
+    private func renderPersonaDetail() {
+        let accountKey = RouteContextStore.currentTargetAccountKey()
+            ?? restrictionSubjectKey
+            ?? resolvedGalleryWork().accountKey
+        let detail = resolvedPersonaDetail(accountKey: accountKey, fallbackName: "Victoria")
+        let workEntries = resolvedPersonaWorks(accountKey: accountKey)
         addPersonaRootGradient()
-        addPersonaBackdrop()
+        addPersonaBackdrop(imageName: detail.coverAsset)
         let scrollView = CancelFriendlyScrollView()
         scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
@@ -1218,36 +1276,27 @@ final class ReferenceCanvasView: UIView {
         let cellGap: CGFloat = 15
         let waterfallLayout = adaptivePairLayout(gap: cellGap)
         let cellWidth = waterfallLayout.width
-        let coverImageName = "discover_feed_cover"
-        func proportionalCellHeight(for imageName: String) -> CGFloat {
-            let imageSize = UIImage(named: imageName)?.size ?? .zero
-            return imageSize.width > 0
-                ? ceil(cellWidth * imageSize.height / imageSize.width)
-                : cellWidth
-        }
         let columnLefts: [CGFloat] = [20, waterfallLayout.secondLeft]
-        let waterfallItems: [(imageName: String, tint: MediaTint)] = [
-            ("profile_avatar", .warm),
-            (coverImageName, .coast),
-            (coverImageName, .night)
-        ]
         var columnBottoms = [cellTop, cellTop]
-        let cellPlacements = waterfallItems.map { item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, imageName: String, tint: MediaTint) in
+        let cellPlacements = workEntries.enumerated().map { index, item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, item: DiscoveryWorkEntry, tint: MediaTint) in
             let columnIndex = columnBottoms[0] <= columnBottoms[1] ? 0 : 1
-            let height = proportionalCellHeight(for: item.imageName)
+            let height = proportionalCellHeight(for: item, width: cellWidth)
             let placement = (
                 top: columnBottoms[columnIndex],
                 left: columnLefts[columnIndex],
                 width: cellWidth,
                 height: height,
-                imageName: item.imageName,
-                tint: item.tint
+                item: item,
+                tint: index.isMultiple(of: 2) ? MediaTint.coast : MediaTint.sky
             )
             columnBottoms[columnIndex] += height + cellGap
             return placement
         }
         personaMediaFrames = cellPlacements.map {
             CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height)
+        }
+        personaMediaTargets = cellPlacements.map {
+            (CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height), $0.item.stableKey, $0.item.accountKey)
         }
         let contentHeight = max(adaptiveLayoutHeight, (columnBottoms.max() ?? adaptiveLayoutHeight) - cellGap + 32)
 
@@ -1274,8 +1323,8 @@ final class ReferenceCanvasView: UIView {
         base.layer.shadowOpacity = 0
         base.layer.cornerRadius = 20
         base.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
-        addText(title, size: 26, weight: .bold, top: nameTop, centered: true)
+        addProfileAvatar(image: resolveAccountAvatar(detail.avatarAsset), top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
+        addText(detail.displayName, size: 26, weight: .bold, top: nameTop, centered: true)
         addStatsPanel(top: statsTop)
         let actionLayout = adaptivePairLayout(gap: 15)
         let dialogueButton = addPillButton("Chat", top: buttonTop, left: 20, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
@@ -1289,8 +1338,8 @@ final class ReferenceCanvasView: UIView {
                 height: placement.height,
                 title: "",
                 tint: placement.tint,
-                action: .play,
-                imageName: placement.imageName,
+                action: placement.item.mediaKind == 1 ? .play : .none,
+                imageName: placement.item.coverAsset,
                 playIconName: "persona_media_play_icon",
                 playIconSize: 28,
                 shadowOpacity: 0
@@ -1314,7 +1363,9 @@ final class ReferenceCanvasView: UIView {
     @objc private func handlePersonaMediaContainerTap(_ gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended, let container = gesture.view else { return }
         let location = gesture.location(in: container)
-        guard personaMediaFrames.contains(where: { $0.contains(location) }) else { return }
+        guard let target = personaMediaTargets.first(where: { $0.frame.contains(location) }) else { return }
+        RouteContextStore.setTargetWorkKey(target.workKey)
+        RouteContextStore.setTargetAccountKey(target.accountKey)
         didRequestPage?(.galleryDetail)
     }
 
@@ -1330,8 +1381,8 @@ final class ReferenceCanvasView: UIView {
         layer.insertSublayer(gradient, at: 0)
     }
 
-    private func addPersonaBackdrop() {
-        let coverImage = UIImage(named: "discover_feed_cover")
+    private func addPersonaBackdrop(imageName: String = "discover_feed_cover") {
+        let coverImage = resolveVisualAsset(imageName)
         let coverView = UIImageView(image: coverImage)
         coverView.contentMode = .scaleAspectFill
         coverView.clipsToBounds = true
@@ -1409,11 +1460,16 @@ final class ReferenceCanvasView: UIView {
         didRequestPage?(.settings)
     }
 
-    private func addPersonaMetricLine(top: CGFloat, left: CGFloat) {
+    private func addPersonaMetricLine(
+        top: CGFloat,
+        left: CGFloat,
+        followersText: String = "77",
+        followingText: String = "99"
+    ) {
         let layoutContainer = activeLayoutContainer ?? self
         let font = AppFont.source(14, weight: .regular)
         let firstValue = UILabel()
-        firstValue.text = "77"
+        firstValue.text = followersText
         firstValue.textColor = UIColor(red: 0.36, green: 0.83, blue: 0.12, alpha: 1)
         firstValue.font = font
 
@@ -1423,7 +1479,7 @@ final class ReferenceCanvasView: UIView {
         firstText.font = font
 
         let secondValue = UILabel()
-        secondValue.text = "99"
+        secondValue.text = followingText
         secondValue.textColor = UIColor(red: 0.08, green: 0.57, blue: 1.0, alpha: 1)
         secondValue.font = font
 
@@ -2619,6 +2675,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderRepliesPanel() {
+        let item = resolvedGalleryWork()
         backgroundColor = UIColor.black.withAlphaComponent(0.58)
         let sheet = UIView()
         sheet.backgroundColor = .white
@@ -2653,6 +2710,12 @@ final class ReferenceCanvasView: UIView {
             trailing: "",
             usesDashedBorder: true,
             in: self,
+            textFieldHandler: { [weak self] field in
+                self?.replyInputField = field
+            },
+            actionHandler: { [weak self] in
+                self?.submitReply(for: item.stableKey)
+            },
             bottomConstraintHandler: { [weak self] bottomConstraint in
                 self?.keyboardAvoidanceBottomConstraint = bottomConstraint
                 self?.keyboardAvoidanceBaseBottomConstant = -29
@@ -2697,29 +2760,67 @@ final class ReferenceCanvasView: UIView {
             tableView.topAnchor.constraint(equalTo: sheet.topAnchor, constant: 15),
             tableView.bottomAnchor.constraint(equalTo: voiceButton.topAnchor, constant: -15)
         ])
-        replyListDataSource.apply([
-            ReplyListItem(
-                accountKey: "acct-local-jasper",
-                name: "Jasper",
-                text: "The video content is great! Keep going!The\nvideo content is great! Keep going!"
-            ),
-            ReplyListItem(
-                accountKey: "acct-local-rowan",
-                name: "Rowan",
-                text: "The video content is great! Keep going!"
-            ),
-            ReplyListItem(
-                accountKey: "acct-local-sophia",
-                name: "Sophia",
-                text: "The video content is great! Keep going!"
-            )
-        ], to: tableView)
+        reloadReplies(for: item.stableKey, in: tableView)
         replyListDataSource.didTapMore = { [weak self] accountKey in
             self?.didRequestSubjectOverlayPage?(.restrictPanel, accountKey)
         }
         keyboardAvoidanceInputView = inputBar
         installKeyboardAvoidance()
         installBlankAreaKeyboardDismissal()
+    }
+
+    private func reloadReplies(for workKey: String, in tableView: UITableView) {
+        let entries = (try? creativeRepository.replies(workKey: workKey)) ?? []
+        let items = entries.map {
+            ReplyListItem(
+                accountKey: $0.accountKey,
+                avatarAsset: $0.avatarAsset,
+                name: $0.displayName,
+                text: $0.bodyText
+            )
+        }
+        replyListDataSource.apply(items, to: tableView)
+    }
+
+    private func submitReply(for workKey: String) {
+        guard let textField = replyInputField else { return }
+        let text = (textField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard text.isEmpty == false else {
+            MorviToastView.show("Please enter content", in: self)
+            return
+        }
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+        endEditing(true)
+        showProgressOverlay()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self, weak textField] in
+            do {
+                try self?.creativeRepository.addReply(
+                    workKey: workKey,
+                    accountKey: accountKey,
+                    bodyText: text
+                )
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        textField?.text = nil
+                        guard let tableView = self?.overlayContentView?.subviews.compactMap({ $0 as? UITableView }).first else {
+                            self?.reloadRenderedContent()
+                            return
+                        }
+                        self?.reloadReplies(for: workKey, in: tableView)
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let self else { return }
+                        MorviToastView.show("Upload failed", in: self)
+                    }
+                }
+            }
+        }
     }
 
     private func renderReportPanel() {
@@ -2841,6 +2942,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func requestPublicPersona(subjectKey: String?) {
+        RouteContextStore.setTargetAccountKey(subjectKey)
         if let didRequestSubjectPage {
             didRequestSubjectPage(.publicPersona, subjectKey)
         } else {
@@ -4875,6 +4977,38 @@ final class ReferenceCanvasView: UIView {
         (try? creativeRepository.discoveryWorks(limit: 12)) ?? []
     }
 
+    private func resolvedGalleryWork() -> DiscoveryWorkEntry {
+        if let workKey = RouteContextStore.currentTargetWorkKey(),
+           let item = try? creativeRepository.workDetail(stableKey: workKey) {
+            return item
+        }
+        if let item = try? creativeRepository.discoveryWorks(limit: 1).first {
+            RouteContextStore.setTargetWorkKey(item.stableKey)
+            RouteContextStore.setTargetAccountKey(item.accountKey)
+            return item
+        }
+        return fallbackWorkEntry()
+    }
+
+    private func fallbackWorkEntry() -> DiscoveryWorkEntry {
+        DiscoveryWorkEntry(
+            stableKey: "fallback-work",
+            accountKey: "acct-local-victoria",
+            displayName: "Victoria",
+            avatarAsset: "builtin_avatar_victoria",
+            coverAssetForAccount: "builtin_avatar_victoria",
+            title: "Moments Matter",
+            bodyText: "Capturing today's happiness. Saving it for tomorrow's memories.",
+            mediaKind: 1,
+            coverAsset: "discover_feed_cover",
+            mediaWidth: nil,
+            mediaHeight: nil,
+            themes: tagTexts,
+            reactionCount: 666,
+            replyCount: 777
+        )
+    }
+
     private func addStoryStrip(top: CGFloat, entries: [DiscoverStoryStripView.StripEntry]) {
         let layoutContainer = activeLayoutContainer ?? self
         let stripView = DiscoverStoryStripView(entries: entries)
@@ -4921,6 +5055,8 @@ final class ReferenceCanvasView: UIView {
             replies: max(item.replyCount, 777)
         )
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 335, height: 444)) { [weak self] in
+            RouteContextStore.setTargetWorkKey(item.stableKey)
+            RouteContextStore.setTargetAccountKey(item.accountKey)
             self?.didRequestPage?(.galleryDetail)
         }
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 48, height: 48)) { [weak self] in
@@ -4930,6 +5066,7 @@ final class ReferenceCanvasView: UIView {
             self?.requestPublicPersona(subjectKey: item.accountKey)
         }
         addTrailingDiscoverActionButton(top: top, trailing: 10, width: 54, height: 44) { [weak self] in
+            RouteContextStore.setTargetWorkKey(item.stableKey)
             self?.didRequestSubjectOverlayPage?(.restrictPanel, item.accountKey)
         }
     }
@@ -4963,6 +5100,8 @@ final class ReferenceCanvasView: UIView {
         addTags(top: top + 366)
         addFeedStats(top: top + 424)
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 335, height: 444)) { [weak self] in
+            RouteContextStore.setTargetWorkKey("work-local-victoria")
+            RouteContextStore.setTargetAccountKey("acct-local-victoria")
             self?.didRequestPage?(.galleryDetail)
         }
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 48, height: 48)) { [weak self] in
@@ -4972,6 +5111,8 @@ final class ReferenceCanvasView: UIView {
             self?.requestPublicPersona(subjectKey: "acct-local-victoria")
         }
         addTrailingDiscoverActionButton(top: top, trailing: 10, width: 54, height: 44) { [weak self] in
+            RouteContextStore.setTargetWorkKey("work-local-victoria")
+            RouteContextStore.setTargetAccountKey("acct-local-victoria")
             self?.didRequestSubjectOverlayPage?(.restrictPanel, "acct-local-victoria")
         }
     }
@@ -5133,14 +5274,14 @@ final class ReferenceCanvasView: UIView {
     private var tagItemSpacing: CGFloat { 8 }
     private var tagRowSpacing: CGFloat { 8 }
 
-    private func measuredTagsHeight(left: CGFloat = 28, right: CGFloat = 20) -> CGFloat {
+    private func measuredTagsHeight(left: CGFloat = 28, right: CGFloat = 20, items: [String]? = nil) -> CGFloat {
         let font = AppFont.source(12)
         let startX = left
         let maxX = adaptiveLayoutWidth - right
         var cursorX = startX
         var rowCount: CGFloat = 1
 
-        tagTexts.forEach { item in
+        (items ?? tagTexts).forEach { item in
             let textWidth = ceil((item as NSString).size(withAttributes: [.font: font]).width)
             let itemWidth = textWidth + tagHorizontalInset * 2
             if cursorX > startX, cursorX + itemWidth > maxX {
