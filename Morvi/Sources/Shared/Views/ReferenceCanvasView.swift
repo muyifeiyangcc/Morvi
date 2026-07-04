@@ -4,6 +4,7 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 final class ReferenceCanvasView: UIView {
+    private static let assistantUnlockCost = 200
     private static var agreementConsentAccepted = true
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
     private static let ciContext = CIContext(options: nil)
@@ -277,11 +278,11 @@ final class ReferenceCanvasView: UIView {
             didRequestOverlayPage?(.accessGate)
             return
         }
-        guard AccountSessionCenter.shared.activeWalletBalanceValue() >= 200 else {
+        guard AccountSessionCenter.shared.activeWalletBalanceValue() >= Self.assistantUnlockCost else {
             didRequestOverlayPage?(.creditShortage)
             return
         }
-        didRequestPage?(.assistantDialogue)
+        didRequestOverlayPage?(.spendConfirm)
     }
 
     private func renderDiscover() {
@@ -2482,7 +2483,7 @@ final class ReferenceCanvasView: UIView {
         if page == .accessGate {
             confirmButton.addTarget(self, action: #selector(openSignInFromPopup), for: .touchUpInside)
         } else if page == .spendConfirm {
-            confirmButton.addTarget(self, action: #selector(showCreditShortagePopup), for: .touchUpInside)
+            confirmButton.addTarget(self, action: #selector(confirmAssistantUnlock), for: .touchUpInside)
         } else if page == .creditShortage {
             confirmButton.addTarget(self, action: #selector(openWalletFromPopup), for: .touchUpInside)
         } else if page == .signOutConfirm {
@@ -2507,6 +2508,24 @@ final class ReferenceCanvasView: UIView {
 
     @objc private func showCreditShortagePopup() {
         didRequestOverlayPage?(.creditShortage)
+    }
+
+    @objc private func confirmAssistantUnlock() {
+        let didConsume: Bool
+        do {
+            didConsume = try AccountSessionCenter.shared.consumeActiveWalletBalanceValue(
+                amount: Self.assistantUnlockCost
+            )
+        } catch {
+            didConsume = false
+        }
+        guard didConsume else {
+            didRequestOverlayPage?(.creditShortage)
+            return
+        }
+        let controller = owningController()
+        removeFromSuperview()
+        controller?.navigationController?.pushViewController(RouteFactory.controller(for: .assistantDialogue), animated: true)
     }
 
     @objc private func openWalletFromPopup() {

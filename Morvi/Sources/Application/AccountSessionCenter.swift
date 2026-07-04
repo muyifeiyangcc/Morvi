@@ -48,6 +48,13 @@ final class AccountSessionCenter {
         return (try? walletRepository.balanceValue(accountKey: accountKey)) ?? 0
     }
 
+    func consumeActiveWalletBalanceValue(amount: Int) throws -> Bool {
+        guard let accountKey = activeAccountKey else {
+            return false
+        }
+        return try walletRepository.consumeBalanceValue(accountKey: accountKey, amount: amount)
+    }
+
     func signInAsGuest() throws {
         let accountKey = try guestRepository.resolveAccountKey()
         try activateSession(accountKey: accountKey, accessKind: 1)

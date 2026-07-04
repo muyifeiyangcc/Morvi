@@ -3,6 +3,7 @@ import Foundation
 protocol WalletRepository {
     func save(_ record: WalletRecord) throws
     func balanceValue(accountKey: String) throws -> Int
+    func consumeBalanceValue(accountKey: String, amount: Int) throws -> Bool
 }
 
 final class SQLiteWalletRepository: WalletRepository {
@@ -34,5 +35,30 @@ final class SQLiteWalletRepository: WalletRepository {
             "SELECT balance_value FROM credit_account WHERE account_key = ? LIMIT 1;",
             bindings: [.text(accountKey)]
         )
+    }
+
+    func consumeBalanceValue(accountKey: String, amount: Int) throws -> Bool {
+        var didConsume = false
+        try store.transaction {
+            let currentValue = try balanceValue(accountKey: accountKey)
+            guard currentValue >= amount else {
+                return
+            }
+            try store.write(
+                """
+                UPDATE credit_account
+                SET balance_value = ?,
+                    updated_at = ?
+                WHERE account_key = ?;
+                """,
+                bindings: [
+                    .int(currentValue - amount),
+                    .text(LocalDateText.now()),
+                    .text(accountKey)
+                ]
+            )
+            didConsume = true
+        }
+        return didConsume
     }
 }
