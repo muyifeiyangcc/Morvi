@@ -4,6 +4,7 @@ final class IntroCopyPanelView: UIView {
     private let gradientLayer = CAGradientLayer()
     private let sizingLabel = UILabel()
     private let titleLabel = UILabel()
+    private let revealFeedbackGenerator = UISelectionFeedbackGenerator()
     private var revealTimer: Timer?
     private var revealCharacters: [Character] = []
     private var revealIndex = 0
@@ -87,6 +88,7 @@ final class IntroCopyPanelView: UIView {
         revealTimer?.invalidate()
         revealCharacters = Array(title)
         revealIndex = 0
+        revealFeedbackGenerator.prepare()
         revealTimer = Timer.scheduledTimer(withTimeInterval: 0.045, repeats: true) { [weak self] timer in
             guard let self else {
                 timer.invalidate()
@@ -99,6 +101,8 @@ final class IntroCopyPanelView: UIView {
             }
             revealIndex += 1
             titleLabel.text = String(revealCharacters.prefix(revealIndex))
+            revealFeedbackGenerator.selectionChanged()
+            revealFeedbackGenerator.prepare()
         }
     }
 }
