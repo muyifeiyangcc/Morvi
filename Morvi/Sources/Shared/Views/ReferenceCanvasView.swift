@@ -23,6 +23,7 @@ final class ReferenceCanvasView: UIView {
     private static var agreementConsentAccepted = true
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
     private static let ciContext = CIContext(options: nil)
+    private static let largeFieldPlaceholderTag = 7801
 
     static var hasAcceptedAgreementConsent: Bool {
         agreementConsentAccepted
@@ -2204,7 +2205,7 @@ final class ReferenceCanvasView: UIView {
         }
 
         let detailText = (uploadDetailTextView?.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        guard detailText.isEmpty == false, detailText != "Say something" else {
+        guard detailText.isEmpty == false else {
             MorviToastView.show("Please enter description", in: self)
             return
         }
@@ -3937,12 +3938,13 @@ final class ReferenceCanvasView: UIView {
         }
         NSLayoutConstraint.activate(fieldConstraints)
         let inputView = UITextView()
-        inputView.text = text
-        inputView.textColor = .darkGray
+        inputView.text = ""
+        inputView.textColor = .black
         inputView.font = AppFont.source(14)
         inputView.backgroundColor = .clear
         inputView.textContainerInset = .zero
         inputView.textContainer.lineFragmentPadding = 0
+        inputView.delegate = self
         textViewHandler?(inputView)
         field.addSubview(inputView)
         inputView.translatesAutoresizingMaskIntoConstraints = false
@@ -3951,6 +3953,20 @@ final class ReferenceCanvasView: UIView {
             inputView.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -16),
             inputView.topAnchor.constraint(equalTo: field.topAnchor, constant: 16),
             inputView.bottomAnchor.constraint(equalTo: field.bottomAnchor, constant: -16)
+        ])
+
+        let placeholderLabel = UILabel()
+        placeholderLabel.tag = Self.largeFieldPlaceholderTag
+        placeholderLabel.text = text
+        placeholderLabel.textColor = .darkGray
+        placeholderLabel.font = AppFont.source(14)
+        placeholderLabel.isUserInteractionEnabled = false
+        field.addSubview(placeholderLabel)
+        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            placeholderLabel.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
+            placeholderLabel.trailingAnchor.constraint(lessThanOrEqualTo: field.trailingAnchor, constant: -16),
+            placeholderLabel.topAnchor.constraint(equalTo: field.topAnchor, constant: 16)
         ])
         return field
     }
@@ -5446,6 +5462,14 @@ extension ReferenceCanvasView: UIGestureRecognizerDelegate {
 extension ReferenceCanvasView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updatePersonaBackdrop(for: scrollView)
+    }
+}
+
+extension ReferenceCanvasView: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        textView.superview?
+            .viewWithTag(Self.largeFieldPlaceholderTag)?
+            .isHidden = textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
 }
 
