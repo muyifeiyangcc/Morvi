@@ -1394,6 +1394,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderWallet() {
         addTopTitle("Wallet")
+        let balanceText = "\(AccountSessionCenter.shared.activeWalletBalanceValue())"
         let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -1425,7 +1426,7 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = scrollContent
         addNotchedPanel(top: 56, left: 20, width: 335, height: 122)
-        addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56)
+        addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56, amountText: balanceText)
         let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900"]
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99"]
         for index in amounts.indices {
@@ -1457,7 +1458,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addWalletBalanceTextGroup(parent: UIView, cardTop: CGFloat) {
+    private func addWalletBalanceTextGroup(parent: UIView, cardTop: CGFloat, amountText: String) {
         let group = UIView()
         group.backgroundColor = .clear
         parent.addSubview(group)
@@ -1469,7 +1470,7 @@ final class ReferenceCanvasView: UIView {
         titleLabel.font = AppFont.source(20, weight: .medium)
 
         let amountLabel = UILabel()
-        amountLabel.text = "1000"
+        amountLabel.text = amountText
         amountLabel.textColor = UIColor(red: 0.79, green: 1, blue: 0.18, alpha: 1)
         amountLabel.font = AppFont.fredoka(36)
 

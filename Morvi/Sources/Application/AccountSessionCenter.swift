@@ -8,17 +8,20 @@ final class AccountSessionCenter {
     private let profileRepository: AccountProfileRepository
     private let guestRepository: GuestAccessRepository
     private let appleRepository: AppleAccessRepository
+    private let walletRepository: WalletRepository
 
     private init(
         repository: AccountSessionRepository = SQLiteAccountSessionRepository(),
         profileRepository: AccountProfileRepository = SQLiteAccountProfileRepository(),
         guestRepository: GuestAccessRepository = GuestAccessRepository(),
-        appleRepository: AppleAccessRepository = AppleAccessRepository()
+        appleRepository: AppleAccessRepository = AppleAccessRepository(),
+        walletRepository: WalletRepository = SQLiteWalletRepository()
     ) {
         self.repository = repository
         self.profileRepository = profileRepository
         self.guestRepository = guestRepository
         self.appleRepository = appleRepository
+        self.walletRepository = walletRepository
     }
 
     var isSignedIn: Bool {
@@ -36,6 +39,13 @@ final class AccountSessionCenter {
         }
         let avatarAsset = try? profileRepository.avatarAsset(stableKey: accountKey)
         return (displayName, avatarAsset)
+    }
+
+    func activeWalletBalanceValue() -> Int {
+        guard let accountKey = activeAccountKey else {
+            return 0
+        }
+        return (try? walletRepository.balanceValue(accountKey: accountKey)) ?? 0
     }
 
     func signInAsGuest() throws {

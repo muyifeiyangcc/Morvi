@@ -2,6 +2,7 @@ import Foundation
 
 protocol WalletRepository {
     func save(_ record: WalletRecord) throws
+    func balanceValue(accountKey: String) throws -> Int
 }
 
 final class SQLiteWalletRepository: WalletRepository {
@@ -25,6 +26,13 @@ final class SQLiteWalletRepository: WalletRepository {
                 .int(record.balanceValue),
                 .text(record.updatedAt)
             ]
+        )
+    }
+
+    func balanceValue(accountKey: String) throws -> Int {
+        try store.readInt(
+            "SELECT balance_value FROM credit_account WHERE account_key = ? LIMIT 1;",
+            bindings: [.text(accountKey)]
         )
     }
 }
