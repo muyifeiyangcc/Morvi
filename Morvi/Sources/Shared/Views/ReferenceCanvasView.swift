@@ -4528,7 +4528,7 @@ final class ReferenceCanvasView: UIView {
         layoutContainer.addSubview(stripView)
         stripView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            stripView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
+            stripView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor),
             stripView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor),
             stripView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             stripView.heightAnchor.constraint(equalToConstant: 78)
@@ -4560,7 +4560,7 @@ final class ReferenceCanvasView: UIView {
             showsShadow: false
         )
         addText(name, size: 19, weight: .bold, top: top + 4, left: 68)
-        addFeedMoreIcon(top: top + 6, left: 314)
+        addFeedMoreIcon(top: top + 6)
         addTags(top: top + 366)
         addFeedStats(top: top + 424)
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 335, height: 444)) { [weak self] in
@@ -4643,14 +4643,14 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addFeedMoreIcon(top: CGFloat, left: CGFloat) {
+    private func addFeedMoreIcon(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let iconView = UIImageView(image: UIImage(named: "feed_more_icon"))
         iconView.contentMode = .scaleAspectFit
         layoutContainer.addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            iconView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            iconView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
             iconView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             iconView.widthAnchor.constraint(equalToConstant: 24),
             iconView.heightAnchor.constraint(equalToConstant: 24)

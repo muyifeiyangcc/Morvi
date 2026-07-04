@@ -22,9 +22,9 @@ final class DiscoverStoryStripView: UIView {
     override init(frame: CGRect) {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
-        layout.itemSize = CGSize(width: 76, height: 78)
+        layout.minimumLineSpacing = 30
+        layout.minimumInteritemSpacing = 30
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         collectionView = CancelFriendlyCollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: frame)
         configureCollectionView()
@@ -73,6 +73,18 @@ extension DiscoverStoryStripView: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         didSelectEntry?(indexPath.item)
     }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        let title = entries[indexPath.item].title
+        let titleWidth = ceil((title as NSString).size(
+            withAttributes: [.font: AppFont.source(12, weight: .regular)]
+        ).width)
+        return CGSize(width: max(48, titleWidth), height: 78)
+    }
 }
 
 private final class StoryStripCell: UICollectionViewCell {
@@ -104,8 +116,6 @@ private final class StoryStripCell: UICollectionViewCell {
         titleLabel.textAlignment = .center
         titleLabel.textColor = .black
         titleLabel.font = AppFont.source(12, weight: .regular)
-        titleLabel.adjustsFontSizeToFitWidth = true
-        titleLabel.minimumScaleFactor = 0.75
 
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
@@ -118,7 +128,8 @@ private final class StoryStripCell: UICollectionViewCell {
             imageView.heightAnchor.constraint(equalToConstant: 48),
 
             titleLabel.centerXAnchor.constraint(equalTo: imageView.centerXAnchor),
-            titleLabel.widthAnchor.constraint(equalToConstant: 72),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 6),
             titleLabel.heightAnchor.constraint(equalToConstant: 18)
         ])
