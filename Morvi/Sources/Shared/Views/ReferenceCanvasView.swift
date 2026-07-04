@@ -1896,7 +1896,7 @@ final class ReferenceCanvasView: UIView {
             bottomBar.leadingAnchor.constraint(equalTo: leadingAnchor),
             bottomBar.trailingAnchor.constraint(equalTo: trailingAnchor),
             bottomBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32),
-            bottomBar.heightAnchor.constraint(equalToConstant: 129)
+            bottomBar.heightAnchor.constraint(equalToConstant: 96)
         ])
 
         let webView = WKWebView(frame: .zero)
@@ -1913,16 +1913,12 @@ final class ReferenceCanvasView: UIView {
             webView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             webView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             webView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
-            webView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor, constant: -10)
+            webView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor, constant: -16)
         ])
 
-        addText("Terms of Use", size: 16, weight: .regular, top: 0, left: 61, parent: bottomBar)
-        addLine(top: 19, left: 61, width: 95, color: .darkGray, parent: bottomBar)
-        addText("Privacy Policy", size: 16, weight: .regular, top: 0, left: 213, parent: bottomBar)
-        addLine(top: 19, left: 213, width: 101, color: .darkGray, parent: bottomBar)
-        addPillButton("Cancel", top: 33, left: 48, width: 124, dark: false, fontWeight: .medium, parent: bottomBar)
-        addPillButton("I agree", top: 33, left: 204, width: 124, dark: true, fontWeight: .medium, parent: bottomBar)
-        addAgreementConsentLine(top: 109, parent: bottomBar)
+        addPillButton("Cancel", top: 0, left: 48, width: 124, dark: false, fontWeight: .medium, parent: bottomBar)
+        addPillButton("I agree", top: 0, left: 204, width: 124, dark: true, fontWeight: .medium, parent: bottomBar)
+        addAgreementConsentLine(top: 76, parent: bottomBar)
         bringSubviewToFront(bottomBar)
         showProgressOverlay()
         webView.loadHTMLString(agreementHTML(), baseURL: nil)
