@@ -1155,20 +1155,31 @@ final class ReferenceCanvasView: UIView {
 
     private func addFullscreenGalleryCover() {
         let coverImage = UIImage(named: "discover_feed_cover")
+        let coverContainer = UIView()
+        coverContainer.clipsToBounds = true
+        addSubview(coverContainer)
+        coverContainer.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            coverContainer.leadingAnchor.constraint(equalTo: leadingAnchor),
+            coverContainer.trailingAnchor.constraint(equalTo: trailingAnchor),
+            coverContainer.topAnchor.constraint(equalTo: topAnchor),
+            coverContainer.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
         let coverView = UIImageView(image: coverImage)
         coverView.contentMode = .scaleAspectFill
         coverView.clipsToBounds = true
-        addSubview(coverView)
+        coverContainer.addSubview(coverView)
         coverView.translatesAutoresizingMaskIntoConstraints = false
-        pinFullHeightImageView(coverView, image: coverImage)
+        pinFullHeightImageView(coverView, image: coverImage, in: coverContainer)
 
         let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
         iconView.contentMode = .scaleAspectFit
-        coverView.addSubview(iconView)
+        coverContainer.addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            iconView.centerXAnchor.constraint(equalTo: coverView.centerXAnchor),
-            iconView.centerYAnchor.constraint(equalTo: coverView.centerYAnchor),
+            iconView.centerXAnchor.constraint(equalTo: coverContainer.centerXAnchor),
+            iconView.centerYAnchor.constraint(equalTo: coverContainer.centerYAnchor),
             iconView.widthAnchor.constraint(equalToConstant: 40),
             iconView.heightAnchor.constraint(equalToConstant: 40)
         ])
@@ -3918,11 +3929,12 @@ final class ReferenceCanvasView: UIView {
         return panel
     }
 
-    private func pinFullHeightImageView(_ imageView: UIImageView, image: UIImage?) {
+    private func pinFullHeightImageView(_ imageView: UIImageView, image: UIImage?, in container: UIView? = nil) {
+        let container = container ?? self
         var constraints = [
-            imageView.topAnchor.constraint(equalTo: topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            imageView.centerXAnchor.constraint(equalTo: centerXAnchor)
+            imageView.topAnchor.constraint(equalTo: container.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            imageView.centerXAnchor.constraint(equalTo: container.centerXAnchor)
         ]
         if let image, image.size.height > 0 {
             constraints.append(imageView.widthAnchor.constraint(
@@ -3931,8 +3943,8 @@ final class ReferenceCanvasView: UIView {
             ))
         } else {
             constraints.append(contentsOf: [
-                imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-                imageView.trailingAnchor.constraint(equalTo: trailingAnchor)
+                imageView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+                imageView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
             ])
         }
         NSLayoutConstraint.activate(constraints)
