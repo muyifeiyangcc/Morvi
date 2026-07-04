@@ -790,13 +790,7 @@ final class ReferenceCanvasView: UIView {
 
     private func assistantDialogueEntries() -> [DialogueFlowEntry] {
         [
-            .wideAsset(name: "assistant_intro_card_background", title: "Hello!\nHow can I help you?"),
-            .roundedPhrase(text: "How to develop self-discipline?", side: .local, showsAvatar: false),
-            .roundedPhrase(
-                text: "Cultivating self-discipline is a\nprocess that requires patience,\nstrategy and continuous practice. It\nis not achieved overnight but\nthrough gradually adjusting habits,\nstrengthening willpower and\nestablishing a support system.",
-                side: .remote,
-                showsAvatar: false
-            )
+            .wideAsset(name: "assistant_intro_card_background", title: "Hello!\nHow can I help you?")
         ]
     }
 
