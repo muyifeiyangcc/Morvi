@@ -94,6 +94,10 @@ class ReferencePageController: BaseSceneController {
             MorviToastView.show("Please enter email", in: view)
             return
         }
+        guard isValidEmailText(emailText) else {
+            MorviToastView.show("Please enter a valid email address", in: view)
+            return
+        }
         guard passwordText.isEmpty == false else {
             MorviToastView.show("Please enter password", in: view)
             return
@@ -131,6 +135,10 @@ class ReferencePageController: BaseSceneController {
 
         guard emailText.isEmpty == false else {
             MorviToastView.show("Please enter email", in: view)
+            return
+        }
+        guard isValidEmailText(emailText) else {
+            MorviToastView.show("Please enter a valid email address", in: view)
             return
         }
         guard secretText.isEmpty == false else {
@@ -189,6 +197,10 @@ class ReferencePageController: BaseSceneController {
 
         guard emailText.isEmpty == false else {
             MorviToastView.show("Please enter email", in: view)
+            return
+        }
+        guard isValidEmailText(emailText) else {
+            MorviToastView.show("Please enter a valid email address", in: view)
             return
         }
         guard secretText.isEmpty == false else {
@@ -484,6 +496,11 @@ class ReferencePageController: BaseSceneController {
 
     private func trimmedText(_ field: UITextField) -> String {
         (field.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func isValidEmailText(_ text: String) -> Bool {
+        let pattern = #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
+        return text.range(of: pattern, options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     private func showProgressOverlay() {
