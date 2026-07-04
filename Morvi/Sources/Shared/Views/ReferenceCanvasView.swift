@@ -44,6 +44,7 @@ final class ReferenceCanvasView: UIView {
     private var keyboardBaseIndicatorInsets: UIEdgeInsets?
     private var keyboardBaseContentOffset: CGPoint?
     private var keyboardIsVisible = false
+    private let creativeRepository = SQLiteCreativeWorkRepository()
     private let replyListDataSource = ReplyListDataSource()
     private let dialogueRepository = SQLiteDialogueRepository()
     private weak var agreementConsentIconView: UIImageView?
@@ -331,6 +332,15 @@ final class ReferenceCanvasView: UIView {
 
     private func renderDiscover() {
         addTopTitle("Discover")
+        let stripEntries = discoverStripEntries()
+        let workEntries = discoverWorkEntries()
+        let cardGap: CGFloat = 28
+        let cardHeight: CGFloat = 444
+        let firstCardTop: CGFloat = 126
+        let contentHeight = max(
+            1090,
+            firstCardTop + CGFloat(max(workEntries.count, 1)) * cardHeight + CGFloat(max(workEntries.count - 1, 0)) * cardGap + 40
+        )
         let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -357,13 +367,34 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: 1090)
+            scrollContent.heightAnchor.constraint(equalToConstant: contentHeight)
         ])
 
         activeLayoutContainer = scrollContent
-        addStoryStrip(top: 22)
-        addFeedCard(name: "Victoria", top: 126, tint: .coast)
-        addFeedCard(name: "Rowan", top: 594, tint: .sky)
+        addStoryStrip(top: 22, entries: stripEntries)
+        if workEntries.isEmpty {
+            addFeedCard(
+                item: DiscoveryWorkEntry(
+                    stableKey: "fallback-work",
+                    accountKey: "acct-local-victoria",
+                    displayName: "Victoria",
+                    avatarAsset: "builtin_avatar_victoria",
+                    title: "Moments Matter",
+                    bodyText: "Capturing today's happiness. Saving it for tomorrow's memories.",
+                    coverAsset: "discover_feed_cover",
+                    themes: tagTexts,
+                    reactionCount: 666,
+                    replyCount: 777
+                ),
+                top: firstCardTop,
+                tint: .coast
+            )
+        } else {
+            for (index, item) in workEntries.enumerated() {
+                let top = firstCardTop + CGFloat(index) * (cardHeight + cardGap)
+                addFeedCard(item: item, top: top, tint: index.isMultiple(of: 2) ? .coast : .sky)
+            }
+        }
         activeLayoutContainer = nil
     }
 
@@ -4515,9 +4546,35 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addStoryStrip(top: CGFloat) {
+    private func discoverStripEntries() -> [DiscoverStoryStripView.StripEntry] {
+        let profiles = (try? creativeRepository.discoveryProfiles(limit: 5)) ?? []
+        guard !profiles.isEmpty else {
+            return DiscoverStoryStripView.defaultEntries()
+        }
+        return [
+            DiscoverStoryStripView.StripEntry(
+                accountKey: nil,
+                title: "My works",
+                imageName: "story_my_works_icon",
+                clipsToCircle: false
+            )
+        ] + profiles.map {
+            DiscoverStoryStripView.StripEntry(
+                accountKey: $0.accountKey,
+                title: $0.displayName,
+                imageName: $0.avatarAsset,
+                clipsToCircle: true
+            )
+        }
+    }
+
+    private func discoverWorkEntries() -> [DiscoveryWorkEntry] {
+        (try? creativeRepository.discoveryWorks(limit: 12)) ?? []
+    }
+
+    private func addStoryStrip(top: CGFloat, entries: [DiscoverStoryStripView.StripEntry]) {
         let layoutContainer = activeLayoutContainer ?? self
-        let stripView = DiscoverStoryStripView()
+        let stripView = DiscoverStoryStripView(entries: entries)
         stripView.didSelectEntry = { [weak self] index in
             if index == 0 {
                 self?.didRequestOverlayPage?(.uploadEmpty)
@@ -4533,6 +4590,45 @@ final class ReferenceCanvasView: UIView {
             stripView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             stripView.heightAnchor.constraint(equalToConstant: 78)
         ])
+    }
+
+    private func addFeedCard(item: DiscoveryWorkEntry, top: CGFloat, tint: MediaTint) {
+        addMediaBlock(
+            top: top + 48,
+            left: 20,
+            width: 335,
+            height: 360,
+            title: item.title,
+            tint: tint,
+            action: .play,
+            imageName: item.coverAsset,
+            cornerRadius: 24,
+            titleSize: 16,
+            titleTop: 286,
+            titleUsesOneFont: true,
+            trailing: 20
+        )
+        addAssetAvatar(item.avatarAsset, top: top, left: 20, size: 36)
+        addText(item.displayName, size: 19, weight: .bold, top: top + 4, left: 68)
+        addFeedMoreIcon(top: top + 6)
+        addTags(top: top + 366, items: item.themes)
+        addFeedStats(
+            top: top + 424,
+            reactions: max(item.reactionCount, 666),
+            replies: max(item.replyCount, 777)
+        )
+        addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 335, height: 444)) { [weak self] in
+            self?.didRequestPage?(.galleryDetail)
+        }
+        addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 48, height: 48)) { [weak self] in
+            self?.didRequestPage?(.publicPersona)
+        }
+        addDiscoverActionButton(frame: CGRect(x: 68, y: top, width: 160, height: 44)) { [weak self] in
+            self?.didRequestPage?(.publicPersona)
+        }
+        addDiscoverActionButton(frame: CGRect(x: 302, y: top, width: 54, height: 44)) { [weak self] in
+            self?.didRequestOverlayPage?(.restrictPanel)
+        }
     }
 
     private func addFeedCard(name: String, top: CGFloat, tint: MediaTint) {
@@ -4613,10 +4709,10 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate(buttonConstraints)
     }
 
-    private func addFeedStats(top: CGFloat) {
+    private func addFeedStats(top: CGFloat, reactions: Int = 666, replies: Int = 777) {
         let layoutContainer = activeLayoutContainer ?? self
-        addFeedStat(iconName: "feed_like_icon", text: "666 Likes", top: top, left: 22, parent: layoutContainer)
-        addFeedStat(iconName: "feed_reply_icon", text: "777 Comments", top: top, left: 130, parent: layoutContainer)
+        addFeedStat(iconName: "feed_like_icon", text: "\(reactions) Likes", top: top, left: 22, parent: layoutContainer)
+        addFeedStat(iconName: "feed_reply_icon", text: "\(replies) Comments", top: top, left: 130, parent: layoutContainer)
     }
 
     private func addFeedStat(iconName: String, text: String, top: CGFloat, left: CGFloat, parent: UIView) {
@@ -4657,7 +4753,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addTags(top: CGFloat, left: CGFloat = 28, right: CGFloat = 20) {
+    private func addTags(top: CGFloat, left: CGFloat = 28, right: CGFloat = 20, items: [String]? = nil) {
         let layoutContainer = activeLayoutContainer ?? self
         let font = AppFont.source(12)
         let rowHeight = tagRowHeight
@@ -4669,7 +4765,7 @@ final class ReferenceCanvasView: UIView {
         var cursorX = startX
         var cursorY = top
 
-        tagTexts.forEach { item in
+        (items ?? tagTexts).forEach { item in
             let textWidth = ceil((item as NSString).size(withAttributes: [.font: font]).width)
             let itemWidth = textWidth + horizontalInset * 2
             if cursorX > startX, cursorX + itemWidth > maxX {

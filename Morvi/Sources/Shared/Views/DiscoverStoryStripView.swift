@@ -1,37 +1,44 @@
 import UIKit
 
 final class DiscoverStoryStripView: UIView {
-    fileprivate struct StripEntry {
+    struct StripEntry {
+        let accountKey: String?
         let title: String
         let imageName: String
         let clipsToCircle: Bool
     }
 
-    private let entries: [StripEntry] = [
-        StripEntry(title: "My works", imageName: "story_my_works_icon", clipsToCircle: false),
-        StripEntry(title: "Victoria", imageName: "profile_avatar", clipsToCircle: true),
-        StripEntry(title: "Rowan", imageName: "profile_avatar", clipsToCircle: true),
-        StripEntry(title: "Sophia", imageName: "profile_avatar", clipsToCircle: true),
-        StripEntry(title: "Jasper", imageName: "profile_avatar", clipsToCircle: true)
-    ]
+    private let entries: [StripEntry]
 
     var didSelectEntry: ((Int) -> Void)?
 
     private let collectionView: UICollectionView
 
-    override init(frame: CGRect) {
+    init(entries: [StripEntry] = DiscoverStoryStripView.defaultEntries()) {
+        self.entries = entries
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 30
         layout.minimumInteritemSpacing = 30
         layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         collectionView = CancelFriendlyCollectionView(frame: .zero, collectionViewLayout: layout)
-        super.init(frame: frame)
+        super.init(frame: .zero)
         configureCollectionView()
     }
 
     required init?(coder: NSCoder) {
         nil
+    }
+
+    static func defaultEntries() -> [StripEntry] {
+        [
+            StripEntry(accountKey: nil, title: "My works", imageName: "story_my_works_icon", clipsToCircle: false),
+            StripEntry(accountKey: "acct-local-victoria", title: "Victoria", imageName: "builtin_avatar_victoria", clipsToCircle: true),
+            StripEntry(accountKey: "acct-local-rowan", title: "Rowan", imageName: "builtin_avatar_rowan", clipsToCircle: true),
+            StripEntry(accountKey: "acct-local-sophia", title: "Sophia", imageName: "builtin_avatar_sophia", clipsToCircle: true),
+            StripEntry(accountKey: "acct-local-jasper", title: "Jasper", imageName: "builtin_avatar_jasper", clipsToCircle: true),
+            StripEntry(accountKey: "acct-local-chloe", title: "Chloe", imageName: "builtin_avatar_chloe", clipsToCircle: true)
+        ]
     }
 
     private func configureCollectionView() {
