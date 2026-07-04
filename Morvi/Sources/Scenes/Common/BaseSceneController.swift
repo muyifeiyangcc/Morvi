@@ -24,12 +24,7 @@ class BaseSceneController: UIViewController {
         let canvasView = ReferenceCanvasView(page: page)
         self.canvasView = canvasView
         canvasView.didRequestPage = { [weak self] targetPage in
-            if AccountSessionCenter.shared.requiresSignedInGate(for: targetPage),
-               AccountSessionCenter.shared.isSignedIn == false {
-                self?.showCanvasOverlay(.accessGate)
-                return
-            }
-            self?.navigationController?.pushViewController(RouteFactory.controller(for: targetPage), animated: true)
+            self?.pushCanvasPage(targetPage, restrictionSubjectKey: nil)
         }
         canvasView.didRequestSubjectPage = { [weak self] targetPage, subjectKey in
             self?.pushCanvasPage(targetPage, restrictionSubjectKey: subjectKey)
@@ -222,6 +217,10 @@ class BaseSceneController: UIViewController {
             showCanvasOverlay(.accessGate)
             return
         }
+        if page == .persona {
+            navigateToOwnPersonaRoot()
+            return
+        }
         let targetAccountKey = restrictionSubjectKey ?? RouteContextStore.currentTargetAccountKey()
         if page == .publicPersona,
            let targetAccountKey,
@@ -242,10 +241,12 @@ class BaseSceneController: UIViewController {
     }
 
     private func navigateToOwnPersonaRoot() {
-        navigationController?.popToRootViewController(animated: false)
-        if let rootTabs = navigationController?.viewControllers.first as? RootTabsController {
-            rootTabs.showPersonaRoot()
-        }
+        guard let navigationController else { return }
+        let rootTabs = navigationController.viewControllers
+            .compactMap { $0 as? RootTabsController }
+            .first ?? RootTabsController(initialPage: .persona)
+        navigationController.setViewControllers([rootTabs], animated: false)
+        rootTabs.showPersonaRoot()
     }
 
     private func showCanvasOverlay(_ page: ScenePage, restrictionSubjectKey: String? = nil) {

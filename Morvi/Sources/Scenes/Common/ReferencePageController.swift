@@ -576,10 +576,12 @@ class ReferencePageController: BaseSceneController {
     }
 
     private func navigateToOwnPersonaRoot() {
-        navigationController?.popToRootViewController(animated: false)
-        if let rootTabs = navigationController?.viewControllers.first as? RootTabsController {
-            rootTabs.showPersonaRoot()
-        }
+        guard let navigationController else { return }
+        let rootTabs = navigationController.viewControllers
+            .compactMap { $0 as? RootTabsController }
+            .first ?? RootTabsController(initialPage: .persona)
+        navigationController.setViewControllers([rootTabs], animated: false)
+        rootTabs.showPersonaRoot()
     }
 
     private func chooseWorkCover() {
