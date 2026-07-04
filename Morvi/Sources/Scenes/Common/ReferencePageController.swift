@@ -153,7 +153,7 @@ class ReferencePageController: BaseSceneController {
                         MorviToastView.show("Invalid email or password", in: view)
                         return
                     }
-                    self?.finishAuthFlow()
+                    self?.finishAuthFlow(successToastText: "Login successful")
                 }
             }
         }
@@ -274,12 +274,21 @@ class ReferencePageController: BaseSceneController {
         finishAuthFlow()
     }
 
-    private func finishAuthFlow() {
+    private func finishAuthFlow(successToastText: String? = nil) {
         if navigationController?.presentingViewController != nil {
-            navigationController?.dismiss(animated: true)
+            navigationController?.dismiss(animated: true) {
+                if let successToastText {
+                    MorviToastView.show(successToastText)
+                }
+            }
             return
         }
         navigationController?.setViewControllers([RootTabsController()], animated: true)
+        if let successToastText {
+            DispatchQueue.main.async {
+                MorviToastView.show(successToastText)
+            }
+        }
     }
 
     private func trimmedText(_ field: UITextField) -> String {
