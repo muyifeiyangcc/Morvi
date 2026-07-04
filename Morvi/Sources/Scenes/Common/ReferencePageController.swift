@@ -37,6 +37,25 @@ class ReferencePageController: BaseSceneController {
         }
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        canvasView?.didRequestPrimaryAction = { [weak self] in
+            guard let self else { return }
+            switch self.page {
+            case .signIn:
+                self.submitSignIn()
+            case .signUp:
+                self.submitSignUp()
+            case .resetAccess:
+                self.submitResetAccess()
+            case .personalDetail:
+                self.submitPersonalDetail()
+            default:
+                break
+            }
+        }
+    }
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         guard view.viewWithTag(9001) == nil else { return }

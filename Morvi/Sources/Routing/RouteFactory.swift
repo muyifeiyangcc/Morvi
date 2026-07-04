@@ -16,18 +16,13 @@ enum RouteFactory {
         case .signIn:
             return AuthSceneController(page: .signIn) { scene in
                 [
-                    HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.submitSignIn() },
                     HitArea(frame: CGRect(x: 290, y: 570, width: 70, height: 44)) { scene.push(.resetAccess) }
                 ]
             }
         case .signUp:
-            return AuthSceneController(page: .signUp) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.submitSignUp() }]
-            }
+            return AuthSceneController(page: .signUp)
         case .resetAccess:
-            return AuthSceneController(page: .resetAccess) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.submitResetAccess() }]
-            }
+            return AuthSceneController(page: .resetAccess)
         case .agreement:
             return AuthSceneController(page: .agreement)
         case .settings:
@@ -71,8 +66,7 @@ enum RouteFactory {
         case .personalDetail:
             return AuthSceneController(page: .personalDetail) { scene in
                 [
-                    HitArea(frame: CGRect(x: 135, y: 137, width: 112, height: 112)) { scene.chooseRegistrationAvatar() },
-                    HitArea(frame: CGRect(x: 20, y: 716, width: 335, height: 56)) { scene.submitPersonalDetail() }
+                    HitArea(frame: CGRect(x: 135, y: 137, width: 112, height: 112)) { scene.chooseRegistrationAvatar() }
                 ]
             }
         default:

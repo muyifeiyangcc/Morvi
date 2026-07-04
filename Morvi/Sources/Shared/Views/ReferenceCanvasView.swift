@@ -25,6 +25,7 @@ final class ReferenceCanvasView: UIView {
     var didTapOutsideContent: (() -> Void)?
     var didRequestPage: ((ScenePage) -> Void)?
     var didRequestOverlayPage: ((ScenePage) -> Void)?
+    var didRequestPrimaryAction: (() -> Void)?
     var didChooseMood: ((Int) -> Void)?
     var didCompleteSignOut: (() -> Void)?
     var didCompleteAccountRemoval: (() -> Void)?
@@ -1410,6 +1411,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderSignIn() {
         let scrollView = CancelFriendlyScrollView()
+        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1451,11 +1453,13 @@ final class ReferenceCanvasView: UIView {
         addInputField("Please enter", top: 523, isSecureTextEntry: true)
         addUnderlinedText("Forgot ?", size: 12, top: 588, left: 303, color: .gray)
         activeLayoutContainer = nil
-        addButton("Log in", top: 716, filled: true, usesOneFont: true)
+        let actionButton = addButton("Log in", bottom: 29, filled: true, usesOneFont: true)
+        actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
     }
 
     private func renderSignUp() {
         let scrollView = CancelFriendlyScrollView()
+        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1503,11 +1507,13 @@ final class ReferenceCanvasView: UIView {
             )
         }
         activeLayoutContainer = nil
-        addButton("Sign up", top: 716, filled: true, usesOneFont: true)
+        let actionButton = addButton("Sign up", bottom: 29, filled: true, usesOneFont: true)
+        actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
     }
 
     private func renderResetAccess() {
         let scrollView = CancelFriendlyScrollView()
+        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1554,7 +1560,8 @@ final class ReferenceCanvasView: UIView {
             )
         }
         activeLayoutContainer = nil
-        addButton("Next", top: 716, filled: true, usesOneFont: true)
+        let actionButton = addButton("Next", bottom: 29, filled: true, usesOneFont: true)
+        actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
     }
 
     private func renderForm(title: String, fields: [String], action: String, footer: String?) {
@@ -2056,6 +2063,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderPersonalDetail() {
         let scrollView = CancelFriendlyScrollView()
+        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -2112,7 +2120,12 @@ final class ReferenceCanvasView: UIView {
             addInputField(items[index].1, top: top + 27)
         }
         activeLayoutContainer = nil
-        addButton("Sign up", top: 716, filled: true, usesOneFont: true)
+        let actionButton = addButton("Sign up", bottom: 29, filled: true, usesOneFont: true)
+        actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
+    }
+
+    @objc private func handlePrimaryAction() {
+        didRequestPrimaryAction?()
     }
 
     private func renderRestrictedList() {
