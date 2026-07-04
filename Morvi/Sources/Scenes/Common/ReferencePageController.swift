@@ -72,6 +72,9 @@ class ReferencePageController: BaseSceneController {
         canvasView?.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
         }
+        canvasView?.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
+            self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -491,13 +494,13 @@ class ReferencePageController: BaseSceneController {
         }
     }
 
-    func showOverlay(_ page: ScenePage) {
+    func showOverlay(_ page: ScenePage, restrictionSubjectKey: String? = nil) {
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
             showOverlay(.accessGate)
             return
         }
-        let overlayView = ReferenceCanvasView(page: page)
+        let overlayView = ReferenceCanvasView(page: page, restrictionSubjectKey: restrictionSubjectKey)
         overlayView.tag = 9102
         view.viewWithTag(9102)?.removeFromSuperview()
         view.addSubview(overlayView)
@@ -520,6 +523,9 @@ class ReferencePageController: BaseSceneController {
         }
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
+        }
+        overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
+            self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
         overlayView.didRequestUploadMediaSelection = { [weak self] in
             self?.chooseWorkCover()

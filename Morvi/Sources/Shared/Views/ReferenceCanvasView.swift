@@ -37,6 +37,7 @@ final class ReferenceCanvasView: UIView {
     var didTapOutsideContent: (() -> Void)?
     var didRequestPage: ((ScenePage) -> Void)?
     var didRequestOverlayPage: ((ScenePage) -> Void)?
+    var didRequestSubjectOverlayPage: ((ScenePage, String?) -> Void)?
     var didRequestPrimaryAction: (() -> Void)?
     var didRequestUploadMediaSelection: (() -> Void)?
     var didSubmitUploadWork: ((WorkUploadDraft) -> Void)?
@@ -85,10 +86,12 @@ final class ReferenceCanvasView: UIView {
     private var personaBackdropHeightConstraint: NSLayoutConstraint?
     private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
     private var animatedAssistantEntryKeys: Set<String> = []
+    private let restrictionSubjectKey: String?
 
-    init(page: ScenePage, selectedMoodIndex: Int = 0) {
+    init(page: ScenePage, selectedMoodIndex: Int = 0, restrictionSubjectKey: String? = nil) {
         self.page = page
         self.selectedMoodIndex = selectedMoodIndex
+        self.restrictionSubjectKey = restrictionSubjectKey
         super.init(frame: .zero)
         NotificationCenter.default.addObserver(
             self,
@@ -2774,10 +2777,10 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = sheet
         addText("Report or block", size: 31, weight: .black, top: 28, left: 20, usesOneFont: true)
         let reportTile = addOptionTile(iconName: "restrict_report_icon", top: 81) { [weak self] in
-            self?.didRequestOverlayPage?(.reportPanel)
+            self?.requestModerationOverlay(.reportPanel)
         }
         let restrictTile = addOptionTile(iconName: "restrict_block_icon", top: 81) { [weak self] in
-            self?.didRequestOverlayPage?(.restrictConfirm)
+            self?.requestModerationOverlay(.restrictConfirm)
         }
         NSLayoutConstraint.activate([
             reportTile.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 20),
@@ -2787,6 +2790,21 @@ final class ReferenceCanvasView: UIView {
         ])
         activeLayoutContainer = nil
         installBlankAreaKeyboardDismissal()
+    }
+
+    private func requestModerationOverlay(_ page: ScenePage) {
+        if let restrictionSubjectKey,
+           let activeKey = AccountSessionCenter.shared.activeAccountKey,
+           restrictionSubjectKey == activeKey {
+            let text = page == .reportPanel ? "You can't report yourself." : "You can't block yourself."
+            MorviToastView.show(text, in: self)
+            return
+        }
+        if let didRequestSubjectOverlayPage {
+            didRequestSubjectOverlayPage(page, restrictionSubjectKey)
+        } else {
+            didRequestOverlayPage?(page)
+        }
     }
 
     private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool, showsWordmark: Bool = false) {
@@ -4768,7 +4786,7 @@ final class ReferenceCanvasView: UIView {
             self?.didRequestPage?(.publicPersona)
         }
         addTrailingDiscoverActionButton(top: top, trailing: 10, width: 54, height: 44) { [weak self] in
-            self?.didRequestOverlayPage?(.restrictPanel)
+            self?.didRequestSubjectOverlayPage?(.restrictPanel, item.accountKey)
         }
     }
 

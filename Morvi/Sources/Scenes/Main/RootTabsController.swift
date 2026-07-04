@@ -50,6 +50,9 @@ final class RootTabsController: UIViewController {
         newCanvasView.didRequestOverlayPage = { [weak self] page in
             self?.showOverlay(page)
         }
+        newCanvasView.didRequestSubjectOverlayPage = { [weak self] page, subjectKey in
+            self?.showOverlay(page, restrictionSubjectKey: subjectKey)
+        }
         newCanvasView.didChooseMood = { [weak self] index in
             self?.selectMood(at: index)
         }
@@ -224,13 +227,17 @@ final class RootTabsController: UIViewController {
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
-    private func showOverlay(_ page: ScenePage) {
+    private func showOverlay(_ page: ScenePage, restrictionSubjectKey: String? = nil) {
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
             showOverlay(.accessGate)
             return
         }
-        let overlayView = ReferenceCanvasView(page: page, selectedMoodIndex: selectedMoodIndex)
+        let overlayView = ReferenceCanvasView(
+            page: page,
+            selectedMoodIndex: selectedMoodIndex,
+            restrictionSubjectKey: restrictionSubjectKey
+        )
         overlayView.tag = 9102
         view.viewWithTag(9102)?.removeFromSuperview()
         view.addSubview(overlayView)
@@ -254,6 +261,9 @@ final class RootTabsController: UIViewController {
         }
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
+        }
+        overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
+            self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
         overlayView.didCompleteSignOut = { [weak self] in
             self?.resetAfterSignOut()

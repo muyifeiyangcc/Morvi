@@ -34,6 +34,9 @@ class BaseSceneController: UIViewController {
         canvasView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showCanvasOverlay(targetPage)
         }
+        canvasView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
+            self?.showCanvasOverlay(targetPage, restrictionSubjectKey: subjectKey)
+        }
         view.addSubview(surfaceView)
         surfaceView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -210,13 +213,13 @@ class BaseSceneController: UIViewController {
         }
     }
 
-    private func showCanvasOverlay(_ page: ScenePage) {
+    private func showCanvasOverlay(_ page: ScenePage, restrictionSubjectKey: String? = nil) {
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
             showCanvasOverlay(.accessGate)
             return
         }
-        let overlayView = ReferenceCanvasView(page: page)
+        let overlayView = ReferenceCanvasView(page: page, restrictionSubjectKey: restrictionSubjectKey)
         overlayView.tag = 9102
         view.viewWithTag(9102)?.removeFromSuperview()
         view.addSubview(overlayView)
@@ -238,6 +241,9 @@ class BaseSceneController: UIViewController {
         }
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showCanvasOverlay(targetPage)
+        }
+        overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
+            self?.showCanvasOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
         overlayView.didCompleteSignOut = { [weak self] in
             self?.completeSignOutFlow()
