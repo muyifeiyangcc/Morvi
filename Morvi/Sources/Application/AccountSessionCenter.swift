@@ -357,7 +357,8 @@ final class AccountSessionCenter {
 
     func requiresSignedInGate(for page: ScenePage) -> Bool {
         switch page {
-        case .wallet,
+        case .persona,
+             .wallet,
              .settings,
              .restrictedList,
              .directDialogue,

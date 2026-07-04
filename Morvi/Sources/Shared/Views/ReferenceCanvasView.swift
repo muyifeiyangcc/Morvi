@@ -549,9 +549,19 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersona() {
-        let accountKey = AccountSessionCenter.shared.activeAccountKey ?? "acct-local-amelia"
-        let detail = resolvedPersonaDetail(accountKey: accountKey, fallbackName: "Amelia")
-        let workEntries = resolvedPersonaWorks(accountKey: accountKey)
+        let accountKey = AccountSessionCenter.shared.activeAccountKey
+        let detail = accountKey.map {
+            resolvedPersonaDetail(accountKey: $0, fallbackName: "Please log in first")
+        } ?? PersonaDetailEntry(
+            accountKey: "",
+            displayName: "Please log in first",
+            avatarAsset: "default_avatar",
+            coverAsset: "image.png",
+            worksText: "0",
+            followersText: "0",
+            followingText: "0"
+        )
+        let workEntries = accountKey.map { resolvedPersonaWorks(accountKey: $0) } ?? []
         addPersonaRootGradient()
         addPersonaBackdrop(imageName: personaBackdropAssetName(for: detail))
         let scrollView = CancelFriendlyScrollView()
