@@ -1931,7 +1931,7 @@ final class ReferenceCanvasView: UIView {
             formView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             formView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             formView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            formView.heightAnchor.constraint(equalToConstant: 506)
+            formView.heightAnchor.constraint(equalToConstant: 518)
         ])
 
         activeLayoutContainer = formView
