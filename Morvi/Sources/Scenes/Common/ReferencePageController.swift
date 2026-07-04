@@ -564,6 +564,9 @@ class ReferencePageController: BaseSceneController {
             return
         }
         let targetAccountKey = restrictionSubjectKey ?? RouteContextStore.currentTargetAccountKey()
+        if page == .directDialogue {
+            guard validateDirectDialogueAccess(targetAccountKey: targetAccountKey) else { return }
+        }
         if page == .publicPersona,
            let targetAccountKey,
            AccountSessionCenter.shared.isActiveAccount(targetAccountKey) {
@@ -580,6 +583,26 @@ class ReferencePageController: BaseSceneController {
             RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
+    }
+
+    private func validateDirectDialogueAccess(targetAccountKey: String?) -> Bool {
+        guard AccountSessionCenter.shared.isSignedIn else {
+            showOverlay(.accessGate)
+            return false
+        }
+        guard let targetAccountKey else {
+            MorviToastView.show("Unable to open chat.", in: view)
+            return false
+        }
+        guard AccountSessionCenter.shared.isActiveAccount(targetAccountKey) == false else {
+            navigateToOwnPersonaRoot()
+            return false
+        }
+        guard AccountSessionCenter.shared.hasMutualConnection(with: targetAccountKey) else {
+            MorviToastView.show("You need to follow each other first.", in: view)
+            return false
+        }
+        return true
     }
 
     private func navigateToOwnPersonaRoot() {
