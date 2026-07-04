@@ -3,6 +3,7 @@ import UIKit
 class ReferencePageController: BaseSceneController {
     private let page: ScenePage
     private let areasBuilder: ((ReferencePageController) -> [HitArea])?
+    private weak var progressOverlayView: MorviProgressOverlayView?
 
     init(page: ScenePage, areas: ((ReferencePageController) -> [HitArea])? = nil) {
         self.page = page
@@ -77,7 +78,27 @@ class ReferencePageController: BaseSceneController {
         }
 
         view.endEditing(true)
-        push(.personalDetail)
+        showProgressOverlay()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                try AccountSessionCenter.shared.registerAndActivate(
+                    email: emailText,
+                    secretText: passwordText
+                )
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        self?.closeAuthFlowAfterRegistration()
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let view = self?.view else { return }
+                        MorviToastView.show("Registration failed", in: view)
+                    }
+                }
+            }
+        }
     }
 
     func showOverlay(_ page: ScenePage) {
@@ -123,6 +144,29 @@ class ReferencePageController: BaseSceneController {
 
     private func trimmedText(_ field: UITextField) -> String {
         (field.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func showProgressOverlay() {
+        let overlay = MorviProgressOverlayView()
+        progressOverlayView = overlay
+        overlay.show(in: view)
+    }
+
+    private func hideProgressOverlay(completion: @escaping () -> Void) {
+        guard let progressOverlayView else {
+            completion()
+            return
+        }
+        progressOverlayView.dismiss(completion: completion)
+        self.progressOverlayView = nil
+    }
+
+    private func closeAuthFlowAfterRegistration() {
+        if navigationController?.presentingViewController != nil {
+            navigationController?.dismiss(animated: true)
+            return
+        }
+        navigationController?.setViewControllers([RootTabsController()], animated: true)
     }
 
     private func textFields(in rootView: UIView) -> [UITextField] {

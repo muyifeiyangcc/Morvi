@@ -1,10 +1,13 @@
 import UIKit
 
 final class MorviProgressOverlayView: UIView {
+    static let minimumVisibleDuration: TimeInterval = 0.5
+
     private let cardView = UIVisualEffectView(effect: nil)
     private let faceView = UIView()
     private let ringLayer = CAShapeLayer()
     private let smileLayer = CAShapeLayer()
+    private var shownAt: Date?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,19 +33,29 @@ final class MorviProgressOverlayView: UIView {
             topAnchor.constraint(equalTo: parent.topAnchor),
             bottomAnchor.constraint(equalTo: parent.bottomAnchor)
         ])
+        shownAt = Date()
         startAnimating()
         UIView.animate(withDuration: 0.18) {
             self.alpha = 1
         }
     }
 
-    func dismiss() {
-        UIView.animate(withDuration: 0.18, animations: {
-            self.alpha = 0
-        }, completion: { _ in
-            self.stopAnimating()
-            self.removeFromSuperview()
-        })
+    func dismiss(completion: (() -> Void)? = nil) {
+        let elapsed = shownAt.map { Date().timeIntervalSince($0) } ?? Self.minimumVisibleDuration
+        let delay = max(0, Self.minimumVisibleDuration - elapsed)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self else {
+                completion?()
+                return
+            }
+            UIView.animate(withDuration: 0.18, animations: {
+                self.alpha = 0
+            }, completion: { _ in
+                self.stopAnimating()
+                self.removeFromSuperview()
+                completion?()
+            })
+        }
     }
 
     private func configureCard() {

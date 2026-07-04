@@ -2,6 +2,7 @@ import Foundation
 
 protocol AccountProfileRepository {
     func save(_ record: AccountProfileRecord) throws
+    func register(_ record: AccountProfileRecord, secretText: String) throws
     func count() throws -> Int
 }
 
@@ -44,6 +45,30 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
                 .text(record.updatedAt)
             ]
         )
+    }
+
+    func register(_ record: AccountProfileRecord, secretText: String) throws {
+        try store.transaction {
+            try save(record)
+            try store.write(
+                """
+                INSERT INTO account_secret (
+                    account_key, email, secret_text, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(email) DO UPDATE SET
+                    account_key = excluded.account_key,
+                    secret_text = excluded.secret_text,
+                    updated_at = excluded.updated_at;
+                """,
+                bindings: [
+                    .text(record.stableKey),
+                    .text(record.email ?? ""),
+                    .text(secretText),
+                    .text(record.createdAt),
+                    .text(record.updatedAt)
+                ]
+            )
+        }
     }
 
     func count() throws -> Int {

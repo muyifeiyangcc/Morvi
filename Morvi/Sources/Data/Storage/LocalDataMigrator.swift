@@ -18,6 +18,11 @@ final class LocalDataMigrator {
         if version < 2 {
             try createBuiltInContentSchema()
             try store.execute("PRAGMA user_version = 2;")
+            version = 2
+        }
+        if version < 3 {
+            try createAccessSecretSchema()
+            try store.execute("PRAGMA user_version = 3;")
         }
     }
 
@@ -27,6 +32,10 @@ final class LocalDataMigrator {
 
     private func createBuiltInContentSchema() throws {
         try store.execute(Self.builtInContentSchema)
+    }
+
+    private func createAccessSecretSchema() throws {
+        try store.execute(Self.accessSecretSchema)
     }
 }
 
@@ -43,6 +52,14 @@ private extension LocalDataMigrator {
         avatar_asset TEXT,
         cover_asset TEXT,
         registration_state INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS account_secret (
+        account_key TEXT PRIMARY KEY,
+        email TEXT NOT NULL UNIQUE,
+        secret_text TEXT NOT NULL,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
     );
@@ -207,6 +224,16 @@ private extension LocalDataMigrator {
     CREATE INDEX IF NOT EXISTS idx_mood_entry_account ON mood_entry(account_key, recorded_at);
     CREATE INDEX IF NOT EXISTS idx_dialogue_thread_latest ON dialogue_thread(latest_entry_at);
     CREATE INDEX IF NOT EXISTS idx_dialogue_entry_thread ON dialogue_entry(thread_key, sequence_number);
+    """
+
+    static let accessSecretSchema = """
+    CREATE TABLE IF NOT EXISTS account_secret (
+        account_key TEXT PRIMARY KEY,
+        email TEXT NOT NULL UNIQUE,
+        secret_text TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    );
     """
 
     static let builtInContentSchema = """
