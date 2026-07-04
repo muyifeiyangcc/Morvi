@@ -494,7 +494,7 @@ final class ReferenceCanvasView: UIView {
         let detail = resolvedPersonaDetail(accountKey: accountKey, fallbackName: "Amelia")
         let workEntries = resolvedPersonaWorks(accountKey: accountKey)
         addPersonaRootGradient()
-        addPersonaBackdrop(imageName: detail.coverAsset)
+        addPersonaBackdrop(imageName: personaBackdropAssetName(for: detail))
         let scrollView = CancelFriendlyScrollView()
         scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
@@ -1426,7 +1426,7 @@ final class ReferenceCanvasView: UIView {
         let detail = resolvedPersonaDetail(accountKey: accountKey, fallbackName: "Victoria")
         let workEntries = resolvedPersonaWorks(accountKey: accountKey)
         addPersonaRootGradient()
-        addPersonaBackdrop(imageName: detail.coverAsset)
+        addPersonaBackdrop(imageName: personaBackdropAssetName(for: detail))
         let scrollView = CancelFriendlyScrollView()
         scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
@@ -1634,6 +1634,10 @@ final class ReferenceCanvasView: UIView {
             coverView.topAnchor.constraint(equalTo: topAnchor),
             heightConstraint
         ])
+    }
+
+    private func personaBackdropAssetName(for detail: PersonaDetailEntry) -> String {
+        detail.avatarAsset == "default_avatar" ? "image.png" : detail.avatarAsset
     }
 
     private func updatePersonaBackdrop(for scrollView: UIScrollView) {
