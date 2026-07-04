@@ -6,7 +6,7 @@ final class RestrictedRosterCell: UICollectionViewCell {
 
     private let avatarView = UIImageView()
     private let nameLabel = UILabel()
-    private let actionIconView = UIImageView(image: UIImage(named: "restricted_restore_icon"))
+    private let actionIconView = UIImageView()
     private let actionButton = UIButton(type: .custom)
     var didTapAction: (() -> Void)?
 
@@ -27,13 +27,18 @@ final class RestrictedRosterCell: UICollectionViewCell {
         avatarView.image = nil
         nameLabel.text = nil
         didTapAction = nil
-        setActionVisible(false)
+        configureAction(imageName: nil, isActionEnabled: false)
     }
 
-    func configure(name: String, avatarAsset: String?, showsAction: Bool) {
+    func configure(
+        name: String,
+        avatarAsset: String?,
+        accessoryImageName: String?,
+        isAccessoryActionEnabled: Bool
+    ) {
         nameLabel.text = name
         avatarView.image = resolveAvatarImage(avatarAsset) ?? UIImage(named: "default_avatar")
-        setActionVisible(showsAction)
+        configureAction(imageName: accessoryImageName, isActionEnabled: isAccessoryActionEnabled)
     }
 
     private func configureCell() {
@@ -96,13 +101,14 @@ final class RestrictedRosterCell: UICollectionViewCell {
         ])
         actionButton.backgroundColor = .clear
         actionButton.addTarget(self, action: #selector(handleActionTap), for: .touchUpInside)
-        setActionVisible(false)
+        configureAction(imageName: nil, isActionEnabled: false)
     }
 
-    private func setActionVisible(_ isVisible: Bool) {
-        actionIconView.isHidden = !isVisible
-        actionButton.isHidden = !isVisible
-        actionButton.isUserInteractionEnabled = isVisible
+    private func configureAction(imageName: String?, isActionEnabled: Bool) {
+        actionIconView.image = imageName.flatMap(UIImage.init(named:))
+        actionIconView.isHidden = imageName == nil
+        actionButton.isHidden = !isActionEnabled
+        actionButton.isUserInteractionEnabled = isActionEnabled
     }
 
     @objc private func handleActionTap() {

@@ -2632,6 +2632,7 @@ final class ReferenceCanvasView: UIView {
         renderRosterList(
             title: "Blacklist",
             entries: AccountSessionCenter.shared.restrictedRoster(),
+            accessoryImageName: "restricted_restore_icon",
             allowsRestrictionRemoval: true
         )
     }
@@ -2641,12 +2642,15 @@ final class ReferenceCanvasView: UIView {
         case .outbound:
             renderRosterList(
                 title: "Following",
-                entries: AccountSessionCenter.shared.outboundConnectionRoster()
+                entries: AccountSessionCenter.shared.outboundConnectionRoster(),
+                accessoryImageName: "restricted_restore_icon",
+                allowsOutboundConnectionRemoval: true
             )
         case .inbound:
             renderRosterList(
                 title: "Followers",
-                entries: AccountSessionCenter.shared.inboundConnectionRoster()
+                entries: AccountSessionCenter.shared.inboundConnectionRoster(),
+                accessoryImageName: "dialogue_card_action_dark"
             )
         }
     }
@@ -2654,6 +2658,8 @@ final class ReferenceCanvasView: UIView {
     private func renderRosterList(
         title: String,
         entries: [RelationRosterRecord],
+        accessoryImageName: String? = nil,
+        allowsOutboundConnectionRemoval: Bool = false,
         allowsRestrictionRemoval: Bool = false
     ) {
         addTopTitle(title)
@@ -2664,9 +2670,17 @@ final class ReferenceCanvasView: UIView {
                 avatarAsset: $0.avatarAsset
             )
         }
-        let listView = RestrictedRosterListView(entries: listEntries)
+        let listView = RestrictedRosterListView(
+            entries: listEntries,
+            accessoryImageName: accessoryImageName
+        )
         listView.didSelectEntry = { [weak self] entry in
             self?.requestPublicPersona(subjectKey: entry.accountKey)
+        }
+        if allowsOutboundConnectionRemoval {
+            listView.didTapAction = { [weak self] entry in
+                self?.removeOutboundConnectionRosterEntry(accountKey: entry.accountKey)
+            }
         }
         if allowsRestrictionRemoval {
             listView.didTapAction = { [weak self] entry in
@@ -2681,6 +2695,20 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func removeOutboundConnectionRosterEntry(accountKey: String) {
+        do {
+            let didRemove = try AccountSessionCenter.shared.removeOutboundConnectionFromRoster(accountKey: accountKey)
+            guard didRemove else {
+                MorviToastView.show("Unable to update following.", in: self)
+                return
+            }
+            MorviToastView.show("Removed from following.", in: self)
+            reloadRenderedContent()
+        } catch {
+            MorviToastView.show("Unable to update following.", in: self)
+        }
     }
 
     private func removeRestrictionRosterEntry(accountKey: String) {

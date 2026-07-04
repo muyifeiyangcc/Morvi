@@ -8,13 +8,15 @@ final class RestrictedRosterListView: UIView {
     }
 
     private let entries: [Entry]
+    private let accessoryImageName: String?
     var didSelectEntry: ((Entry) -> Void)?
     var didTapAction: ((Entry) -> Void)?
 
     private let collectionView: UICollectionView
 
-    init(entries: [Entry]) {
+    init(entries: [Entry], accessoryImageName: String? = nil) {
         self.entries = entries
+        self.accessoryImageName = accessoryImageName
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 8
@@ -62,7 +64,12 @@ extension RestrictedRosterListView: UICollectionViewDataSource, UICollectionView
             return UICollectionViewCell()
         }
         let entry = entries[indexPath.item]
-        cell.configure(name: entry.name, avatarAsset: entry.avatarAsset, showsAction: didTapAction != nil)
+        cell.configure(
+            name: entry.name,
+            avatarAsset: entry.avatarAsset,
+            accessoryImageName: accessoryImageName,
+            isAccessoryActionEnabled: didTapAction != nil
+        )
         cell.didTapAction = { [weak self] in
             self?.didTapAction?(entry)
         }

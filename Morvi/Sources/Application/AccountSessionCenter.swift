@@ -137,6 +137,16 @@ final class AccountSessionCenter {
         return true
     }
 
+    func removeOutboundConnectionFromRoster(accountKey: String) throws -> Bool {
+        guard let activeKey = activeAccountKey,
+              activeKey != accountKey else {
+            return false
+        }
+        try profileRepository.removeConnection(originKey: activeKey, subjectKey: accountKey)
+        notifySessionChange()
+        return true
+    }
+
     func toggleConnectionToAccount(accountKey: String) throws -> Bool? {
         guard let activeKey = activeAccountKey,
               activeKey != accountKey else {
