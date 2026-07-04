@@ -5,6 +5,7 @@ enum RouteContextStore {
     private static var targetWorkKey: String?
     private static var targetDialogueThreadKey: String?
     private static var targetDialogueTitle: String?
+    private static var agreementTitle: String?
 
     static func setTargetAccountKey(_ key: String?) {
         targetAccountKey = key
@@ -17,6 +18,10 @@ enum RouteContextStore {
     static func setTargetDialogueThread(key: String?, title: String?) {
         targetDialogueThreadKey = key
         targetDialogueTitle = title
+    }
+
+    static func setAgreementTitle(_ title: String?) {
+        agreementTitle = title
     }
 
     static func currentTargetAccountKey() -> String? {
@@ -33,6 +38,10 @@ enum RouteContextStore {
 
     static func currentTargetDialogueTitle() -> String? {
         targetDialogueTitle
+    }
+
+    static func currentAgreementTitle() -> String? {
+        agreementTitle
     }
 }
 
@@ -60,7 +69,7 @@ enum RouteFactory {
         case .resetAccess:
             return AuthSceneController(page: .resetAccess)
         case .agreement:
-            return AuthSceneController(page: .agreement)
+            return ReferencePageController(page: .agreement)
         case .settings:
             return ReferencePageController(page: .settings)
         case .uploadEmpty:

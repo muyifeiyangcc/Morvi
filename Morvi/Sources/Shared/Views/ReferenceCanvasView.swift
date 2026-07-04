@@ -2893,7 +2893,10 @@ final class ReferenceCanvasView: UIView {
                 }
             }
         case "Privacy Policy", "User Agreement":
-            return { [weak self] in self?.didRequestPage?(.agreement) }
+            return { [weak self] in
+                RouteContextStore.setAgreementTitle(text)
+                self?.didRequestPage?(.agreement)
+            }
         case "Delete account":
             return { [weak self] in
                 self?.performSettingsSignedInAction {

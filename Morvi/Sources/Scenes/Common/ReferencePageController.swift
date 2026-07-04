@@ -109,7 +109,7 @@ class ReferencePageController: BaseSceneController {
             showOverlay(.accessGate)
             return
         }
-        navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
+        navigationController?.pushViewController(controllerForPushedPage(page), animated: true)
     }
 
     func canContinueWithAgreementConsent() -> Bool {
@@ -582,7 +582,7 @@ class ReferencePageController: BaseSceneController {
         if let restrictionSubjectKey {
             RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
-        navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
+        navigationController?.pushViewController(controllerForPushedPage(page), animated: true)
     }
 
     private func validateDirectDialogueAccess(targetAccountKey: String?) -> Bool {

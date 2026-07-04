@@ -65,6 +65,10 @@ class BaseSceneController: UIViewController {
         ReferenceCanvasView(page: page)
     }
 
+    func controllerForPushedPage(_ page: ScenePage) -> UIViewController {
+        RouteFactory.controller(for: page)
+    }
+
     private func installFullScreenBackdropIfNeeded() {
         guard page == .publicPersona else { return }
         let image = UIImage(named: "discover_feed_cover")
@@ -169,7 +173,7 @@ class BaseSceneController: UIViewController {
         case .restrictedList:
             return "Blacklist"
         case .agreement:
-            return "EULA"
+            return RouteContextStore.currentAgreementTitle() ?? "EULA"
         default:
             return nil
         }
@@ -244,7 +248,7 @@ class BaseSceneController: UIViewController {
         if let restrictionSubjectKey {
             RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
-        navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
+        navigationController?.pushViewController(controllerForPushedPage(page), animated: true)
     }
 
     private func validateDirectDialogueAccess(targetAccountKey: String?) -> Bool {
