@@ -27,16 +27,22 @@ final class AccountSessionCenter {
         activate(accountKey: localAccountKey)
     }
 
-    func registerLocalAccount(email: String, secretText: String) throws {
+    func registerLocalAccount(
+        email: String,
+        secretText: String,
+        genderText: String,
+        birthDate: String?,
+        locationText: String?
+    ) throws {
         let now = LocalDateText.now()
         let key = "acct-local-\(UUID().uuidString.lowercased())"
         let profile = AccountProfileRecord(
             stableKey: key,
             email: email,
             displayName: "Amelia",
-            genderCode: nil,
-            birthDate: nil,
-            locationText: nil,
+            genderCode: genderCode(from: genderText),
+            birthDate: birthDate,
+            locationText: locationText,
             avatarAsset: "default_avatar",
             coverAsset: "default_avatar",
             registrationState: 1,
@@ -44,6 +50,17 @@ final class AccountSessionCenter {
             updatedAt: now
         )
         try profileRepository.register(profile, secretText: secretText)
+    }
+
+    private func genderCode(from text: String) -> Int {
+        let normalizedText = text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if normalizedText == "male" {
+            return 0
+        }
+        if normalizedText == "female" {
+            return 1
+        }
+        return 2
     }
 
     private func activate(accountKey: String) {

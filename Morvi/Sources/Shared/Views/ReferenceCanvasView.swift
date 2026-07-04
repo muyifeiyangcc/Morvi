@@ -1832,8 +1832,8 @@ final class ReferenceCanvasView: UIView {
         let items = [
             ("Email", "Please enter"),
             ("Gender", "Female"),
-            ("Birthday", "Please enter"),
-            ("Location", "Please enter")
+            ("Birthday (Optional)", "Please enter"),
+            ("Location (Optional)", "Please enter")
         ]
         for index in items.indices {
             let top = CGFloat(274 + index * 109)

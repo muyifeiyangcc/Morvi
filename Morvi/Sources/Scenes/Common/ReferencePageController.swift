@@ -1,6 +1,13 @@
 import UIKit
 
 class ReferencePageController: BaseSceneController {
+    private struct RegistrationDraft {
+        let secretText: String
+    }
+
+    private static var registrationDraft: RegistrationDraft?
+    private static var shouldShowRegistrationSuccessToast = false
+
     private let page: ScenePage
     private let areasBuilder: ((ReferencePageController) -> [HitArea])?
     private weak var progressOverlayView: MorviProgressOverlayView?
@@ -32,6 +39,15 @@ class ReferencePageController: BaseSceneController {
         marker.isHidden = true
         view.addSubview(marker)
         installHitAreas(areasBuilder?(self) ?? [])
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if page == .entry,
+           Self.shouldShowRegistrationSuccessToast {
+            Self.shouldShowRegistrationSuccessToast = false
+            MorviToastView.show("Registration successful", in: view)
+        }
     }
 
     func push(_ page: ScenePage) {
@@ -78,16 +94,56 @@ class ReferencePageController: BaseSceneController {
         }
 
         view.endEditing(true)
+        Self.registrationDraft = RegistrationDraft(secretText: passwordText)
+        push(.personalDetail)
+    }
+
+    func submitPersonalDetail() {
+        let entries = textFields(in: view)
+            .map { field -> (field: UITextField, frame: CGRect) in
+                (field, field.convert(field.bounds, to: view))
+            }
+            .sorted { $0.frame.minY < $1.frame.minY }
+            .map(\.field)
+
+        guard entries.count >= 4 else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+
+        let emailText = trimmedText(entries[0])
+        let genderText = trimmedText(entries[1])
+        let birthdayText = trimmedText(entries[2])
+        let locationText = trimmedText(entries[3])
+
+        guard emailText.isEmpty == false else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+        guard genderText.isEmpty == false else {
+            MorviToastView.show("Please enter gender", in: view)
+            return
+        }
+        guard let draft = Self.registrationDraft else {
+            MorviToastView.show("Please enter password", in: view)
+            return
+        }
+
+        view.endEditing(true)
         showProgressOverlay()
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             do {
                 try AccountSessionCenter.shared.registerLocalAccount(
                     email: emailText,
-                    secretText: passwordText
+                    secretText: draft.secretText,
+                    genderText: genderText,
+                    birthDate: birthdayText.isEmpty ? nil : birthdayText,
+                    locationText: locationText.isEmpty ? nil : locationText
                 )
                 DispatchQueue.main.async {
                     self?.hideProgressOverlay {
-                        self?.closeAuthFlowAfterRegistration()
+                        Self.registrationDraft = nil
+                        self?.returnToAuthRootAfterRegistration()
                     }
                 }
             } catch {
@@ -161,17 +217,10 @@ class ReferencePageController: BaseSceneController {
         self.progressOverlayView = nil
     }
 
-    private func closeAuthFlowAfterRegistration() {
+    private func returnToAuthRootAfterRegistration() {
         guard let navigationController else { return }
-        if navigationController.viewControllers.count > 1 {
-            navigationController.popViewController(animated: true)
-            return
-        }
-        if navigationController.presentingViewController != nil {
-            navigationController.dismiss(animated: true)
-            return
-        }
-        navigationController.setViewControllers([RootTabsController()], animated: true)
+        Self.shouldShowRegistrationSuccessToast = true
+        navigationController.popToRootViewController(animated: true)
     }
 
     private func textFields(in rootView: UIView) -> [UITextField] {
