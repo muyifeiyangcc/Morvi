@@ -74,6 +74,16 @@ final class CustomTopLayerView: UIView {
         nil
     }
 
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if showsBackIcon, backArea.frame.contains(point) {
+            return super.hitTest(point, with: event)
+        }
+        if trailingIconView.isHidden == false, trailingArea.frame.contains(point) {
+            return super.hitTest(point, with: event)
+        }
+        return nil
+    }
+
     func configure(
         title: String?,
         statusBarHeight: CGFloat,
@@ -82,8 +92,10 @@ final class CustomTopLayerView: UIView {
         titleLeading: CGFloat = 96
     ) {
         self.showsBackIcon = showsBackIcon
+        backArea.isUserInteractionEnabled = showsBackIcon
         trailingIconView.image = trailingIconName.flatMap { UIImage(named: $0) }
         trailingIconView.isHidden = trailingIconName == nil
+        trailingArea.isUserInteractionEnabled = trailingIconName != nil
         titleLabel.text = title
         titleLabel.isHidden = title == nil
         titleLabel.font = AppFont.fredoka(31)
