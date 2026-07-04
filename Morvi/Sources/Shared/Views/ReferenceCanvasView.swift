@@ -499,7 +499,7 @@ final class ReferenceCanvasView: UIView {
         let scrollView = CancelFriendlyScrollView()
         scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
-        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: Self.floatingDockClearance, right: 0)
+        scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = scrollView.contentInset
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
@@ -547,7 +547,10 @@ final class ReferenceCanvasView: UIView {
         personaMediaTargets = cellPlacements.map {
             (CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height), $0.item.stableKey, $0.item.accountKey)
         }
-        let contentHeight = max(adaptiveLayoutHeight, (columnBottoms.max() ?? adaptiveLayoutHeight) - cellGap + 10)
+        let contentHeight = max(
+            adaptiveLayoutHeight + Self.floatingDockClearance,
+            (columnBottoms.max() ?? adaptiveLayoutHeight) - cellGap + Self.floatingDockClearance
+        )
         NSLayoutConstraint.activate([
             scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
