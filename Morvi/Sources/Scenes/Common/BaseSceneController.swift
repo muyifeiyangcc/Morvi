@@ -224,6 +224,12 @@ class BaseSceneController: UIViewController {
         }
         if page == .publicPersona,
            let restrictionSubjectKey,
+           AccountSessionCenter.shared.isActiveAccount(restrictionSubjectKey) {
+            navigateToOwnPersonaRoot()
+            return
+        }
+        if page == .publicPersona,
+           let restrictionSubjectKey,
            AccountSessionCenter.shared.canOpenPublicPersona(accountKey: restrictionSubjectKey) == false {
             MorviToastView.show("This profile is unavailable.", in: view)
             return
@@ -232,6 +238,13 @@ class BaseSceneController: UIViewController {
             RouteContextStore.setTargetAccountKey(restrictionSubjectKey)
         }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
+    }
+
+    private func navigateToOwnPersonaRoot() {
+        navigationController?.popToRootViewController(animated: false)
+        if let rootTabs = navigationController?.viewControllers.first as? RootTabsController {
+            rootTabs.showPersonaRoot()
+        }
     }
 
     private func showCanvasOverlay(_ page: ScenePage, restrictionSubjectKey: String? = nil) {

@@ -52,9 +52,13 @@ protocol CreativeWorkRepository {
     func personaDetail(accountKey: String) throws -> PersonaDetailEntry?
     func replies(workKey: String) throws -> [WorkReplyEntry]
     func addReply(workKey: String, accountKey: String, bodyText: String) throws
+    func hasReaction(workKey: String, accountKey: String) throws -> Bool
+    func toggleReaction(workKey: String, accountKey: String) throws -> Bool
 }
 
 final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
+    static let activityDidChangeNotification = Notification.Name("Morvi.creativeWorkActivityDidChange")
+
     private let store: LocalStore
 
     init(store: LocalStore = .shared) {
@@ -224,8 +228,8 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 mediaWidth: row[10].doubleValue,
                 mediaHeight: row[11].doubleValue,
                 themes: themes,
-                reactionCount: max(row[12].intValue, 666),
-                replyCount: max(row[13].intValue, 777)
+                reactionCount: row[12].intValue,
+                replyCount: row[13].intValue
             )
         }
     }
@@ -279,8 +283,8 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
             displayName: displayName,
             avatarAsset: avatarAsset,
             coverAsset: coverAsset,
-            followersText: "\(max(row[4].intValue, 77))",
-            followingText: "\(max(row[5].intValue, 99))"
+            followersText: "\(row[4].intValue)",
+            followingText: "\(row[5].intValue)"
         )
     }
 
@@ -338,6 +342,48 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 .text(now)
             ]
         )
+        Self.notifyActivityChange()
+    }
+
+    func hasReaction(workKey: String, accountKey: String) throws -> Bool {
+        try store.readInt(
+            """
+            SELECT COUNT(*)
+            FROM work_reaction
+            WHERE work_key = ?
+                AND account_key = ?;
+            """,
+            bindings: [.text(workKey), .text(accountKey)]
+        ) > 0
+    }
+
+    func toggleReaction(workKey: String, accountKey: String) throws -> Bool {
+        let active = try hasReaction(workKey: workKey, accountKey: accountKey)
+        if active {
+            try store.write(
+                """
+                DELETE FROM work_reaction
+                WHERE work_key = ?
+                    AND account_key = ?;
+                """,
+                bindings: [.text(workKey), .text(accountKey)]
+            )
+            Self.notifyActivityChange()
+            return false
+        }
+        try store.write(
+            """
+            INSERT OR IGNORE INTO work_reaction (work_key, account_key, created_at)
+            VALUES (?, ?, ?);
+            """,
+            bindings: [
+                .text(workKey),
+                .text(accountKey),
+                .text(LocalDateText.now())
+            ]
+        )
+        Self.notifyActivityChange()
+        return true
     }
 
     private func works(
@@ -405,9 +451,15 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 mediaWidth: row[10].doubleValue,
                 mediaHeight: row[11].doubleValue,
                 themes: try themesForWork(stableKey: stableKey),
-                reactionCount: max(row[12].intValue, 666),
-                replyCount: max(row[13].intValue, 777)
+                reactionCount: row[12].intValue,
+                replyCount: row[13].intValue
             )
+        }
+    }
+
+    private static func notifyActivityChange() {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: activityDidChangeNotification, object: nil)
         }
     }
 

@@ -28,6 +28,12 @@ final class RootTabsController: UIViewController {
             name: AccountSessionCenter.sessionDidChangeNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleCreativeWorkActivityDidChange),
+            name: SQLiteCreativeWorkRepository.activityDidChangeNotification,
+            object: nil
+        )
         renderCurrentPage()
     }
 
@@ -36,8 +42,21 @@ final class RootTabsController: UIViewController {
     }
 
     @objc private func handleSessionDidChange() {
-        guard currentPage == .home else { return }
-        renderCurrentPage()
+        switch currentPage {
+        case .home, .persona:
+            renderCurrentPage()
+        default:
+            break
+        }
+    }
+
+    @objc private func handleCreativeWorkActivityDidChange() {
+        switch currentPage {
+        case .home, .discover, .persona:
+            renderCurrentPage()
+        default:
+            break
+        }
     }
 
     private func renderCurrentPage() {
@@ -195,6 +214,11 @@ final class RootTabsController: UIViewController {
         renderCurrentPage()
     }
 
+    func showPersonaRoot() {
+        currentPage = .persona
+        renderCurrentPage()
+    }
+
     private func dockItem(for page: ScenePage) -> FloatingDockView.Item {
         switch page {
         case .weeklyFeeling:
@@ -225,6 +249,12 @@ final class RootTabsController: UIViewController {
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
             showOverlay(.accessGate)
+            return
+        }
+        if page == .publicPersona,
+           let restrictionSubjectKey,
+           AccountSessionCenter.shared.isActiveAccount(restrictionSubjectKey) {
+            showPersonaRoot()
             return
         }
         if page == .publicPersona,

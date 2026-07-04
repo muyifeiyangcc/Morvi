@@ -18,6 +18,9 @@ protocol AccountProfileRepository {
     func addRestriction(originKey: String, subjectKey: String) throws
     func addSafetyNotice(originKey: String, subjectKey: String, reasonCode: Int, detailText: String?) throws
     func hasSafetyBarrier(originKey: String, subjectKey: String) throws -> Bool
+    func connect(originKey: String, subjectKey: String) throws
+    func hasConnection(originKey: String, subjectKey: String) throws -> Bool
+    func hasMutualConnection(firstKey: String, secondKey: String) throws -> Bool
     func remove(stableKey: String) throws -> String?
     func count() throws -> Int
 }
@@ -230,6 +233,39 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
             """,
             bindings: [.text(originKey), .text(subjectKey)]
         ) > 0
+    }
+
+    func connect(originKey: String, subjectKey: String) throws {
+        try store.write(
+            """
+            INSERT OR IGNORE INTO account_relation (
+                origin_account_key, target_account_key, created_at
+            ) VALUES (?, ?, ?);
+            """,
+            bindings: [
+                .text(originKey),
+                .text(subjectKey),
+                .text(LocalDateText.now())
+            ]
+        )
+    }
+
+    func hasConnection(originKey: String, subjectKey: String) throws -> Bool {
+        try store.readInt(
+            """
+            SELECT COUNT(*)
+            FROM account_relation
+            WHERE origin_account_key = ?
+                AND target_account_key = ?;
+            """,
+            bindings: [.text(originKey), .text(subjectKey)]
+        ) > 0
+    }
+
+    func hasMutualConnection(firstKey: String, secondKey: String) throws -> Bool {
+        let firstToSecond = try hasConnection(originKey: firstKey, subjectKey: secondKey)
+        let secondToFirst = try hasConnection(originKey: secondKey, subjectKey: firstKey)
+        return firstToSecond && secondToFirst
     }
 
     func remove(stableKey: String) throws -> String? {

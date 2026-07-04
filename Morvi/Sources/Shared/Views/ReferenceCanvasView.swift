@@ -123,6 +123,12 @@ final class ReferenceCanvasView: UIView {
             name: Self.agreementConsentDidChangeNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleCreativeWorkActivityDidChange),
+            name: SQLiteCreativeWorkRepository.activityDidChangeNotification,
+            object: nil
+        )
         clipsToBounds = true
         backgroundColor = usesDecorativeBackground ? .clear : .white
         render()
@@ -1191,13 +1197,21 @@ final class ReferenceCanvasView: UIView {
     private func renderGalleryDetail() {
         let item = resolvedGalleryWork()
         addFullscreenGalleryCover(item: item)
+        let bodyWidth = adaptiveLayoutWidth - 40
+        let bodyHeight = measuredCopyHeight(
+            item.bodyText,
+            size: 16,
+            weight: .regular,
+            width: bodyWidth
+        )
         let tagsHeight = measuredTagsHeight(left: 20, right: 20, items: item.themes)
-        let tagsOffset: CGFloat = 132
+        let bodyOffset: CGFloat = 78
+        let tagsOffset = bodyOffset + bodyHeight + 24
         let panelHeight = tagsOffset + tagsHeight + 68
         let panelTop = max(0, adaptiveLayoutHeight - panelHeight)
         let avatarTop = panelTop + 23
         let nameTop = panelTop + 31
-        let bodyTop = panelTop + 78
+        let bodyTop = panelTop + bodyOffset
         let tagsTop = panelTop + tagsOffset
         let reactionsTop = tagsTop + tagsHeight + 22
         let panel = addGlassPanel(
@@ -1216,18 +1230,25 @@ final class ReferenceCanvasView: UIView {
         addText(item.displayName, size: 17, weight: .bold, top: nameTop, left: 68)
         addText(item.bodyText, size: 16, weight: .regular, top: bodyTop, left: 20)
         addTags(top: tagsTop, left: 20, right: 20, items: item.themes)
-        addText(
-            "♡ \(max(item.reactionCount, 666)) Likes       ☵ \(max(item.replyCount, 777)) Comments",
-            size: 13,
-            weight: .regular,
+        addFeedStat(
+            iconName: "feed_like_icon",
+            text: "\(item.reactionCount) Likes",
             top: reactionsTop,
             left: 22,
-            color: .darkGray
+            parent: self,
+            iconTint: isWorkReacted(item.stableKey) ? UIColor(red: 0.70, green: 0.96, blue: 0.22, alpha: 1) : nil
         )
-        addDiscoverActionButton(frame: CGRect(x: 20, y: reactionsTop - 12, width: 240, height: 44)) { [weak self] in
+        addFeedStat(iconName: "feed_reply_icon", text: "\(item.replyCount) Comments", top: reactionsTop, left: 130, parent: self)
+        addDiscoverActionButton(frame: CGRect(x: 20, y: reactionsTop - 12, width: 106, height: 44)) { [weak self] in
+            self?.toggleWorkReaction(workKey: item.stableKey)
+        }
+        addDiscoverActionButton(frame: CGRect(x: 126, y: reactionsTop - 12, width: 152, height: 44)) { [weak self] in
             RouteContextStore.setTargetWorkKey(item.stableKey)
             RouteContextStore.setTargetAccountKey(item.accountKey)
             self?.didRequestOverlayPage?(.repliesPanel)
+        }
+        addDiscoverActionButton(frame: CGRect(x: 20, y: avatarTop - 8, width: 220, height: 58)) { [weak self] in
+            self?.requestPublicPersona(subjectKey: item.accountKey)
         }
     }
 
@@ -1249,6 +1270,7 @@ final class ReferenceCanvasView: UIView {
 
         guard item.mediaKind == 1,
               let mediaURL = resolvedMediaURL(for: item.mediaAsset) else {
+            addGalleryPreviewBackButton()
             return
         }
 
@@ -1266,6 +1288,27 @@ final class ReferenceCanvasView: UIView {
             hostView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
         player.play()
+        addGalleryPreviewBackButton()
+    }
+
+    private func addGalleryPreviewBackButton() {
+        let buttonSize: CGFloat = 58
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "navigation_back_circle"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.addTarget(self, action: #selector(closeGalleryPreview), for: .touchUpInside)
+        addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            button.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            button.topAnchor.constraint(equalTo: topAnchor, constant: currentStatusBarHeight() + 20),
+            button.widthAnchor.constraint(equalToConstant: buttonSize),
+            button.heightAnchor.constraint(equalToConstant: buttonSize)
+        ])
+    }
+
+    @objc private func closeGalleryPreview() {
+        removeFromSuperview()
     }
 
     private func resolvedMediaURL(for asset: String?) -> URL? {
@@ -1334,7 +1377,7 @@ final class ReferenceCanvasView: UIView {
         let button = ClearTapButton(frame: .zero) { [weak self] in
             RouteContextStore.setTargetWorkKey(item.stableKey)
             RouteContextStore.setTargetAccountKey(item.accountKey)
-            self?.didRequestPage?(.galleryPreview)
+            self?.didRequestOverlayPage?(.galleryPreview)
         }
         coverContainer.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -1437,7 +1480,8 @@ final class ReferenceCanvasView: UIView {
         let actionLayout = adaptivePairLayout(gap: 15)
         let dialogueButton = addPillButton("Chat", top: buttonTop, left: 20, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         dialogueButton.addTarget(self, action: #selector(handlePersonaDialogueTap), for: .touchUpInside)
-        addPillButton("Follow", top: buttonTop, left: actionLayout.secondLeft, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        let connectButton = addPillButton("Follow", top: buttonTop, left: actionLayout.secondLeft, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        connectButton.addTarget(self, action: #selector(handlePersonaConnectTap), for: .touchUpInside)
         cellPlacements.forEach { placement in
             addMediaBlock(
                 top: placement.top,
@@ -1458,7 +1502,46 @@ final class ReferenceCanvasView: UIView {
     }
 
     @objc private func handlePersonaDialogueTap() {
+        let accountKey = RouteContextStore.currentTargetAccountKey()
+            ?? restrictionSubjectKey
+            ?? resolvedGalleryWork().accountKey
+        guard AccountSessionCenter.shared.isSignedIn else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+        guard AccountSessionCenter.shared.isActiveAccount(accountKey) == false else {
+            didRequestPage?(.persona)
+            return
+        }
+        guard AccountSessionCenter.shared.hasMutualConnection(with: accountKey) else {
+            MorviToastView.show("You need to follow each other first.", in: self)
+            return
+        }
         didRequestPage?(.directDialogue)
+    }
+
+    @objc private func handlePersonaConnectTap() {
+        let accountKey = RouteContextStore.currentTargetAccountKey()
+            ?? restrictionSubjectKey
+            ?? resolvedGalleryWork().accountKey
+        guard AccountSessionCenter.shared.isSignedIn else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+        guard AccountSessionCenter.shared.isActiveAccount(accountKey) == false else {
+            MorviToastView.show("You cannot follow yourself.", in: self)
+            return
+        }
+        do {
+            guard try AccountSessionCenter.shared.connectToAccount(accountKey: accountKey) else {
+                MorviToastView.show("You cannot follow yourself.", in: self)
+                return
+            }
+            MorviToastView.show("Followed", in: self)
+            reloadRenderedContent()
+        } catch {
+            MorviToastView.show("Operation failed", in: self)
+        }
     }
 
     private func addPersonaMediaContainerSelection(to container: UIView) {
@@ -2829,28 +2912,6 @@ final class ReferenceCanvasView: UIView {
                 self?.keyboardAvoidanceBaseBottomConstant = -29
             }
         )
-        let voiceButton = UIButton(type: .custom)
-        voiceButton.setImage(UIImage(named: "input_voice_icon"), for: .normal)
-        voiceButton.imageView?.contentMode = .scaleAspectFit
-        sheet.addSubview(voiceButton)
-        voiceButton.translatesAutoresizingMaskIntoConstraints = false
-
-        let photoButton = UIButton(type: .custom)
-        photoButton.setImage(UIImage(named: "input_photo_icon"), for: .normal)
-        photoButton.imageView?.contentMode = .scaleAspectFit
-        sheet.addSubview(photoButton)
-        photoButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            voiceButton.leadingAnchor.constraint(equalTo: sheet.leadingAnchor, constant: 28),
-            voiceButton.bottomAnchor.constraint(equalTo: sheet.bottomAnchor, constant: -86),
-            voiceButton.widthAnchor.constraint(equalToConstant: 24),
-            voiceButton.heightAnchor.constraint(equalToConstant: 24),
-
-            photoButton.leadingAnchor.constraint(equalTo: voiceButton.trailingAnchor, constant: 12),
-            photoButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
-            photoButton.widthAnchor.constraint(equalToConstant: 24),
-            photoButton.heightAnchor.constraint(equalToConstant: 24)
-        ])
         let tableView = CancelFriendlyTableView(frame: .zero, style: .plain)
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
@@ -2866,7 +2927,7 @@ final class ReferenceCanvasView: UIView {
             tableView.leadingAnchor.constraint(equalTo: sheet.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: sheet.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: sheet.topAnchor, constant: 15),
-            tableView.bottomAnchor.constraint(equalTo: voiceButton.topAnchor, constant: -15)
+            tableView.bottomAnchor.constraint(equalTo: inputBar.topAnchor, constant: -20)
         ])
         reloadReplies(for: item.stableKey, in: tableView)
         replyListDataSource.didTapMore = { [weak self] accountKey in
@@ -2928,6 +2989,26 @@ final class ReferenceCanvasView: UIView {
                     }
                 }
             }
+        }
+    }
+
+    private func isWorkReacted(_ workKey: String) -> Bool {
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey else {
+            return false
+        }
+        return (try? creativeRepository.hasReaction(workKey: workKey, accountKey: accountKey)) ?? false
+    }
+
+    private func toggleWorkReaction(workKey: String) {
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+        do {
+            _ = try creativeRepository.toggleReaction(workKey: workKey, accountKey: accountKey)
+            reloadRenderedContent()
+        } catch {
+            MorviToastView.show("Operation failed", in: self)
         }
     }
 
@@ -5160,8 +5241,9 @@ final class ReferenceCanvasView: UIView {
         addTags(top: top + 366, items: item.themes)
         addFeedStats(
             top: top + 424,
-            reactions: max(item.reactionCount, 666),
-            replies: max(item.replyCount, 777)
+            reactions: item.reactionCount,
+            replies: item.replyCount,
+            reacted: isWorkReacted(item.stableKey)
         )
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 335, height: 444)) { [weak self] in
             RouteContextStore.setTargetWorkKey(item.stableKey)
@@ -5281,15 +5363,26 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate(buttonConstraints)
     }
 
-    private func addFeedStats(top: CGFloat, reactions: Int = 666, replies: Int = 777) {
+    private func addFeedStats(top: CGFloat, reactions: Int = 666, replies: Int = 777, reacted: Bool = false) {
         let layoutContainer = activeLayoutContainer ?? self
-        addFeedStat(iconName: "feed_like_icon", text: "\(reactions) Likes", top: top, left: 22, parent: layoutContainer)
+        addFeedStat(
+            iconName: "feed_like_icon",
+            text: "\(reactions) Likes",
+            top: top,
+            left: 22,
+            parent: layoutContainer,
+            iconTint: reacted ? UIColor(red: 0.70, green: 0.96, blue: 0.22, alpha: 1) : nil
+        )
         addFeedStat(iconName: "feed_reply_icon", text: "\(replies) Comments", top: top, left: 130, parent: layoutContainer)
     }
 
-    private func addFeedStat(iconName: String, text: String, top: CGFloat, left: CGFloat, parent: UIView) {
-        let iconView = UIImageView(image: UIImage(named: iconName))
+    private func addFeedStat(iconName: String, text: String, top: CGFloat, left: CGFloat, parent: UIView, iconTint: UIColor? = nil) {
+        let sourceImage = UIImage(named: iconName)
+        let iconView = UIImageView(image: iconTint == nil ? sourceImage : sourceImage?.withRenderingMode(.alwaysTemplate))
         iconView.contentMode = .scaleAspectFit
+        if let iconTint {
+            iconView.tintColor = iconTint
+        }
         parent.addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -5401,6 +5494,22 @@ final class ReferenceCanvasView: UIView {
         }
 
         return rowCount * tagRowHeight + max(0, rowCount - 1) * tagRowSpacing
+    }
+
+    private func measuredCopyHeight(
+        _ text: String,
+        size: CGFloat,
+        weight: UIFont.Weight,
+        width: CGFloat
+    ) -> CGFloat {
+        let font = sourceFont(for: text, size: size, weight: weight)
+        let boundingRect = (text as NSString).boundingRect(
+            with: CGSize(width: width, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        return max(ceil(boundingRect.height), ceil(font.lineHeight))
     }
 
     private func addMediaGrid(top: CGFloat) {
@@ -5591,6 +5700,15 @@ final class ReferenceCanvasView: UIView {
 
     @objc private func handleAgreementConsentDidChange() {
         refreshAgreementConsentIcon()
+    }
+
+    @objc private func handleCreativeWorkActivityDidChange() {
+        switch page {
+        case .discover, .galleryDetail, .persona, .publicPersona:
+            reloadRenderedContent()
+        default:
+            break
+        }
     }
 
     private func refreshAgreementConsentIcon() {

@@ -65,6 +65,35 @@ final class AccountSessionCenter {
         )) ?? false) == false
     }
 
+    func isActiveAccount(_ accountKey: String?) -> Bool {
+        guard let activeKey = activeAccountKey,
+              let accountKey else {
+            return false
+        }
+        return activeKey == accountKey
+    }
+
+    func connectToAccount(accountKey: String) throws -> Bool {
+        guard let activeKey = activeAccountKey,
+              activeKey != accountKey else {
+            return false
+        }
+        try profileRepository.connect(originKey: activeKey, subjectKey: accountKey)
+        notifySessionChange()
+        return true
+    }
+
+    func hasMutualConnection(with accountKey: String) -> Bool {
+        guard let activeKey = activeAccountKey,
+              activeKey != accountKey else {
+            return false
+        }
+        return (try? profileRepository.hasMutualConnection(
+            firstKey: activeKey,
+            secondKey: accountKey
+        )) ?? false
+    }
+
     func submitSafetyNotice(subjectKey: String, reasonCode: Int, detailText: String?) throws -> Bool {
         guard let activeKey = activeAccountKey,
               activeKey != subjectKey else {
