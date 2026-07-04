@@ -33,6 +33,11 @@ final class LocalDataMigrator {
         if version < 5 {
             try enforceIdentifierFloors()
             try store.execute("PRAGMA user_version = 5;")
+            version = 5
+        }
+        if version < 6 {
+            try addMoodTitle()
+            try store.execute("PRAGMA user_version = 6;")
         }
     }
 
@@ -82,6 +87,41 @@ final class LocalDataMigrator {
                 try setSequenceFloor(for: table, minimum: 999)
             }
         }
+    }
+
+    private func addMoodTitle() throws {
+        try store.execute(
+            """
+            ALTER TABLE mood_entry
+            ADD COLUMN mood_title TEXT NOT NULL DEFAULT 'Happy';
+
+            UPDATE mood_entry
+            SET mood_title = CASE mood_asset
+                WHEN 'mood_cool' THEN 'Calm'
+                WHEN 'weekly_mood_cool' THEN 'Calm'
+                WHEN 'weekly_mood_panic' THEN 'Nervous'
+                WHEN 'weekly_mood_sad' THEN 'Sad'
+                WHEN 'weekly_mood_crying' THEN 'Distressed'
+                WHEN 'weekly_mood_strained' THEN 'Worried'
+                WHEN 'weekly_mood_calm' THEN 'Calm'
+                ELSE mood_title
+            END;
+
+            UPDATE mood_entry
+            SET mood_asset = CASE mood_asset
+                WHEN 'mood_happy' THEN 'home_mood_happy'
+                WHEN 'mood_cool' THEN 'home_mood_calm'
+                WHEN 'weekly_mood_happy' THEN 'home_mood_happy'
+                WHEN 'weekly_mood_panic' THEN 'home_mood_nervous'
+                WHEN 'weekly_mood_sad' THEN 'home_mood_sad'
+                WHEN 'weekly_mood_crying' THEN 'home_mood_distressed'
+                WHEN 'weekly_mood_strained' THEN 'home_mood_worried'
+                WHEN 'weekly_mood_calm' THEN 'home_mood_calm'
+                WHEN 'weekly_mood_cool' THEN 'home_mood_calm'
+                ELSE mood_asset
+            END;
+            """
+        )
     }
 
     private func setSequenceFloor(for table: String, minimum: Int) throws {

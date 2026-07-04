@@ -1,19 +1,23 @@
 import UIKit
 
-final class WeeklyFeelingHeaderView: UIView {
-    private let days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
-    private let iconNames = [
-        "weekly_mood_happy",
-        "weekly_mood_panic",
-        "weekly_mood_sad",
-        "weekly_mood_crying",
-        "weekly_mood_strained",
-        "weekly_mood_calm",
-        "weekly_mood_cool"
-    ]
-    private let fillHeights: [CGFloat] = [200, 148, 118, 82, 104, 156, 198]
+struct WeeklyFeelingDaySummary {
+    let moodAsset: String?
+    let entryCount: Int
+}
 
-    override init(frame: CGRect) {
+final class WeeklyFeelingHeaderView: UIView {
+    private struct AnimatedBar {
+        let fillHeightConstraint: NSLayoutConstraint
+        let iconTopConstraint: NSLayoutConstraint
+        let targetFillHeight: CGFloat
+        let targetIconTop: CGFloat
+    }
+
+    private let days = ["Sun", "Mon", "Tue", "Wed", "Thr", "Fri", "Sat"]
+    private var animatedBars: [AnimatedBar] = []
+    private var hasAnimated = false
+
+    init(frame: CGRect, summaries: [WeeklyFeelingDaySummary]) {
         super.init(frame: frame)
         backgroundColor = .clear
 
@@ -31,13 +35,24 @@ final class WeeklyFeelingHeaderView: UIView {
         let barTop = 60 + ceil(AppFont.source(24, weight: .bold).lineHeight) + 26
         let sideInset: CGFloat = 20
         let trackWidth: CGFloat = 40
-        let availableWidth = max(bounds.width, min(UIScreen.main.bounds.width, UIScreen.main.bounds.height))
-        let itemGap = max(0, (availableWidth - sideInset * 2 - trackWidth * CGFloat(days.count)) / CGFloat(days.count - 1))
+        let availableWidth = max(frame.width, min(UIScreen.main.bounds.width, UIScreen.main.bounds.height))
+        let itemGap = max(
+            0,
+            (availableWidth - sideInset * 2 - trackWidth * CGFloat(days.count))
+                / CGFloat(days.count - 1)
+        )
+        let highestCount = max(summaries.map(\.entryCount).max() ?? 0, 1)
         for index in days.indices {
+            let summary = index < summaries.count
+                ? summaries[index]
+                : WeeklyFeelingDaySummary(moodAsset: nil, entryCount: 0)
+            let fillHeight = summary.entryCount == 0
+                ? 0
+                : 200 * CGFloat(summary.entryCount) / CGFloat(highestCount)
             addBar(
                 day: days[index],
-                iconName: iconNames[index],
-                fillHeight: fillHeights[index],
+                iconName: summary.moodAsset,
+                fillHeight: fillHeight,
                 top: barTop,
                 left: sideInset + CGFloat(index) * (trackWidth + itemGap)
             )
@@ -48,7 +63,24 @@ final class WeeklyFeelingHeaderView: UIView {
         nil
     }
 
-    private func addBar(day: String, iconName: String, fillHeight: CGFloat, top: CGFloat, left: CGFloat) {
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window != nil, hasAnimated == false else { return }
+        hasAnimated = true
+        layoutIfNeeded()
+        animatedBars.forEach {
+            $0.fillHeightConstraint.constant = $0.targetFillHeight
+            $0.iconTopConstraint.constant = $0.targetIconTop
+        }
+        UIView.animate(
+            withDuration: 0.7,
+            delay: 0.08,
+            options: [.curveEaseOut, .allowUserInteraction],
+            animations: { self.layoutIfNeeded() }
+        )
+    }
+
+    private func addBar(day: String, iconName: String?, fillHeight: CGFloat, top: CGFloat, left: CGFloat) {
         let trackView = UIView()
         trackView.backgroundColor = UIColor(red: 1, green: 0.94, blue: 0.62, alpha: 1)
         trackView.layer.cornerRadius = 19
@@ -61,8 +93,9 @@ final class WeeklyFeelingHeaderView: UIView {
         addSubview(fillView)
         fillView.translatesAutoresizingMaskIntoConstraints = false
 
-        let iconView = UIImageView(image: UIImage(named: iconName))
+        let iconView = UIImageView(image: iconName.flatMap(UIImage.init(named:)))
         iconView.contentMode = .scaleAspectFit
+        iconView.isHidden = iconName == nil
         addSubview(iconView)
         iconView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -73,6 +106,22 @@ final class WeeklyFeelingHeaderView: UIView {
         addSubview(dayLabel)
         dayLabel.translatesAutoresizingMaskIntoConstraints = false
 
+        let initialIconTop = top + 220 - 55
+        let targetIconTop = top + 220 - fillHeight - 55
+        let fillHeightConstraint = fillView.heightAnchor.constraint(equalToConstant: 0)
+        let iconTopConstraint = iconView.topAnchor.constraint(
+            equalTo: topAnchor,
+            constant: initialIconTop
+        )
+        animatedBars.append(
+            AnimatedBar(
+                fillHeightConstraint: fillHeightConstraint,
+                iconTopConstraint: iconTopConstraint,
+                targetFillHeight: fillHeight,
+                targetIconTop: targetIconTop
+            )
+        )
+
         NSLayoutConstraint.activate([
             trackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
             trackView.topAnchor.constraint(equalTo: topAnchor, constant: top),
@@ -82,10 +131,10 @@ final class WeeklyFeelingHeaderView: UIView {
             fillView.leadingAnchor.constraint(equalTo: trackView.leadingAnchor),
             fillView.trailingAnchor.constraint(equalTo: trackView.trailingAnchor),
             fillView.bottomAnchor.constraint(equalTo: trackView.bottomAnchor),
-            fillView.heightAnchor.constraint(equalToConstant: fillHeight),
+            fillHeightConstraint,
 
             iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left - 10),
-            iconView.topAnchor.constraint(equalTo: topAnchor, constant: top + 220 - fillHeight - 55),
+            iconTopConstraint,
             iconView.widthAnchor.constraint(equalToConstant: 60),
             iconView.heightAnchor.constraint(equalToConstant: 60),
 

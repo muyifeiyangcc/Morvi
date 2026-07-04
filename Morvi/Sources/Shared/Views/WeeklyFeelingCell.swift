@@ -15,6 +15,10 @@ struct WeeklyFeelingEntry {
         }
     }
 
+    let moodTitle: String
+    let bodyText: String
+    let moodAsset: String
+    let dateText: String
     let style: Style
 }
 
@@ -42,7 +46,6 @@ final class WeeklyFeelingCell: UITableViewCell {
         contentView.addSubview(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false
 
-        moodLabel.text = "Happy"
         moodLabel.textColor = .darkGray
         moodLabel.font = AppFont.source(30, weight: .medium)
         cardView.addSubview(moodLabel)
@@ -53,21 +56,18 @@ final class WeeklyFeelingCell: UITableViewCell {
         cardView.addSubview(noteView)
         noteView.translatesAutoresizingMaskIntoConstraints = false
 
-        noteLabel.text = "Two pieces of good news\ncame today!"
         noteLabel.numberOfLines = 0
         noteLabel.textColor = .darkGray
         noteLabel.font = AppFont.source(15)
         noteView.addSubview(noteLabel)
         noteLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        avatarView.image = UIImage(named: "profile_avatar")
-        avatarView.contentMode = .scaleAspectFill
+        avatarView.contentMode = .scaleAspectFit
         avatarView.clipsToBounds = true
         avatarView.layer.cornerRadius = 20
         cardView.addSubview(avatarView)
         avatarView.translatesAutoresizingMaskIntoConstraints = false
 
-        dateLabel.text = "23 June 2026\n5 : 30PM"
         dateLabel.numberOfLines = 0
         dateLabel.textAlignment = .right
         dateLabel.textColor = .darkGray
@@ -116,6 +116,10 @@ final class WeeklyFeelingCell: UITableViewCell {
     }
 
     func configure(with entry: WeeklyFeelingEntry, isLast: Bool) {
+        moodLabel.text = entry.moodTitle
+        noteLabel.text = entry.bodyText
+        avatarView.image = UIImage(named: entry.moodAsset)
+        dateLabel.text = entry.dateText
         gradientLayer.colors = [
             entry.style.tintColor.cgColor,
             entry.style.tintColor.withAlphaComponent(0).cgColor

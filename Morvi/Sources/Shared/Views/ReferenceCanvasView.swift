@@ -73,6 +73,7 @@ final class ReferenceCanvasView: UIView {
     var didRequestProfileAvatarSelection: (() -> Void)?
     var didSubmitProfileEdit: ((ProfileEditDraft) -> Void)?
     var didChooseMood: ((Int) -> Void)?
+    var didCompleteMoodEntry: (() -> Void)?
     var didCompleteSignOut: (() -> Void)?
     var didCompleteAccountRemoval: (() -> Void)?
     private weak var activeLayoutContainer: UIView?
@@ -90,6 +91,7 @@ final class ReferenceCanvasView: UIView {
     private weak var uploadMediaPlayIconView: UIImageView?
     private weak var profileEditAvatarImageView: UIImageView?
     private weak var profileEditNameField: UITextField?
+    private weak var feelingInputTextView: UITextView?
     private var uploadMediaAsset: String?
     private var uploadCoverAsset: String?
     private var uploadMediaSize: CGSize?
@@ -105,6 +107,7 @@ final class ReferenceCanvasView: UIView {
     private var keyboardBaseContentOffset: CGPoint?
     private var keyboardIsVisible = false
     private let creativeRepository = SQLiteCreativeWorkRepository()
+    private let moodRepository = SQLiteMoodEntryRepository()
     private let replyListDataSource = ReplyListDataSource()
     private let dialogueRepository = SQLiteDialogueRepository()
     private weak var agreementConsentIconView: UIImageView?
@@ -2334,6 +2337,7 @@ final class ReferenceCanvasView: UIView {
             shadowOpacity: 0,
             bottomPlateHeight: 3
         )
+        uploadButton.addTarget(self, action: #selector(handleFeelingUploadTap), for: .touchUpInside)
         uploadButton.addTarget(self, action: #selector(handleUploadWorkAction), for: .touchUpInside)
         activeLayoutContainer = nil
 
@@ -3038,7 +3042,10 @@ final class ReferenceCanvasView: UIView {
             horizontalMargin: 16,
             parent: card,
             bottomAnchor: card.bottomAnchor,
-            bottomInset: 16
+            bottomInset: 16,
+            textViewHandler: { [weak self] textView in
+                self?.feelingInputTextView = textView
+            }
         )
         feelingInput.topAnchor.constraint(equalTo: card.topAnchor, constant: 75).isActive = true
         keyboardAvoidanceInputView = feelingInput
@@ -3048,8 +3055,67 @@ final class ReferenceCanvasView: UIView {
         (uploadButton.layer.sublayers?.first as? CAGradientLayer)?.frame = uploadButton.bounds
     }
 
+    @objc private func handleFeelingUploadTap() {
+        let text = (feelingInputTextView?.text ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard text.isEmpty == false else {
+            MorviToastView.show("Please enter your feelings.", in: self)
+            return
+        }
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+
+        endEditing(true)
+        showProgressOverlay()
+        let descriptor = MoodDescriptor.descriptor(at: selectedMoodIndex)
+        let timestamp = LocalDateText.now()
+        let record = MoodEntryRecord(
+            stableKey: "mood-\(UUID().uuidString.lowercased())",
+            accountKey: accountKey,
+            moodCode: min(max(selectedMoodIndex, 0), MoodDescriptor.all.count - 1),
+            moodAsset: descriptor.assetName,
+            moodTitle: descriptor.title,
+            bodyText: text,
+            toneCode: descriptor.toneCode,
+            recordedAt: timestamp,
+            updatedAt: timestamp
+        )
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                try self?.moodRepository.save(record)
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let self else { return }
+                        MorviToastView.show("Published successfully", in: self)
+                        self.didCompleteMoodEntry?()
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let self else { return }
+                        MorviToastView.show("Upload failed", in: self)
+                    }
+                }
+            }
+        }
+    }
+
     private func renderWeeklyFeeling() {
-        let listView = WeeklyFeelingListView()
+        let records: [MoodEntryRecord]
+        if let accountKey = AccountSessionCenter.shared.activeAccountKey {
+            let interval = currentWeekInterval()
+            records = (try? moodRepository.entries(
+                accountKey: accountKey,
+                from: LocalDateText.string(from: interval.start),
+                through: LocalDateText.string(from: interval.end)
+            )) ?? []
+        } else {
+            records = []
+        }
+        let listView = WeeklyFeelingListView(records: records)
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -3058,6 +3124,13 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func currentWeekInterval() -> DateInterval {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 1
+        return calendar.dateInterval(of: .weekOfYear, for: Date())
+            ?? DateInterval(start: calendar.startOfDay(for: Date()), duration: 7 * 24 * 60 * 60)
     }
 
     private func renderProfileEditor() {
@@ -5222,9 +5295,13 @@ final class ReferenceCanvasView: UIView {
             scrollView.heightAnchor.constraint(equalToConstant: 100)
         ])
 
+        var selectedTile: UIControl?
         moodImageNames.enumerated().forEach { index, imageName in
             let tile = UIControl()
             let isSelected = index == selectedMoodIndex
+            if isSelected {
+                selectedTile = tile
+            }
             tile.backgroundColor = isSelected ? moodColor : .clear
             tile.layer.cornerRadius = 28
             tile.layer.shadowColor = UIColor.black.cgColor
@@ -5279,33 +5356,25 @@ final class ReferenceCanvasView: UIView {
                 faceView.heightAnchor.constraint(equalToConstant: 72)
             ])
         }
-        let selectedCenterX = 20 + CGFloat(selectedMoodIndex) * 112 + 50
-        let contentWidth = 40 + CGFloat(moodImageNames.count) * 100
-            + CGFloat(max(0, moodImageNames.count - 1)) * 12
-        let selectedOffset = min(
-            max(0, selectedCenterX - adaptiveLayoutWidth / 2),
-            max(0, contentWidth - adaptiveLayoutWidth)
-        )
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak scrollView, weak selectedTile] in
+            guard let scrollView, let selectedTile else { return }
+            scrollView.layoutIfNeeded()
+            let selectedCenterX = selectedTile.convert(
+                CGPoint(x: selectedTile.bounds.midX, y: selectedTile.bounds.midY),
+                to: scrollView
+            ).x + scrollView.contentOffset.x
+            let viewportWidth = scrollView.bounds.width
+            let maxOffset = max(0, scrollView.contentSize.width - viewportWidth)
+            let selectedOffset = min(
+                max(0, selectedCenterX - viewportWidth / 2),
+                maxOffset
+            )
             scrollView.setContentOffset(CGPoint(x: selectedOffset, y: 0), animated: false)
         }
     }
 
     private var moodImageNames: [String] {
-        [
-            "home_mood_smile",
-            "home_mood_happy",
-            "home_mood_laugh",
-            "home_mood_playful",
-            "home_mood_surprised",
-            "home_mood_nervous",
-            "home_mood_beaming",
-            "home_mood_worried",
-            "home_mood_shocked",
-            "home_mood_sad",
-            "home_mood_calm",
-            "home_mood_distressed"
-        ]
+        MoodDescriptor.all.map(\.assetName)
     }
 
     private var selectedMoodImageName: String {

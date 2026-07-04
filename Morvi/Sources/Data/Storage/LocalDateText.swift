@@ -2,7 +2,15 @@ import Foundation
 
 enum LocalDateText {
     static func now() -> String {
-        formatter.string(from: Date())
+        string(from: Date())
+    }
+
+    static func string(from date: Date) -> String {
+        formatter.string(from: date)
+    }
+
+    static func date(from text: String) -> Date? {
+        formatter.date(from: text)
     }
 
     private static let formatter: ISO8601DateFormatter = {

@@ -536,6 +536,9 @@ class ReferencePageController: BaseSceneController {
         overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
             self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
+        overlayView.didCompleteMoodEntry = { [weak self] in
+            self?.view.viewWithTag(9102)?.removeFromSuperview()
+        }
         overlayView.didRequestUploadMediaSelection = { [weak self] in
             self?.chooseWorkCover()
         }

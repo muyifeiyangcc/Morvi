@@ -329,6 +329,12 @@ final class RootTabsController: UIViewController {
         overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
             self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
+        overlayView.didCompleteMoodEntry = { [weak self] in
+            self?.dismissActiveOverlay()
+            if self?.currentPage == .weeklyFeeling {
+                self?.renderCurrentPage()
+            }
+        }
         if page == .profileEditor {
             activeProfileEditOverlayView = overlayView
             overlayView.didRequestProfileAvatarSelection = { [weak self, weak overlayView] in
