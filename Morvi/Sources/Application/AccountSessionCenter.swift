@@ -97,6 +97,10 @@ final class AccountSessionCenter {
         return true
     }
 
+    func resetLocalSecret(email: String, secretText: String) throws -> Bool {
+        try profileRepository.updateSecret(email: email, secretText: secretText)
+    }
+
     private func genderCode(from text: String) -> Int? {
         let normalizedText = text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if normalizedText.isEmpty {

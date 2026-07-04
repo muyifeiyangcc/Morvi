@@ -5,6 +5,7 @@ protocol AccountProfileRepository {
     func register(_ record: AccountProfileRecord, secretText: String) throws
     func accountKey(email: String) throws -> String?
     func secretText(email: String) throws -> String?
+    func updateSecret(email: String, secretText: String) throws -> Bool
     func displayName(stableKey: String) throws -> String?
     func avatarAsset(stableKey: String) throws -> String?
     func remove(stableKey: String) throws -> String?
@@ -102,6 +103,28 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
                 .text(email)
             ]
         )
+    }
+
+    func updateSecret(email: String, secretText: String) throws -> Bool {
+        guard let accountKey = try accountKey(email: email) else {
+            return false
+        }
+        try store.write(
+            """
+            UPDATE account_secret
+            SET secret_text = ?,
+                updated_at = ?
+            WHERE account_key = ?
+                AND lower(email) = lower(?);
+            """,
+            bindings: [
+                .text(secretText),
+                .text(LocalDateText.now()),
+                .text(accountKey),
+                .text(email)
+            ]
+        )
+        return true
     }
 
     func displayName(stableKey: String) throws -> String? {

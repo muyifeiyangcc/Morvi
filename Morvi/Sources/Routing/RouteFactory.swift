@@ -26,7 +26,7 @@ enum RouteFactory {
             }
         case .resetAccess:
             return AuthSceneController(page: .resetAccess) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.push(.signIn) }]
+                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.submitResetAccess() }]
             }
         case .agreement:
             return AuthSceneController(page: .agreement)

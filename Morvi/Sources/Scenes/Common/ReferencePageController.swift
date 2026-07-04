@@ -170,6 +170,75 @@ class ReferencePageController: BaseSceneController {
         }
     }
 
+    func submitResetAccess() {
+        let entries = textFields(in: view)
+            .map { field -> (field: UITextField, frame: CGRect) in
+                (field, field.convert(field.bounds, to: view))
+            }
+            .sorted { $0.frame.minY < $1.frame.minY }
+            .map(\.field)
+
+        guard entries.count >= 3 else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+
+        let emailText = trimmedText(entries[0])
+        let secretText = trimmedText(entries[1])
+        let repeatedSecretText = trimmedText(entries[2])
+
+        guard emailText.isEmpty == false else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+        guard secretText.isEmpty == false else {
+            MorviToastView.show("Please enter password", in: view)
+            return
+        }
+        guard repeatedSecretText.isEmpty == false else {
+            MorviToastView.show("Please enter the password again", in: view)
+            return
+        }
+        guard secretText == repeatedSecretText else {
+            MorviToastView.show("Passwords do not match", in: view)
+            return
+        }
+
+        view.endEditing(true)
+        showProgressOverlay()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let didUpdate: Bool
+            do {
+                didUpdate = try AccountSessionCenter.shared.resetLocalSecret(
+                    email: emailText,
+                    secretText: secretText
+                )
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let view = self?.view else { return }
+                        MorviToastView.show("Password reset failed", in: view)
+                    }
+                }
+                return
+            }
+
+            DispatchQueue.main.async {
+                self?.hideProgressOverlay {
+                    guard didUpdate else {
+                        guard let view = self?.view else { return }
+                        MorviToastView.show("Email not found", in: view)
+                        return
+                    }
+                    self?.navigationController?.popViewController(animated: true)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        MorviToastView.show("Password reset successful")
+                    }
+                }
+            }
+        }
+    }
+
     func chooseRegistrationAvatar() {
         view.endEditing(true)
         showProgressOverlay()
