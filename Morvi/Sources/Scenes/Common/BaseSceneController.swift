@@ -67,7 +67,7 @@ class BaseSceneController: UIViewController {
     }
 
     private func installFullScreenBackdropIfNeeded() {
-        guard page == .galleryDetail || page == .publicPersona else { return }
+        guard page == .publicPersona else { return }
         let image = UIImage(named: "discover_feed_cover")
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFill

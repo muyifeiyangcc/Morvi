@@ -1168,11 +1168,15 @@ final class ReferenceCanvasView: UIView {
     private func renderGalleryDetail() {
         let item = resolvedGalleryWork()
         addFullscreenGalleryCover(item: item)
-        let panelTop: CGFloat = 586
-        let tagsTop: CGFloat = 718
         let tagsHeight = measuredTagsHeight(left: 20, right: 20, items: item.themes)
+        let tagsOffset: CGFloat = 132
+        let panelHeight = tagsOffset + tagsHeight + 68
+        let panelTop = max(0, adaptiveLayoutHeight - panelHeight)
+        let avatarTop = panelTop + 23
+        let nameTop = panelTop + 31
+        let bodyTop = panelTop + 78
+        let tagsTop = panelTop + tagsOffset
         let reactionsTop = tagsTop + tagsHeight + 22
-        let panelHeight = reactionsTop + 18 + 28 - panelTop
         let panel = addGlassPanel(
             top: panelTop,
             left: 0,
@@ -1185,9 +1189,9 @@ final class ReferenceCanvasView: UIView {
             trailing: 0
         )
         panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        addAssetAvatar(item.avatarAsset, top: 609, left: 20, size: 36)
-        addText(item.displayName, size: 17, weight: .bold, top: 617, left: 68)
-        addText(item.bodyText, size: 16, weight: .regular, top: 664, left: 20)
+        addAssetAvatar(item.avatarAsset, top: avatarTop, left: 20, size: 36)
+        addText(item.displayName, size: 17, weight: .bold, top: nameTop, left: 68)
+        addText(item.bodyText, size: 16, weight: .regular, top: bodyTop, left: 20)
         addTags(top: tagsTop, left: 20, right: 20, items: item.themes)
         addText(
             "♡ \(max(item.reactionCount, 666)) Likes       ☵ \(max(item.replyCount, 777)) Comments",
@@ -1222,7 +1226,12 @@ final class ReferenceCanvasView: UIView {
         coverView.clipsToBounds = true
         coverContainer.addSubview(coverView)
         coverView.translatesAutoresizingMaskIntoConstraints = false
-        pinFullHeightImageView(coverView, image: coverImage, in: coverContainer)
+        NSLayoutConstraint.activate([
+            coverView.leadingAnchor.constraint(equalTo: coverContainer.leadingAnchor),
+            coverView.trailingAnchor.constraint(equalTo: coverContainer.trailingAnchor),
+            coverView.topAnchor.constraint(equalTo: coverContainer.topAnchor),
+            coverView.bottomAnchor.constraint(equalTo: coverContainer.bottomAnchor)
+        ])
 
         if item.mediaKind == 1 {
             let iconView = UIImageView(image: UIImage(named: "video_play_icon"))
