@@ -312,9 +312,25 @@ class ReferencePageController: BaseSceneController {
         }
     }
 
-    func enterMainFlow() {
-        AccountSessionCenter.shared.activateLocalAccount()
-        finishAuthFlow()
+    func submitGuestSignIn() {
+        showProgressOverlay()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                try AccountSessionCenter.shared.signInAsGuest()
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        self?.finishAuthFlow(successToastText: "Login successful")
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let view = self?.view else { return }
+                        MorviToastView.show("Login failed", in: view)
+                    }
+                }
+            }
+        }
     }
 
     private func finishAuthFlow(successToastText: String? = nil) {

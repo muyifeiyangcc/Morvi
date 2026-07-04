@@ -175,6 +175,13 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
             try store.write("DELETE FROM agreement_acceptance WHERE account_key = ?;", bindings: binding)
             try store.write("DELETE FROM local_session WHERE account_key = ?;", bindings: binding)
             try store.write("DELETE FROM account_secret WHERE account_key = ?;", bindings: binding)
+            try store.write(
+                """
+                DELETE FROM local_identity_state
+                WHERE stable_key = 'guest_account_anchor' AND text_value = ?;
+                """,
+                bindings: binding
+            )
             try store.write("DELETE FROM account_profile WHERE stable_key = ?;", bindings: binding)
         }
 

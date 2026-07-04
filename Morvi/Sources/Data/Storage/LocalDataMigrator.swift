@@ -23,6 +23,11 @@ final class LocalDataMigrator {
         if version < 3 {
             try createAccessSecretSchema()
             try store.execute("PRAGMA user_version = 3;")
+            version = 3
+        }
+        if version < 4 {
+            try createLocalIdentitySchema()
+            try store.execute("PRAGMA user_version = 4;")
         }
     }
 
@@ -36,6 +41,10 @@ final class LocalDataMigrator {
 
     private func createAccessSecretSchema() throws {
         try store.execute(Self.accessSecretSchema)
+    }
+
+    private func createLocalIdentitySchema() throws {
+        try store.execute(Self.localIdentitySchema)
     }
 }
 
@@ -250,6 +259,15 @@ private extension LocalDataMigrator {
     CREATE TABLE IF NOT EXISTS local_seed_state (
         stable_key TEXT PRIMARY KEY,
         created_at TEXT NOT NULL
+    );
+    """
+
+    static let localIdentitySchema = """
+    CREATE TABLE IF NOT EXISTS local_identity_state (
+        stable_key TEXT PRIMARY KEY,
+        text_value TEXT,
+        integer_value INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL
     );
     """
 }

@@ -5,14 +5,16 @@ final class AccountSessionCenter {
 
     private let repository: AccountSessionRepository
     private let profileRepository: AccountProfileRepository
-    private let localAccountKey = "acct-local-amelia"
+    private let guestRepository: GuestAccessRepository
 
     private init(
         repository: AccountSessionRepository = SQLiteAccountSessionRepository(),
-        profileRepository: AccountProfileRepository = SQLiteAccountProfileRepository()
+        profileRepository: AccountProfileRepository = SQLiteAccountProfileRepository(),
+        guestRepository: GuestAccessRepository = GuestAccessRepository()
     ) {
         self.repository = repository
         self.profileRepository = profileRepository
+        self.guestRepository = guestRepository
     }
 
     var isSignedIn: Bool {
@@ -23,8 +25,9 @@ final class AccountSessionCenter {
         try? repository.activeAccountKey()
     }
 
-    func activateLocalAccount() {
-        activate(accountKey: localAccountKey)
+    func signInAsGuest() throws {
+        let accountKey = try guestRepository.resolveAccountKey()
+        try activateSession(accountKey: accountKey, accessKind: 1)
     }
 
     func registerLocalAccount(
@@ -82,14 +85,10 @@ final class AccountSessionCenter {
         return 2
     }
 
-    private func activate(accountKey: String) {
-        try? activateSession(accountKey: accountKey)
-    }
-
-    private func activateSession(accountKey: String) throws {
+    private func activateSession(accountKey: String, accessKind: Int = 0) throws {
         let record = AccountSessionRecord(
             accountKey: accountKey,
-            accessKind: 0,
+            accessKind: accessKind,
             isActive: true,
             signedInAt: LocalDateText.now(),
             expiresAt: nil
