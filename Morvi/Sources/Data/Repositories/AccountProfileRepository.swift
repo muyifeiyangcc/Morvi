@@ -19,6 +19,7 @@ protocol AccountProfileRepository {
     func addSafetyNotice(originKey: String, subjectKey: String, reasonCode: Int, detailText: String?) throws
     func hasSafetyBarrier(originKey: String, subjectKey: String) throws -> Bool
     func connect(originKey: String, subjectKey: String) throws
+    func removeConnection(originKey: String, subjectKey: String) throws
     func hasConnection(originKey: String, subjectKey: String) throws -> Bool
     func hasMutualConnection(firstKey: String, secondKey: String) throws -> Bool
     func remove(stableKey: String) throws -> String?
@@ -247,6 +248,17 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
                 .text(subjectKey),
                 .text(LocalDateText.now())
             ]
+        )
+    }
+
+    func removeConnection(originKey: String, subjectKey: String) throws {
+        try store.write(
+            """
+            DELETE FROM account_relation
+            WHERE origin_account_key = ?
+                AND target_account_key = ?;
+            """,
+            bindings: [.text(originKey), .text(subjectKey)]
         )
     }
 

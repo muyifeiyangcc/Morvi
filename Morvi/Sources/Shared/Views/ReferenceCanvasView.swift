@@ -1510,7 +1510,17 @@ final class ReferenceCanvasView: UIView {
         let actionLayout = adaptivePairLayout(gap: 15)
         let dialogueButton = addPillButton("Chat", top: buttonTop, left: 20, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         dialogueButton.addTarget(self, action: #selector(handlePersonaDialogueTap), for: .touchUpInside)
-        let connectButton = addPillButton("Follow", top: buttonTop, left: actionLayout.secondLeft, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        let isConnected = AccountSessionCenter.shared.isConnectedToAccount(accountKey: accountKey)
+        let connectButton = addPillButton(
+            isConnected ? "Unfollow" : "Follow",
+            top: buttonTop,
+            left: actionLayout.secondLeft,
+            width: actionLayout.width,
+            height: 40,
+            dark: isConnected == false,
+            fontSize: 16,
+            fontWeight: .medium
+        )
         connectButton.addTarget(self, action: #selector(handlePersonaConnectTap), for: .touchUpInside)
         cellPlacements.forEach { placement in
             addMediaBlock(
@@ -1563,11 +1573,11 @@ final class ReferenceCanvasView: UIView {
             return
         }
         do {
-            guard try AccountSessionCenter.shared.connectToAccount(accountKey: accountKey) else {
+            guard let isConnected = try AccountSessionCenter.shared.toggleConnectionToAccount(accountKey: accountKey) else {
                 MorviToastView.show("You cannot follow yourself.", in: self)
                 return
             }
-            MorviToastView.show("Followed", in: self)
+            MorviToastView.show(isConnected ? "Followed" : "Unfollowed", in: self)
             reloadRenderedContent()
         } catch {
             MorviToastView.show("Operation failed", in: self)
