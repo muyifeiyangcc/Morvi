@@ -264,14 +264,15 @@ class BaseSceneController: UIViewController {
 
 extension BaseSceneController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if touch.view is UIControl {
-            return false
-        }
-        if touch.view is UITextView {
-            return false
-        }
-        if touch.view?.isDescendant(of: topLayer) == true {
-            return false
+        var touchedView = touch.view
+        while let candidate = touchedView {
+            if candidate is UIControl || candidate is UITextField || candidate is UITextView {
+                return false
+            }
+            if candidate === topLayer {
+                return false
+            }
+            touchedView = candidate.superview
         }
         return true
     }
@@ -280,7 +281,12 @@ extension BaseSceneController: UIGestureRecognizerDelegate {
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        gestureBelongsToScrollableArea(gestureRecognizer) || gestureBelongsToScrollableArea(otherGestureRecognizer)
+        if gestureRecognizer is UITapGestureRecognizer,
+           otherGestureRecognizer is UITapGestureRecognizer {
+            return true
+        }
+        return gestureBelongsToScrollableArea(gestureRecognizer)
+            || gestureBelongsToScrollableArea(otherGestureRecognizer)
     }
 
     private func gestureBelongsToScrollableArea(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
