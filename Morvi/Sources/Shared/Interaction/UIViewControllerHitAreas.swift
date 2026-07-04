@@ -51,7 +51,33 @@ private final class HitAreaTapProxy: NSObject {
     @objc func handleTap(_ gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended, let hostView else { return }
         let location = gesture.location(in: hostView)
-        guard let area = areas.first(where: { $0.frame.contains(location) }) else { return }
+        guard let area = areas.first(where: { hitTest($0, at: location, in: hostView, gesture: gesture) }) else { return }
         area.action()
+    }
+
+    private func hitTest(_ area: HitArea, at location: CGPoint, in hostView: UIView, gesture: UITapGestureRecognizer) -> Bool {
+        if area.frame.contains(location) {
+            return true
+        }
+        return scrollViews(in: hostView).contains { scrollView in
+            let scrollLocation = gesture.location(in: scrollView)
+            guard scrollView.bounds.contains(scrollLocation) else { return false }
+            let contentLocation = CGPoint(
+                x: scrollLocation.x + scrollView.contentOffset.x,
+                y: scrollLocation.y + scrollView.contentOffset.y
+            )
+            return area.frame.contains(contentLocation)
+        }
+    }
+
+    private func scrollViews(in view: UIView) -> [UIScrollView] {
+        var result: [UIScrollView] = []
+        for subview in view.subviews {
+            if let scrollView = subview as? UIScrollView {
+                result.append(scrollView)
+            }
+            result.append(contentsOf: scrollViews(in: subview))
+        }
+        return result
     }
 }
