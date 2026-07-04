@@ -106,8 +106,10 @@ final class WeeklyFeelingHeaderView: UIView {
         addSubview(dayLabel)
         dayLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        let initialIconTop = top + 220 - 55
-        let targetIconTop = top + 220 - fillHeight - 55
+        let iconSize: CGFloat = 48
+        let iconCenterOffset = iconSize / 2
+        let initialIconTop = top + 220 - iconCenterOffset
+        let targetIconTop = top + 220 - fillHeight - iconCenterOffset
         let fillHeightConstraint = fillView.heightAnchor.constraint(equalToConstant: 0)
         let iconTopConstraint = iconView.topAnchor.constraint(
             equalTo: topAnchor,
@@ -133,10 +135,10 @@ final class WeeklyFeelingHeaderView: UIView {
             fillView.bottomAnchor.constraint(equalTo: trackView.bottomAnchor),
             fillHeightConstraint,
 
-            iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left - 10),
+            iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left + (40 - iconSize) / 2),
             iconTopConstraint,
-            iconView.widthAnchor.constraint(equalToConstant: 60),
-            iconView.heightAnchor.constraint(equalToConstant: 60),
+            iconView.widthAnchor.constraint(equalToConstant: iconSize),
+            iconView.heightAnchor.constraint(equalToConstant: iconSize),
 
             dayLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left + 3),
             dayLabel.topAnchor.constraint(equalTo: topAnchor, constant: top + 233)
