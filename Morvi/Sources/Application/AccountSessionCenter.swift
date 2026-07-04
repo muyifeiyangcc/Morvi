@@ -27,7 +27,7 @@ final class AccountSessionCenter {
         activate(accountKey: localAccountKey)
     }
 
-    func registerAndActivate(email: String, secretText: String) throws {
+    func registerLocalAccount(email: String, secretText: String) throws {
         let now = LocalDateText.now()
         let key = "acct-local-\(UUID().uuidString.lowercased())"
         let profile = AccountProfileRecord(
@@ -44,7 +44,6 @@ final class AccountSessionCenter {
             updatedAt: now
         )
         try profileRepository.register(profile, secretText: secretText)
-        try activateSession(accountKey: key)
     }
 
     private func activate(accountKey: String) {

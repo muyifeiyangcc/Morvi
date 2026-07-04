@@ -81,7 +81,7 @@ class ReferencePageController: BaseSceneController {
         showProgressOverlay()
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             do {
-                try AccountSessionCenter.shared.registerAndActivate(
+                try AccountSessionCenter.shared.registerLocalAccount(
                     email: emailText,
                     secretText: passwordText
                 )
