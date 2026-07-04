@@ -59,11 +59,7 @@ private final class HitAreaTapProxy: NSObject {
         for scrollView in scrollViews(in: hostView) {
             let scrollLocation = gesture.location(in: scrollView)
             guard scrollView.bounds.contains(scrollLocation) else { continue }
-            let contentLocation = CGPoint(
-                x: scrollLocation.x + scrollView.contentOffset.x,
-                y: scrollLocation.y + scrollView.contentOffset.y
-            )
-            if let area = areas.first(where: { $0.frame.contains(contentLocation) }) {
+            if let area = areas.first(where: { $0.frame.contains(scrollLocation) }) {
                 return area
             }
         }
