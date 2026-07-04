@@ -3,6 +3,14 @@ import ImageIO
 
 final class DialogueFlowCell: UITableViewCell {
     static let reuseIdentifier = "DialogueFlowCell"
+    private enum LayoutMetric {
+        static let sideInset: CGFloat = 20
+        static let avatarInset: CGFloat = 26
+        static let avatarSize: CGFloat = 44
+        static let avatarGap: CGFloat = 16
+        static let imageWidth: CGFloat = 160
+    }
+
     private let revealFeedbackGenerator = UISelectionFeedbackGenerator()
     private var revealTimer: Timer?
     private var thinkingTimer: Timer?
@@ -121,10 +129,16 @@ final class DialogueFlowCell: UITableViewCell {
         ]
 
         if side == .local {
-            constraints.append(bubble.trailingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 288))
+            constraints.append(bubble.trailingAnchor.constraint(
+                equalTo: showsAvatar ? localAvatarLeadingAnchor() : contentView.trailingAnchor,
+                constant: showsAvatar ? -LayoutMetric.avatarGap : -LayoutMetric.sideInset
+            ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
         } else {
-            constraints.append(bubble.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 86))
+            constraints.append(bubble.leadingAnchor.constraint(
+                equalTo: showsAvatar ? remoteAvatarTrailingAnchor() : contentView.leadingAnchor,
+                constant: showsAvatar ? LayoutMetric.avatarGap : LayoutMetric.sideInset
+            ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
         }
 
@@ -187,13 +201,13 @@ final class DialogueFlowCell: UITableViewCell {
 
         if side == .local {
             constraints.append(bubble.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor,
-                constant: showsAvatar ? -87 : -20
+                equalTo: showsAvatar ? localAvatarLeadingAnchor() : contentView.trailingAnchor,
+                constant: showsAvatar ? -LayoutMetric.avatarGap : -LayoutMetric.sideInset
             ))
         } else {
             constraints.append(bubble.leadingAnchor.constraint(
-                equalTo: contentView.leadingAnchor,
-                constant: showsAvatar ? 86 : 20
+                equalTo: showsAvatar ? remoteAvatarTrailingAnchor() : contentView.leadingAnchor,
+                constant: showsAvatar ? LayoutMetric.avatarGap : LayoutMetric.sideInset
             ))
         }
 
@@ -265,9 +279,15 @@ final class DialogueFlowCell: UITableViewCell {
         ]
 
         if side == .local {
-            constraints.append(bubble.trailingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 288))
+            constraints.append(bubble.trailingAnchor.constraint(
+                equalTo: showsAvatar ? localAvatarLeadingAnchor() : contentView.trailingAnchor,
+                constant: showsAvatar ? -LayoutMetric.avatarGap : -LayoutMetric.sideInset
+            ))
         } else {
-            constraints.append(bubble.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 86))
+            constraints.append(bubble.leadingAnchor.constraint(
+                equalTo: showsAvatar ? remoteAvatarTrailingAnchor() : contentView.leadingAnchor,
+                constant: showsAvatar ? LayoutMetric.avatarGap : LayoutMetric.sideInset
+            ))
         }
 
         NSLayoutConstraint.activate(constraints)
@@ -276,7 +296,7 @@ final class DialogueFlowCell: UITableViewCell {
 
     private func configurePortraitAsset(name: String, side: DialogueFlowSide, showsAvatar: Bool) {
         let image = resolvedImage(named: name)
-        let width: CGFloat = 160
+        let width: CGFloat = LayoutMetric.imageWidth
         let ratio = (image?.size.height ?? width) / max(image?.size.width ?? width, 1)
 
         let imageView = UIImageView(image: image)
@@ -294,10 +314,16 @@ final class DialogueFlowCell: UITableViewCell {
         ]
 
         if side == .local {
-            constraints.append(imageView.trailingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 288))
+            constraints.append(imageView.trailingAnchor.constraint(
+                equalTo: showsAvatar ? localAvatarLeadingAnchor() : contentView.trailingAnchor,
+                constant: showsAvatar ? -LayoutMetric.avatarGap : -LayoutMetric.sideInset
+            ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: imageView.topAnchor)
         } else {
-            constraints.append(imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 86))
+            constraints.append(imageView.leadingAnchor.constraint(
+                equalTo: showsAvatar ? remoteAvatarTrailingAnchor() : contentView.leadingAnchor,
+                constant: showsAvatar ? LayoutMetric.avatarGap : LayoutMetric.sideInset
+            ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: imageView.topAnchor)
         }
 
@@ -350,15 +376,35 @@ final class DialogueFlowCell: UITableViewCell {
         contentView.addSubview(avatarView)
         avatarView.translatesAutoresizingMaskIntoConstraints = false
 
-        let leading = side == .local
-            ? avatarView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 306)
-            : avatarView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 26)
+        let horizontalConstraint = side == .local
+            ? avatarView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -LayoutMetric.avatarInset)
+            : avatarView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: LayoutMetric.avatarInset)
 
         NSLayoutConstraint.activate([
-            leading,
+            horizontalConstraint,
             avatarView.topAnchor.constraint(equalTo: topAnchor, constant: -2),
-            avatarView.widthAnchor.constraint(equalToConstant: 44),
-            avatarView.heightAnchor.constraint(equalToConstant: 44)
+            avatarView.widthAnchor.constraint(equalToConstant: LayoutMetric.avatarSize),
+            avatarView.heightAnchor.constraint(equalToConstant: LayoutMetric.avatarSize)
         ])
+    }
+
+    private func localAvatarLeadingAnchor() -> NSLayoutXAxisAnchor {
+        let guide = UILayoutGuide()
+        contentView.addLayoutGuide(guide)
+        NSLayoutConstraint.activate([
+            guide.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -LayoutMetric.avatarInset),
+            guide.widthAnchor.constraint(equalToConstant: LayoutMetric.avatarSize)
+        ])
+        return guide.leadingAnchor
+    }
+
+    private func remoteAvatarTrailingAnchor() -> NSLayoutXAxisAnchor {
+        let guide = UILayoutGuide()
+        contentView.addLayoutGuide(guide)
+        NSLayoutConstraint.activate([
+            guide.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: LayoutMetric.avatarInset),
+            guide.widthAnchor.constraint(equalToConstant: LayoutMetric.avatarSize)
+        ])
+        return guide.trailingAnchor
     }
 }
