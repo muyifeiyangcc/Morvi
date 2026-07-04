@@ -2874,18 +2874,42 @@ final class ReferenceCanvasView: UIView {
     private func settingsTapAction(for text: String) -> (() -> Void)? {
         switch text {
         case "Wallet":
-            return { [weak self] in self?.didRequestPage?(.wallet) }
+            return { [weak self] in
+                self?.performSettingsSignedInAction {
+                    self?.didRequestPage?(.wallet)
+                }
+            }
         case "Blacklist":
-            return { [weak self] in self?.didRequestPage?(.restrictedList) }
+            return { [weak self] in
+                self?.performSettingsSignedInAction {
+                    self?.didRequestPage?(.restrictedList)
+                }
+            }
         case "Privacy Policy", "User Agreement":
             return { [weak self] in self?.didRequestPage?(.agreement) }
         case "Delete account":
-            return { [weak self] in self?.didRequestOverlayPage?(.exitConfirm) }
+            return { [weak self] in
+                self?.performSettingsSignedInAction {
+                    self?.didRequestOverlayPage?(.exitConfirm)
+                }
+            }
         case "Log out":
-            return { [weak self] in self?.didRequestOverlayPage?(.signOutConfirm) }
+            return { [weak self] in
+                self?.performSettingsSignedInAction {
+                    self?.didRequestOverlayPage?(.signOutConfirm)
+                }
+            }
         default:
             return nil
         }
+    }
+
+    private func performSettingsSignedInAction(_ action: () -> Void) {
+        guard AccountSessionCenter.shared.isSignedIn else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+        action()
     }
 
     private func renderPersonalDetail() {
