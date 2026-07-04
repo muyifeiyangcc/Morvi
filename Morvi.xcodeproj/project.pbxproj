@@ -92,6 +92,7 @@
 		300000000000000000000122 /* AccountSessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000022 /* AccountSessionRecord.swift */; };
 		300000000000000000000123 /* AccountSessionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000023 /* AccountSessionRepository.swift */; };
 		300000000000000000000124 /* GuestAccessRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000024 /* GuestAccessRepository.swift */; };
+		300000000000000000000125 /* AppleAccessRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000025 /* AppleAccessRepository.swift */; };
 		400000000000000000000201 /* builtin_victoria.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000001 /* builtin_victoria.mp4 */; };
 		400000000000000000000202 /* builtin_sophia.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000002 /* builtin_sophia.mp4 */; };
 		400000000000000000000203 /* builtin_chloe.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000003 /* builtin_chloe.mp4 */; };
@@ -189,6 +190,7 @@
 		300000000000000000000022 /* AccountSessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionRecord.swift; sourceTree = "<group>"; };
 		300000000000000000000023 /* AccountSessionRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionRepository.swift; sourceTree = "<group>"; };
 		300000000000000000000024 /* GuestAccessRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestAccessRepository.swift; sourceTree = "<group>"; };
+		300000000000000000000025 /* AppleAccessRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAccessRepository.swift; sourceTree = "<group>"; };
 		400000000000000000000001 /* builtin_victoria.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_victoria.mp4; sourceTree = "<group>"; };
 		400000000000000000000002 /* builtin_sophia.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_sophia.mp4; sourceTree = "<group>"; };
 		400000000000000000000003 /* builtin_chloe.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_chloe.mp4; sourceTree = "<group>"; };
@@ -438,6 +440,7 @@
 				300000000000000000000014 /* AccountProfileRepository.swift */,
 				300000000000000000000023 /* AccountSessionRepository.swift */,
 				300000000000000000000024 /* GuestAccessRepository.swift */,
+				300000000000000000000025 /* AppleAccessRepository.swift */,
 				300000000000000000000015 /* CreativeWorkRepository.swift */,
 				300000000000000000000016 /* MoodEntryRepository.swift */,
 				300000000000000000000017 /* DialogueRepository.swift */,
@@ -630,6 +633,7 @@
 				300000000000000000000114 /* AccountProfileRepository.swift in Sources */,
 				300000000000000000000123 /* AccountSessionRepository.swift in Sources */,
 				300000000000000000000124 /* GuestAccessRepository.swift in Sources */,
+				300000000000000000000125 /* AppleAccessRepository.swift in Sources */,
 				300000000000000000000115 /* CreativeWorkRepository.swift in Sources */,
 				300000000000000000000116 /* MoodEntryRepository.swift in Sources */,
 				300000000000000000000117 /* DialogueRepository.swift in Sources */,

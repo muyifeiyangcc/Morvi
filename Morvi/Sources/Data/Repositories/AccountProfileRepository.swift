@@ -194,7 +194,8 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
             try store.write(
                 """
                 DELETE FROM local_identity_state
-                WHERE stable_key = 'guest_account_anchor' AND text_value = ?;
+                WHERE stable_key IN ('guest_account_anchor', 'apple_account_anchor')
+                    AND text_value = ?;
                 """,
                 bindings: binding
             )

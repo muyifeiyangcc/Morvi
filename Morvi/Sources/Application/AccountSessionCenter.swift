@@ -7,15 +7,18 @@ final class AccountSessionCenter {
     private let repository: AccountSessionRepository
     private let profileRepository: AccountProfileRepository
     private let guestRepository: GuestAccessRepository
+    private let appleRepository: AppleAccessRepository
 
     private init(
         repository: AccountSessionRepository = SQLiteAccountSessionRepository(),
         profileRepository: AccountProfileRepository = SQLiteAccountProfileRepository(),
-        guestRepository: GuestAccessRepository = GuestAccessRepository()
+        guestRepository: GuestAccessRepository = GuestAccessRepository(),
+        appleRepository: AppleAccessRepository = AppleAccessRepository()
     ) {
         self.repository = repository
         self.profileRepository = profileRepository
         self.guestRepository = guestRepository
+        self.appleRepository = appleRepository
     }
 
     var isSignedIn: Bool {
@@ -38,6 +41,11 @@ final class AccountSessionCenter {
     func signInAsGuest() throws {
         let accountKey = try guestRepository.resolveAccountKey()
         try activateSession(accountKey: accountKey, accessKind: 1)
+    }
+
+    func signInWithApple() throws {
+        let accountKey = try appleRepository.resolveAccountKey()
+        try activateSession(accountKey: accountKey, accessKind: 2)
     }
 
     func registerLocalAccount(
