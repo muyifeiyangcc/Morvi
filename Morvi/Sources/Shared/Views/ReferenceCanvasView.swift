@@ -234,7 +234,7 @@ final class ReferenceCanvasView: UIView {
         addButton("I'm new", top: 486, filled: true, usesOneFont: true)
         addEntrySignUpPrompt(top: 568)
         addText("Guest login", size: 12, weight: .regular, top: 608, centered: true, color: .lightGray)
-        addAppleLoginCircle(top: 640, left: 168)
+        addAppleLoginCircle(top: 640)
         activeLayoutContainer = nil
     }
 
@@ -3478,7 +3478,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addAppleLoginCircle(top: CGFloat, left: CGFloat) {
+    private func addAppleLoginCircle(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let background = UIView()
         background.backgroundColor = UIColor(white: 0.94, alpha: 1)
@@ -3495,7 +3495,7 @@ final class ReferenceCanvasView: UIView {
         icon.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            background.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            background.centerXAnchor.constraint(equalTo: layoutContainer.centerXAnchor),
             background.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             background.widthAnchor.constraint(equalToConstant: 40),
             background.heightAnchor.constraint(equalToConstant: 40),
