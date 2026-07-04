@@ -2337,7 +2337,6 @@ final class ReferenceCanvasView: UIView {
             shadowOpacity: 0,
             bottomPlateHeight: 3
         )
-        uploadButton.addTarget(self, action: #selector(handleFeelingUploadTap), for: .touchUpInside)
         uploadButton.addTarget(self, action: #selector(handleUploadWorkAction), for: .touchUpInside)
         activeLayoutContainer = nil
 
@@ -3009,6 +3008,7 @@ final class ReferenceCanvasView: UIView {
             shadowOpacity: 0,
             bottomPlateHeight: 3
         )
+        uploadButton.addTarget(self, action: #selector(handleFeelingUploadTap), for: .touchUpInside)
         activeLayoutContainer = nil
 
         let card = UIView()
