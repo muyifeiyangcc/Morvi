@@ -1423,8 +1423,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom)
         ])
 
         let scrollContent = UIView()
@@ -1455,6 +1454,7 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = nil
         let actionButton = addButton("Log in", bottom: 29, filled: true, usesOneFont: true)
         actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
+        scrollView.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -16).isActive = true
     }
 
     private func renderSignUp() {
@@ -1471,8 +1471,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom)
         ])
 
         let scrollContent = UIView()
@@ -1509,6 +1508,7 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = nil
         let actionButton = addButton("Sign up", bottom: 29, filled: true, usesOneFont: true)
         actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
+        scrollView.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -16).isActive = true
     }
 
     private func renderResetAccess() {
@@ -1525,8 +1525,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom)
         ])
 
         let scrollContent = UIView()
@@ -1562,6 +1561,7 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = nil
         let actionButton = addButton("Next", bottom: 29, filled: true, usesOneFont: true)
         actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
+        scrollView.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -16).isActive = true
     }
 
     private func renderForm(title: String, fields: [String], action: String, footer: String?) {
@@ -2075,8 +2075,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom)
         ])
 
         let scrollContent = UIView()
@@ -2122,6 +2121,7 @@ final class ReferenceCanvasView: UIView {
         activeLayoutContainer = nil
         let actionButton = addButton("Sign up", bottom: 29, filled: true, usesOneFont: true)
         actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
+        scrollView.bottomAnchor.constraint(equalTo: actionButton.topAnchor, constant: -16).isActive = true
     }
 
     @objc private func handlePrimaryAction() {
