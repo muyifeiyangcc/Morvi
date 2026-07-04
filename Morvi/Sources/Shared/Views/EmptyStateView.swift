@@ -2,9 +2,12 @@ import UIKit
 
 final class EmptyStateView: UIView {
     private let illustrationView = UIImageView()
+    private let copyLabel = UILabel()
+    private let copy: String
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(copy: String) {
+        self.copy = copy
+        super.init(frame: .zero)
         configureView()
     }
 
@@ -18,14 +21,25 @@ final class EmptyStateView: UIView {
 
         illustrationView.image = UIImage(named: "empty_list_illustration")
         illustrationView.contentMode = .scaleAspectFit
-        addSubview(illustrationView)
+        copyLabel.text = copy
+        copyLabel.font = AppFont.source(16, weight: .medium)
+        copyLabel.textColor = UIColor(white: 0.45, alpha: 1)
+        copyLabel.textAlignment = .center
+
+        let contentStack = UIStackView(arrangedSubviews: [illustrationView, copyLabel])
+        contentStack.axis = .vertical
+        contentStack.alignment = .center
+        contentStack.spacing = 6
+        addSubview(contentStack)
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
         illustrationView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            illustrationView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            illustrationView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            illustrationView.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor, multiplier: 0.56),
-            illustrationView.widthAnchor.constraint(lessThanOrEqualToConstant: 210),
-            illustrationView.heightAnchor.constraint(equalTo: illustrationView.widthAnchor, multiplier: 1.18)
+            contentStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            contentStack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            contentStack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 20),
+            contentStack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -20),
+            illustrationView.widthAnchor.constraint(equalToConstant: 105),
+            illustrationView.heightAnchor.constraint(equalToConstant: 197)
         ])
     }
 }

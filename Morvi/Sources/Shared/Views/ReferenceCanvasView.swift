@@ -644,7 +644,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addPersonaEmptyState(top: CGFloat, in container: UIView) {
-        let emptyStateView = EmptyStateView()
+        let emptyStateView = EmptyStateView(copy: "No works yet")
         container.addSubview(emptyStateView)
         emptyStateView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -2688,7 +2688,8 @@ final class ReferenceCanvasView: UIView {
         }
         let listView = RestrictedRosterListView(
             entries: listEntries,
-            accessoryImageName: accessoryImageName
+            accessoryImageName: accessoryImageName,
+            emptyCopy: rosterEmptyCopy(for: title)
         )
         listView.didSelectEntry = { [weak self] entry in
             self?.requestPublicPersona(subjectKey: entry.accountKey)
@@ -2716,6 +2717,19 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func rosterEmptyCopy(for title: String) -> String {
+        switch title {
+        case "Blacklist":
+            return "No blocked users"
+        case "Following":
+            return "No following yet"
+        case "Followers":
+            return "No followers yet"
+        default:
+            return "No data yet"
+        }
     }
 
     private func requestRosterDialogue(accountKey: String) {

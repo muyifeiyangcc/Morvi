@@ -9,14 +9,16 @@ final class RestrictedRosterListView: UIView {
 
     private let entries: [Entry]
     private let accessoryImageName: String?
+    private let emptyCopy: String
     var didSelectEntry: ((Entry) -> Void)?
     var didTapAction: ((Entry) -> Void)?
 
     private let collectionView: UICollectionView
 
-    init(entries: [Entry], accessoryImageName: String? = nil) {
+    init(entries: [Entry], accessoryImageName: String? = nil, emptyCopy: String) {
         self.entries = entries
         self.accessoryImageName = accessoryImageName
+        self.emptyCopy = emptyCopy
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 8
@@ -41,7 +43,7 @@ final class RestrictedRosterListView: UIView {
         collectionView.delegate = self
         collectionView.register(RestrictedRosterCell.self, forCellWithReuseIdentifier: RestrictedRosterCell.reuseIdentifier)
         if entries.isEmpty {
-            collectionView.backgroundView = EmptyStateView()
+            collectionView.backgroundView = EmptyStateView(copy: emptyCopy)
         }
         addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
