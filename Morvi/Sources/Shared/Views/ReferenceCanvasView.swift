@@ -181,7 +181,7 @@ final class ReferenceCanvasView: UIView {
         addButton("Login by email", top: 417, filled: false, usesOneFont: true)
         addButton("I'm new", top: 486, filled: true, usesOneFont: true)
         addEntrySignUpPrompt(top: 568)
-        addText("Other login methods", size: 12, weight: .regular, top: 608, centered: true, color: .lightGray)
+        addText("Guest login", size: 12, weight: .regular, top: 608, centered: true, color: .lightGray)
         addAppleLoginCircle(top: 640, left: 168)
         activeLayoutContainer = nil
     }
