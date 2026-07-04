@@ -2507,9 +2507,12 @@ final class ReferenceCanvasView: UIView {
     }
 
     @objc private func confirmAssistantUnlock() {
-        showProgressOverlay()
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
+        let controller = owningController()
+        let requestOverlay = didRequestOverlayPage
+        let overlay = MorviProgressOverlayView()
+        overlay.show(in: controller?.view ?? superview ?? self)
+        removeFromSuperview()
+        DispatchQueue.main.async {
             let didConsume: Bool
             do {
                 didConsume = try AccountSessionCenter.shared.consumeActiveWalletBalanceValue(
@@ -2518,14 +2521,11 @@ final class ReferenceCanvasView: UIView {
             } catch {
                 didConsume = false
             }
-            self.hideProgressOverlay { [weak self] in
-                guard let self else { return }
+            overlay.dismiss {
                 guard didConsume else {
-                    self.didRequestOverlayPage?(.creditShortage)
+                    requestOverlay?(.creditShortage)
                     return
                 }
-                let controller = self.owningController()
-                self.removeFromSuperview()
                 controller?.navigationController?.pushViewController(RouteFactory.controller(for: .assistantDialogue), animated: true)
             }
         }
