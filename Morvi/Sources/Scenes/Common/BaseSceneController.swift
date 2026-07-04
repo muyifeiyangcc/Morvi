@@ -239,10 +239,23 @@ class BaseSceneController: UIViewController {
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showCanvasOverlay(targetPage)
         }
+        overlayView.didCompleteSignOut = { [weak self] in
+            self?.completeSignOutFlow()
+        }
     }
 
     private func dismissCanvasOverlay() {
         view.viewWithTag(9102)?.removeFromSuperview()
+    }
+
+    private func completeSignOutFlow() {
+        guard let navigationController else { return }
+        if let rootTabsController = navigationController.viewControllers.first as? RootTabsController {
+            rootTabsController.resetAfterSignOut()
+            navigationController.popToRootViewController(animated: false)
+            return
+        }
+        navigationController.setViewControllers([RootTabsController()], animated: false)
     }
 }
 

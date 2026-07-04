@@ -14,6 +14,7 @@ final class ReferenceCanvasView: UIView {
     var didRequestPage: ((ScenePage) -> Void)?
     var didRequestOverlayPage: ((ScenePage) -> Void)?
     var didChooseMood: ((Int) -> Void)?
+    var didCompleteSignOut: (() -> Void)?
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var keyboardAvoidanceInputView: UIView?
@@ -2481,6 +2482,7 @@ final class ReferenceCanvasView: UIView {
 
     @objc private func confirmSignOut() {
         AccountSessionCenter.shared.clearActiveSession()
+        didCompleteSignOut?()
         removeFromSuperview()
     }
 

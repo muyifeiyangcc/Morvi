@@ -169,6 +169,11 @@ final class RootTabsController: UIViewController {
         renderCurrentPage()
     }
 
+    func resetAfterSignOut() {
+        currentPage = .home
+        renderCurrentPage()
+    }
+
     private func dockItem(for page: ScenePage) -> FloatingDockView.Item {
         switch page {
         case .weeklyFeeling:
@@ -234,6 +239,9 @@ final class RootTabsController: UIViewController {
         }
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
+        }
+        overlayView.didCompleteSignOut = { [weak self] in
+            self?.resetAfterSignOut()
         }
     }
 

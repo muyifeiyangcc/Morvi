@@ -264,6 +264,9 @@ class ReferencePageController: BaseSceneController {
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
         }
+        overlayView.didCompleteSignOut = { [weak self] in
+            self?.navigationController?.setViewControllers([RootTabsController()], animated: false)
+        }
     }
 
     func enterMainFlow() {
