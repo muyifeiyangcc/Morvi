@@ -1,4 +1,5 @@
 import UIKit
+import Photos
 import PhotosUI
 
 class ReferencePageController: BaseSceneController {
@@ -162,6 +163,31 @@ class ReferencePageController: BaseSceneController {
     func chooseRegistrationAvatar() {
         view.endEditing(true)
         showProgressOverlay()
+        handlePhotoLibraryAccess(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+    }
+
+    private func handlePhotoLibraryAccess(_ status: PHAuthorizationStatus) {
+        switch status {
+        case .authorized, .limited:
+            presentRegistrationAvatarPicker()
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] updatedStatus in
+                DispatchQueue.main.async {
+                    self?.handlePhotoLibraryAccess(updatedStatus)
+                }
+            }
+        case .denied, .restricted:
+            hideProgressOverlay { [weak self] in
+                self?.showPhotoLibrarySettingsGuide()
+            }
+        @unknown default:
+            hideProgressOverlay { [weak self] in
+                self?.showPhotoLibrarySettingsGuide()
+            }
+        }
+    }
+
+    private func presentRegistrationAvatarPicker() {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         configuration.filter = .images
         configuration.selectionLimit = 1
@@ -170,6 +196,20 @@ class ReferencePageController: BaseSceneController {
         present(picker, animated: true) { [weak self] in
             self?.hideProgressOverlay {}
         }
+    }
+
+    private func showPhotoLibrarySettingsGuide() {
+        let alert = UIAlertController(
+            title: "Photo access required",
+            message: "Please allow photo access in Settings to select an avatar.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Open Settings", style: .default) { _ in
+            guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+            UIApplication.shared.open(settingsURL)
+        })
+        present(alert, animated: true)
     }
 
     func submitPersonalDetail() {
