@@ -75,7 +75,6 @@ final class FloatingDockView: UIView {
             button.layer.cornerRadius = itemSide / 2
             button.layer.masksToBounds = true
             button.addAction(UIAction { [weak self] _ in
-                self?.selectedItem = item
                 self?.didSelect?(item)
             }, for: .touchUpInside)
             let iconView = UIImageView(image: UIImage(named: item.imageName))

@@ -146,8 +146,22 @@ final class RootTabsController: UIViewController {
         ])
         dockView.selectedItem = dockItem(for: currentPage)
         dockView.didSelect = { [weak self] item in
-            self?.switchTo(self?.page(for: item) ?? .home)
+            self?.handleDockSelection(item)
         }
+    }
+
+    private func handleDockSelection(_ item: FloatingDockView.Item) {
+        if requiresSignedInForDockItem(item),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showOverlay(.accessGate)
+            dockView.selectedItem = dockItem(for: currentPage)
+            return
+        }
+        switchTo(page(for: item))
+    }
+
+    private func requiresSignedInForDockItem(_ item: FloatingDockView.Item) -> Bool {
+        item == .discover || item == .dialogue
     }
 
     private func switchTo(_ page: ScenePage) {
