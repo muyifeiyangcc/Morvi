@@ -29,6 +29,7 @@ enum ScenePage: String, CaseIterable {
     case settings = "设置"
     case repliesPanel = "评论区"
     case exitConfirm = "退出登录弹窗"
+    case signOutConfirm = "退出登录确认"
     case wallet = "钱包"
     case home = "首页"
     case restrictedList = "黑名单"

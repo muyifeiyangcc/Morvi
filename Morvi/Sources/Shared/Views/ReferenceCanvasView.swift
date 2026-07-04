@@ -137,6 +137,8 @@ final class ReferenceCanvasView: UIView {
             renderConfirmCard(title: "Victoria", text: "Are you sure you want to block\nthis user? After blocking, no\nrelated content will be received.", confirm: "Sure", portrait: true)
         case .exitConfirm:
             renderConfirmCard(title: nil, text: "Are you sure you want to delete\nthis account? All data will be\ncleared after deletion and cannot\nbe recovered.", confirm: "Sure", portrait: false)
+        case .signOutConfirm:
+            renderConfirmCard(title: nil, text: "Are you sure you want to log\nout of this account?", confirm: "Sure", portrait: false)
         }
     }
 
@@ -1782,8 +1784,10 @@ final class ReferenceCanvasView: UIView {
             return { [weak self] in self?.didRequestPage?(.restrictedList) }
         case "Privacy Policy", "User Agreement":
             return { [weak self] in self?.didRequestPage?(.agreement) }
-        case "Delete account", "Log out":
+        case "Delete account":
             return { [weak self] in self?.didRequestOverlayPage?(.exitConfirm) }
+        case "Log out":
+            return { [weak self] in self?.didRequestOverlayPage?(.signOutConfirm) }
         default:
             return nil
         }
