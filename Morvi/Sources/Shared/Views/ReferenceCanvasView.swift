@@ -1444,15 +1444,7 @@ final class ReferenceCanvasView: UIView {
         addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56, amountText: balanceText)
         for index in amounts.indices {
             let top = listTop + CGFloat(index) * rowStep
-            let rowAction: (() -> Void)?
-            if index == 0 {
-                rowAction = { [weak self] in self?.didRequestOverlayPage?(.spendConfirm) }
-            } else if index == 1 {
-                rowAction = { [weak self] in self?.didRequestOverlayPage?(.creditShortage) }
-            } else {
-                rowAction = nil
-            }
-            addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index], action: rowAction)
+            addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index])
         }
         addGem(assetName: "balance_gem_mark", top: -4, left: 144, width: 180, height: 182)
         activeLayoutContainer = nil
