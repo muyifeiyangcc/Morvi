@@ -14,6 +14,7 @@ class ReferencePageController: BaseSceneController {
     private enum PhotoSelectionTarget {
         case registrationAvatar
         case workCover
+        case dialogueImage
     }
 
     private enum WorkMediaSource {
@@ -68,6 +69,9 @@ class ReferencePageController: BaseSceneController {
             default:
                 break
             }
+        }
+        canvasView?.didRequestDialogueImageSelection = { [weak self] in
+            self?.chooseDialogueImage()
         }
         canvasView?.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
@@ -612,6 +616,13 @@ class ReferencePageController: BaseSceneController {
         }
     }
 
+    private func chooseDialogueImage() {
+        view.endEditing(true)
+        photoSelectionTarget = .dialogueImage
+        showProgressOverlay()
+        handlePhotoLibraryAccess(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+    }
+
     private func submitWorkUpload(
         _ draft: ReferenceCanvasView.WorkUploadDraft,
         overlayView: ReferenceCanvasView
@@ -938,6 +949,8 @@ extension ReferencePageController: PHPickerViewControllerDelegate {
             switch target {
             case .workCover:
                 storedAsset = try storeWorkImage(image)
+            case .dialogueImage:
+                storedAsset = try storeWorkImage(image)
             default:
                 storedAsset = try storeAvatarImage(image)
             }
@@ -951,6 +964,11 @@ extension ReferencePageController: PHPickerViewControllerDelegate {
                             coverAsset: storedAsset,
                             mediaKind: 0
                         )
+                case .dialogueImage:
+                    self.canvasView?.appendDirectDialogueImage(
+                        mediaAsset: storedAsset,
+                        imageSize: image.size
+                    )
                 default:
                     Self.registrationAvatarAsset = storedAsset
                     self.canvasView?.updateRegistrationAvatar(image)

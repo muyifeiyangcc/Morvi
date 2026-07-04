@@ -1,4 +1,5 @@
 import UIKit
+import ImageIO
 
 final class DialogueFlowCell: UITableViewCell {
     static let reuseIdentifier = "DialogueFlowCell"
@@ -274,7 +275,7 @@ final class DialogueFlowCell: UITableViewCell {
     }
 
     private func configurePortraitAsset(name: String, side: DialogueFlowSide, showsAvatar: Bool) {
-        let image = UIImage(named: name)
+        let image = resolvedImage(named: name)
         let width: CGFloat = 160
         let ratio = (image?.size.height ?? width) / max(image?.size.width ?? width, 1)
 
@@ -301,6 +302,43 @@ final class DialogueFlowCell: UITableViewCell {
         }
 
         NSLayoutConstraint.activate(constraints)
+    }
+
+    private func resolvedImage(named name: String) -> UIImage? {
+        if let bundledImage = UIImage(named: name) {
+            return bundledImage
+        }
+        guard name.hasPrefix("local-work/") || name.hasPrefix("local-avatar/") else {
+            return nil
+        }
+        let folderName: String
+        let prefix: String
+        if name.hasPrefix("local-avatar/") {
+            folderName = "Avatars"
+            prefix = "local-avatar/"
+        } else {
+            folderName = "WorkMedia"
+            prefix = "local-work/"
+        }
+        let fileName = String(name.dropFirst(prefix.count))
+        guard fileName.isEmpty == false,
+              let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+              ) else {
+            return nil
+        }
+        let fileURL = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent(folderName, isDirectory: true)
+            .appendingPathComponent(fileName)
+        guard let imageSource = CGImageSourceCreateWithURL(fileURL as CFURL, nil),
+              let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage)
     }
 
     private func addAvatarIfNeeded(_ isVisible: Bool, side: DialogueFlowSide, topAnchor: NSLayoutYAxisAnchor) {

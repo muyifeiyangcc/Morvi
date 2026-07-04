@@ -3,6 +3,8 @@ import UIKit
 enum RouteContextStore {
     private static var targetAccountKey: String?
     private static var targetWorkKey: String?
+    private static var targetDialogueThreadKey: String?
+    private static var targetDialogueTitle: String?
 
     static func setTargetAccountKey(_ key: String?) {
         targetAccountKey = key
@@ -12,12 +14,25 @@ enum RouteContextStore {
         targetWorkKey = key
     }
 
+    static func setTargetDialogueThread(key: String?, title: String?) {
+        targetDialogueThreadKey = key
+        targetDialogueTitle = title
+    }
+
     static func currentTargetAccountKey() -> String? {
         targetAccountKey
     }
 
     static func currentTargetWorkKey() -> String? {
         targetWorkKey
+    }
+
+    static func currentTargetDialogueThreadKey() -> String? {
+        targetDialogueThreadKey
+    }
+
+    static func currentTargetDialogueTitle() -> String? {
+        targetDialogueTitle
     }
 }
 
@@ -56,7 +71,10 @@ enum RouteFactory {
             return ReferencePageController(page: .directDialogue) { scene in
                 [
                     HitArea(frame: CGRect(x: 294, y: 60, width: 70, height: 70)) {
-                        scene.showOverlay(.restrictPanel, restrictionSubjectKey: "acct-local-victoria")
+                        scene.showOverlay(
+                            .restrictPanel,
+                            restrictionSubjectKey: RouteContextStore.currentTargetAccountKey() ?? "acct-local-victoria"
+                        )
                     }
                 ]
             }

@@ -3,6 +3,7 @@ import Foundation
 protocol DialogueRepository {
     func saveThread(_ record: DialogueThreadRecord) throws
     func saveEntry(_ record: DialogueEntryRecord) throws
+    func summaries(accountKey: String) throws -> [DialogueThreadSummaryRecord]
     func entries(threadKey: String) throws -> [DialogueEntryRecord]
     func nextSequenceNumber(threadKey: String) throws -> Int
     func removePendingAssistantEntries(threadKey: String) throws
@@ -83,6 +84,52 @@ final class SQLiteDialogueRepository: DialogueRepository {
                 .text(record.createdAt)
             ]
         )
+    }
+
+    func summaries(accountKey: String) throws -> [DialogueThreadSummaryRecord] {
+        let assistantThreadKey = "assistant-\(accountKey)"
+        let rows = try store.readRows(
+            """
+            SELECT t.stable_key, t.thread_kind, t.counterpart_account_key, t.title, t.avatar_asset,
+                e.body_text, e.entry_kind, e.audio_duration
+            FROM dialogue_thread t
+            LEFT JOIN dialogue_entry e
+                ON e.stable_key = t.latest_entry_key
+                AND e.removed_at IS NULL
+            WHERE t.is_archived = 0
+                AND (
+                    t.stable_key = ?
+                    OR EXISTS (
+                        SELECT 1
+                        FROM dialogue_entry owned_entry
+                        WHERE owned_entry.thread_key = t.stable_key
+                            AND owned_entry.author_account_key = ?
+                            AND owned_entry.removed_at IS NULL
+                    )
+                )
+            ORDER BY COALESCE(t.latest_entry_at, t.updated_at, t.created_at) DESC, t.id DESC;
+            """,
+            bindings: [
+                .text(assistantThreadKey),
+                .text(accountKey)
+            ]
+        )
+
+        return rows.compactMap { row in
+            guard row.count == 8 else { return nil }
+            return DialogueThreadSummaryRecord(
+                stableKey: textValue(row[0]) ?? "",
+                threadKind: intValue(row[1]),
+                counterpartAccountKey: textValue(row[2]),
+                title: textValue(row[3]) ?? "",
+                avatarAsset: textValue(row[4]),
+                latestPreviewText: previewText(
+                    bodyText: textValue(row[5]),
+                    entryKind: intValue(row[6]),
+                    duration: doubleValue(row[7])
+                )
+            )
+        }
     }
 
     func entries(threadKey: String) throws -> [DialogueEntryRecord] {
@@ -189,5 +236,18 @@ final class SQLiteDialogueRepository: DialogueRepository {
         case .null:
             return nil
         }
+    }
+
+    private func previewText(bodyText: String?, entryKind: Int, duration: Double?) -> String {
+        if let bodyText, bodyText.isEmpty == false {
+            return bodyText
+        }
+        if entryKind == 2, let duration {
+            return "\(Int(duration))s"
+        }
+        if entryKind == 1 {
+            return "Photo"
+        }
+        return "Say something"
     }
 }

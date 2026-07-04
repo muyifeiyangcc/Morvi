@@ -1,8 +1,12 @@
 import UIKit
 
 struct DialogueCardEntry {
+    let stableKey: String
+    let counterpartAccountKey: String?
     let name: String
     let preview: String
+    let portraitImage: UIImage?
+    let threadKind: Int
     let usesDarkStyle: Bool
 }
 
@@ -78,6 +82,7 @@ final class DialogueCardCell: UICollectionViewCell {
         nameLabel.textColor = entry.usesDarkStyle ? .white : .black
         previewLabel.text = entry.preview
         previewLabel.textColor = entry.usesDarkStyle ? .white : .darkGray
+        avatarView.image = entry.portraitImage ?? UIImage(named: "profile_avatar")
         actionView.image = UIImage(
             named: entry.usesDarkStyle ? "dialogue_card_action_light" : "dialogue_card_action_dark"
         )

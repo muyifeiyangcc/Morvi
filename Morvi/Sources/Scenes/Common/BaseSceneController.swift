@@ -159,7 +159,7 @@ class BaseSceneController: UIViewController {
         case .discover:
             return "Discover"
         case .directDialogue, .voiceDialogue:
-            return "Victoria"
+            return RouteContextStore.currentTargetDialogueTitle() ?? "Victoria"
         case .assistantDialogue:
             return "Recot Bot"
         case .restrictedList:

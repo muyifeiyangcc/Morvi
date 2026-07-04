@@ -13,3 +13,12 @@ struct DialogueThreadRecord {
     let createdAt: String
     let updatedAt: String
 }
+
+struct DialogueThreadSummaryRecord {
+    let stableKey: String
+    let threadKind: Int
+    let counterpartAccountKey: String?
+    let title: String
+    let avatarAsset: String?
+    let latestPreviewText: String
+}

@@ -67,6 +67,7 @@ final class ReferenceCanvasView: UIView {
     var didRequestSubjectPage: ((ScenePage, String?) -> Void)?
     var didRequestOverlayPage: ((ScenePage) -> Void)?
     var didRequestSubjectOverlayPage: ((ScenePage, String?) -> Void)?
+    var didRequestDialogueImageSelection: (() -> Void)?
     var didRequestPrimaryAction: (() -> Void)?
     var didRequestUploadMediaSelection: (() -> Void)?
     var didSubmitUploadWork: ((WorkUploadDraft) -> Void)?
@@ -113,6 +114,7 @@ final class ReferenceCanvasView: UIView {
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
     private weak var assistantInputField: UITextField?
+    private weak var directDialogueInputField: UITextField?
     private var galleryPreviewPlayer: AVPlayer?
     private weak var voiceDurationLabel: UILabel?
     private weak var activeVoiceRippleView: VoiceRippleView?
@@ -495,9 +497,11 @@ final class ReferenceCanvasView: UIView {
         addDecorativeBackground()
         addTopTitle("Chat")
         let statusBarHeight = currentStatusBarHeight()
-        let listView = DialogueCardListView()
-        listView.didSelectEntry = { [weak self] in
-            self?.didRequestPage?(.directDialogue)
+        let listView = DialogueCardListView(entries: dialogueCardEntries())
+        listView.didSelectEntry = { [weak self] entry in
+            RouteContextStore.setTargetDialogueThread(key: entry.stableKey, title: entry.name)
+            RouteContextStore.setTargetAccountKey(entry.counterpartAccountKey)
+            self?.didRequestPage?(entry.threadKind == Self.assistantThreadKind ? .assistantDialogue : .directDialogue)
         }
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
@@ -507,6 +511,24 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor, constant: statusBarHeight + 76),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func dialogueCardEntries() -> [DialogueCardEntry] {
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey,
+              let records = try? dialogueRepository.summaries(accountKey: accountKey) else {
+            return []
+        }
+        return records.enumerated().map { index, record in
+            DialogueCardEntry(
+                stableKey: record.stableKey,
+                counterpartAccountKey: record.counterpartAccountKey,
+                name: record.title,
+                preview: record.latestPreviewText,
+                portraitImage: resolveAccountAvatar(record.avatarAsset),
+                threadKind: record.threadKind,
+                usesDarkStyle: index % 3 != 0
+            )
+        }
     }
 
     private func renderPersona() {
@@ -679,8 +701,15 @@ final class ReferenceCanvasView: UIView {
         addTopTitle(title)
         switch mode {
         case .text:
-            let dockView = addDialogueInputDock()
-            addDialogueFlowList(top: 136, bottomAnchor: dockView.topAnchor, bottomSpacing: 8)
+            let dockView = addDialogueInputDock { [weak self] in
+                self?.submitDirectDialogueText()
+            }
+            addDialogueFlowList(
+                top: 136,
+                bottomAnchor: dockView.topAnchor,
+                bottomSpacing: 8,
+                entries: directDialogueEntries()
+            )
             bringSubviewToFront(dockView)
         case .voice:
             addDialogueFlowList(top: 136, bottom: 696)
@@ -721,13 +750,14 @@ final class ReferenceCanvasView: UIView {
         let voiceButton = UIButton(type: .custom)
         voiceButton.setImage(UIImage(named: "input_voice_icon"), for: .normal)
         voiceButton.imageView?.contentMode = .scaleAspectFit
-        voiceButton.addTarget(self, action: #selector(showVoiceInputPanel), for: .touchUpInside)
+        voiceButton.addTarget(self, action: #selector(requestVoiceInputPanel), for: .touchUpInside)
         dockView.addSubview(voiceButton)
         voiceButton.translatesAutoresizingMaskIntoConstraints = false
 
         let photoButton = UIButton(type: .custom)
         photoButton.setImage(UIImage(named: "input_photo_icon"), for: .normal)
         photoButton.imageView?.contentMode = .scaleAspectFit
+        photoButton.addTarget(self, action: #selector(requestDialogueImageSelection), for: .touchUpInside)
         dockView.addSubview(photoButton)
         photoButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -737,9 +767,21 @@ final class ReferenceCanvasView: UIView {
             trailing: "➤",
             in: dockView,
             textFieldHandler: { [weak self] textField in
-                guard showsAccessoryButtons == false else { return }
-                self?.assistantInputField = textField
-                textField.addTarget(self, action: #selector(ReferenceCanvasView.submitAssistantText), for: .editingDidEndOnExit)
+                if showsAccessoryButtons {
+                    self?.directDialogueInputField = textField
+                    textField.addTarget(
+                        self,
+                        action: #selector(ReferenceCanvasView.submitDirectDialogueText),
+                        for: .editingDidEndOnExit
+                    )
+                } else {
+                    self?.assistantInputField = textField
+                    textField.addTarget(
+                        self,
+                        action: #selector(ReferenceCanvasView.submitAssistantText),
+                        for: .editingDidEndOnExit
+                    )
+                }
             },
             actionHandler: onSubmit
         )
@@ -770,6 +812,38 @@ final class ReferenceCanvasView: UIView {
         installKeyboardAvoidance()
         installBlankAreaKeyboardDismissal()
         return dockView
+    }
+
+    @objc private func requestDialogueImageSelection() {
+        didRequestDialogueImageSelection?()
+    }
+
+    @objc private func requestVoiceInputPanel() {
+        let status = AVCaptureDevice.authorizationStatus(for: .audio)
+        switch status {
+        case .authorized:
+            showVoiceInputPanel()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .audio) { [weak self] isAllowed in
+                DispatchQueue.main.async {
+                    if isAllowed {
+                        self?.showVoiceInputPanel()
+                    } else {
+                        self?.openMicrophoneSettingsGuide()
+                    }
+                }
+            }
+        case .denied, .restricted:
+            openMicrophoneSettingsGuide()
+        @unknown default:
+            openMicrophoneSettingsGuide()
+        }
+    }
+
+    private func openMicrophoneSettingsGuide() {
+        MorviToastView.show("Please allow microphone access in Settings.", in: self)
+        guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(settingsURL)
     }
 
     @objc private func showVoiceInputPanel() {
@@ -889,8 +963,11 @@ final class ReferenceCanvasView: UIView {
                 )
             })
         case .ended, .cancelled, .failed:
-            if voiceTimer != nil && voiceElapsedSeconds < 1 {
+            let elapsedSeconds = voiceElapsedSeconds
+            if voiceTimer != nil && elapsedSeconds < 1 {
                 MorviToastView.show("Audio is too short", in: self)
+            } else if voiceTimer != nil {
+                appendDirectDialogueAudio(durationSeconds: elapsedSeconds)
             }
             stopVoiceCapture()
         default:
@@ -1067,6 +1144,149 @@ final class ReferenceCanvasView: UIView {
 
     private func reloadAssistantDialogueList() {
         dialogueFlowListView?.configure(entries: assistantDialogueEntries())
+    }
+
+    private func directDialogueEntries() -> [DialogueFlowEntry] {
+        guard let threadKey = activeDirectDialogueThreadKey else { return [] }
+        let records = (try? dialogueRepository.entries(threadKey: threadKey)) ?? []
+        guard records.isEmpty == false else { return [] }
+        var entries: [DialogueFlowEntry] = []
+        if let firstDate = LocalDateText.date(from: records.first?.createdAt ?? "") {
+            var calendar = Calendar.current
+            calendar.locale = Locale(identifier: "en_US_POSIX")
+            entries.append(.moment(DialogueMomentFormatter.title(for: firstDate, referenceDate: Date(), calendar: calendar)))
+        }
+        for index in records.indices {
+            let record = records[index]
+            let side: DialogueFlowSide = record.speakerKind == Self.assistantLocalSpeakerKind ? .local : .remote
+            let showsAvatar = index == records.startIndex || records[records.index(before: index)].speakerKind != record.speakerKind
+            switch record.entryKind {
+            case 1:
+                entries.append(.portraitAsset(name: record.mediaAsset ?? "profile_avatar", side: side, showsAvatar: showsAvatar))
+            case 2:
+                let durationText = "\(Int(record.audioDuration ?? 1))s"
+                entries.append(.audioClip(durationText: durationText, side: side, showsAvatar: showsAvatar))
+            default:
+                entries.append(.phrase(text: record.bodyText ?? "", side: side, showsAvatar: showsAvatar))
+            }
+        }
+        return entries
+    }
+
+    private var activeDirectDialogueThreadKey: String? {
+        if let key = RouteContextStore.currentTargetDialogueThreadKey() {
+            return key
+        }
+        guard let activeKey = AccountSessionCenter.shared.activeAccountKey,
+              let targetKey = RouteContextStore.currentTargetAccountKey() else {
+            return nil
+        }
+        let pair = [activeKey, targetKey].sorted().joined(separator: "-")
+        let threadKey = "direct-\(pair)"
+        RouteContextStore.setTargetDialogueThread(key: threadKey, title: resolvedDirectDialogueProfile().displayName)
+        return threadKey
+    }
+
+    private func resolvedDirectDialogueProfile() -> (displayName: String, avatarAsset: String?) {
+        if let targetKey = RouteContextStore.currentTargetAccountKey(),
+           let profile = AccountSessionCenter.shared.safetyProfile(accountKey: targetKey) {
+            return (profile.displayName, profile.avatarAsset)
+        }
+        return (RouteContextStore.currentTargetDialogueTitle() ?? "Victoria", "profile_avatar")
+    }
+
+    @objc private func submitDirectDialogueText() {
+        let text = directDialogueInputField?.text?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard text.isEmpty == false else { return }
+        guard appendDirectDialogueEntry(entryKind: 0, bodyText: text) else {
+            MorviToastView.show("Send failed", in: self)
+            return
+        }
+        directDialogueInputField?.text = nil
+        reloadDirectDialogueList()
+    }
+
+    func appendDirectDialogueImage(mediaAsset: String, imageSize: CGSize) {
+        guard appendDirectDialogueEntry(
+            entryKind: 1,
+            mediaAsset: mediaAsset,
+            mediaSize: imageSize
+        ) else {
+            MorviToastView.show("Image send failed", in: self)
+            return
+        }
+        reloadDirectDialogueList()
+    }
+
+    private func appendDirectDialogueAudio(durationSeconds: Int) {
+        guard appendDirectDialogueEntry(
+            entryKind: 2,
+            durationSeconds: TimeInterval(durationSeconds)
+        ) else {
+            MorviToastView.show("Audio send failed", in: self)
+            return
+        }
+        reloadDirectDialogueList()
+    }
+
+    private func appendDirectDialogueEntry(
+        entryKind: Int,
+        bodyText: String? = nil,
+        mediaAsset: String? = nil,
+        mediaSize: CGSize? = nil,
+        durationSeconds: TimeInterval? = nil
+    ) -> Bool {
+        guard let activeKey = AccountSessionCenter.shared.activeAccountKey,
+              let threadKey = activeDirectDialogueThreadKey else {
+            didRequestOverlayPage?(.accessGate)
+            return false
+        }
+        do {
+            let now = LocalDateText.now()
+            let sequenceNumber = try dialogueRepository.nextSequenceNumber(threadKey: threadKey)
+            let entryKey = "entry-direct-\(UUID().uuidString.lowercased())"
+            let profile = resolvedDirectDialogueProfile()
+            try dialogueRepository.saveEntry(
+                DialogueEntryRecord(
+                    stableKey: entryKey,
+                    threadKey: threadKey,
+                    authorAccountKey: activeKey,
+                    speakerKind: Self.assistantLocalSpeakerKind,
+                    entryKind: entryKind,
+                    bodyText: bodyText,
+                    mediaAsset: mediaAsset,
+                    mediaWidth: mediaSize.map { Double($0.width) },
+                    mediaHeight: mediaSize.map { Double($0.height) },
+                    audioDuration: durationSeconds,
+                    sequenceNumber: sequenceNumber,
+                    deliveryState: Self.assistantCompleteState,
+                    createdAt: now
+                )
+            )
+            try dialogueRepository.saveThread(
+                DialogueThreadRecord(
+                    stableKey: threadKey,
+                    threadKind: 0,
+                    counterpartAccountKey: RouteContextStore.currentTargetAccountKey(),
+                    title: profile.displayName,
+                    avatarAsset: profile.avatarAsset,
+                    latestEntryKey: entryKey,
+                    latestEntryAt: now,
+                    lastReadAt: nil,
+                    isArchived: false,
+                    createdAt: now,
+                    updatedAt: now
+                )
+            )
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    private func reloadDirectDialogueList() {
+        dialogueFlowListView?.configure(entries: directDialogueEntries())
     }
 
     @objc private func submitAssistantText() {
@@ -1602,6 +1822,9 @@ final class ReferenceCanvasView: UIView {
             MorviToastView.show("You need to follow each other first.", in: self)
             return
         }
+        let profile = AccountSessionCenter.shared.safetyProfile(accountKey: accountKey)
+        RouteContextStore.setTargetAccountKey(accountKey)
+        RouteContextStore.setTargetDialogueThread(key: nil, title: profile?.displayName)
         didRequestPage?(.directDialogue)
     }
 
@@ -2764,7 +2987,9 @@ final class ReferenceCanvasView: UIView {
             }
             return
         }
+        let profile = AccountSessionCenter.shared.safetyProfile(accountKey: accountKey)
         RouteContextStore.setTargetAccountKey(accountKey)
+        RouteContextStore.setTargetDialogueThread(key: nil, title: profile?.displayName)
         hideProgressOverlay { [weak self] in
             guard let self else { return }
             if let didRequestSubjectPage {

@@ -1,41 +1,29 @@
 import UIKit
 
 final class DialogueCardListView: UIView {
-    var didSelectEntry: (() -> Void)?
+    var didSelectEntry: ((DialogueCardEntry) -> Void)?
+    private enum LayoutMetric {
+        static let horizontalInset: CGFloat = 20
+        static let itemSpacing: CGFloat = 11
+        static let itemHeight: CGFloat = 198
+    }
 
-    private let entries: [DialogueCardEntry] = [
-        DialogueCardEntry(
-            name: "Victoria",
-            preview: "Hello! Nice to meet\nyou. Your work is\nwonderful!",
-            usesDarkStyle: false
-        ),
-        DialogueCardEntry(
-            name: "Rowan",
-            preview: "Hello! Nice to meet\nyou. Your work is\nwonderful!",
-            usesDarkStyle: true
-        ),
-        DialogueCardEntry(
-            name: "Jasper",
-            preview: "Hello! Nice to meet\nyou. Your work is\nwonderful!",
-            usesDarkStyle: true
-        ),
-        DialogueCardEntry(
-            name: "Sophia",
-            preview: "Hello! Nice to meet\nyou. Your work is\nwonderful!",
-            usesDarkStyle: false
-        )
-    ]
-
+    private let entries: [DialogueCardEntry]
     private let collectionView: UICollectionView
 
-    override init(frame: CGRect) {
+    init(entries: [DialogueCardEntry]) {
+        self.entries = entries
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: 164, height: 198)
-        layout.minimumInteritemSpacing = 8
-        layout.minimumLineSpacing = 10
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 10, right: 19)
+        layout.minimumInteritemSpacing = LayoutMetric.itemSpacing
+        layout.minimumLineSpacing = LayoutMetric.itemSpacing
+        layout.sectionInset = UIEdgeInsets(
+            top: 0,
+            left: LayoutMetric.horizontalInset,
+            bottom: 10,
+            right: LayoutMetric.horizontalInset
+        )
         collectionView = CancelFriendlyCollectionView(frame: .zero, collectionViewLayout: layout)
-        super.init(frame: frame)
+        super.init(frame: .zero)
 
         backgroundColor = .clear
         collectionView.backgroundColor = .clear
@@ -46,6 +34,7 @@ final class DialogueCardListView: UIView {
         collectionView.verticalScrollIndicatorInsets.bottom = 104
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.backgroundView = entries.isEmpty ? EmptyStateView(copy: "No chats yet") : nil
         collectionView.register(
             DialogueCardCell.self,
             forCellWithReuseIdentifier: DialogueCardCell.reuseIdentifier
@@ -65,7 +54,7 @@ final class DialogueCardListView: UIView {
     }
 }
 
-extension DialogueCardListView: UICollectionViewDataSource, UICollectionViewDelegate {
+extension DialogueCardListView: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         entries.count
     }
@@ -85,6 +74,18 @@ extension DialogueCardListView: UICollectionViewDataSource, UICollectionViewDele
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        didSelectEntry?()
+        didSelectEntry?(entries[indexPath.item])
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        let availableWidth = collectionView.bounds.width
+            - LayoutMetric.horizontalInset * 2
+            - LayoutMetric.itemSpacing
+        let itemWidth = floor(availableWidth / 2)
+        return CGSize(width: itemWidth, height: LayoutMetric.itemHeight)
     }
 }
