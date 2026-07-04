@@ -7,7 +7,7 @@ enum DialogueFlowSide {
 
 enum DialogueFlowEntry {
     case moment(String)
-    case wideAsset(name: String, title: String?)
+    case wideAsset(name: String, title: String?, revealsCharacters: Bool = false)
     case phrase(text: String, side: DialogueFlowSide, showsAvatar: Bool)
     case roundedPhrase(text: String, side: DialogueFlowSide, showsAvatar: Bool)
     case audioClip(durationText: String, side: DialogueFlowSide, showsAvatar: Bool)

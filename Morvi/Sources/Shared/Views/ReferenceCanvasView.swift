@@ -790,7 +790,11 @@ final class ReferenceCanvasView: UIView {
 
     private func assistantDialogueEntries() -> [DialogueFlowEntry] {
         [
-            .wideAsset(name: "assistant_intro_card_background", title: "Hello!\nHow can I help you?")
+            .wideAsset(
+                name: "assistant_intro_card_background",
+                title: "Hello!\nHow can I help you?",
+                revealsCharacters: true
+            )
         ]
     }
 

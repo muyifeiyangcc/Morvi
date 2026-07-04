@@ -25,8 +25,8 @@ final class DialogueFlowCell: UITableViewCell {
         switch entry {
         case .moment(let title):
             configureMoment(title)
-        case .wideAsset(let name, let title):
-            configureWideAsset(name: name, title: title)
+        case .wideAsset(let name, let title, let revealsCharacters):
+            configureWideAsset(name: name, title: title, revealsCharacters: revealsCharacters)
         case .phrase(let text, let side, let showsAvatar):
             configurePhrase(text: text, side: side, showsAvatar: showsAvatar)
         case .roundedPhrase(let text, let side, let showsAvatar):
@@ -54,7 +54,7 @@ final class DialogueFlowCell: UITableViewCell {
         ])
     }
 
-    private func configureWideAsset(name: String, title: String?) {
+    private func configureWideAsset(name: String, title: String?, revealsCharacters: Bool) {
         let image = UIImage(named: name)
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFill
@@ -65,7 +65,7 @@ final class DialogueFlowCell: UITableViewCell {
 
         var constraints: [NSLayoutConstraint] = []
         if let title {
-            let titlePanel = IntroCopyPanelView(title: title)
+            let titlePanel = IntroCopyPanelView(title: title, revealsCharacters: revealsCharacters)
             contentView.addSubview(titlePanel)
             titlePanel.translatesAutoresizingMaskIntoConstraints = false
             constraints.append(contentsOf: [
