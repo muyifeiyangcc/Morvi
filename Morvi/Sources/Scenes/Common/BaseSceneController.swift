@@ -222,15 +222,16 @@ class BaseSceneController: UIViewController {
             showCanvasOverlay(.accessGate)
             return
         }
+        let targetAccountKey = restrictionSubjectKey ?? RouteContextStore.currentTargetAccountKey()
         if page == .publicPersona,
-           let restrictionSubjectKey,
-           AccountSessionCenter.shared.isActiveAccount(restrictionSubjectKey) {
+           let targetAccountKey,
+           AccountSessionCenter.shared.isActiveAccount(targetAccountKey) {
             navigateToOwnPersonaRoot()
             return
         }
         if page == .publicPersona,
-           let restrictionSubjectKey,
-           AccountSessionCenter.shared.canOpenPublicPersona(accountKey: restrictionSubjectKey) == false {
+           let targetAccountKey,
+           AccountSessionCenter.shared.canOpenPublicPersona(accountKey: targetAccountKey) == false {
             MorviToastView.show("This profile is unavailable.", in: view)
             return
         }
