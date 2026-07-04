@@ -12,6 +12,8 @@ protocol DialogueRepository {
 }
 
 final class SQLiteDialogueRepository: DialogueRepository {
+    static let didChangeNotification = Notification.Name("Morvi.dialogueRepositoryDidChange")
+
     private let store: LocalStore
 
     init(store: LocalStore = .shared) {
@@ -49,6 +51,7 @@ final class SQLiteDialogueRepository: DialogueRepository {
                 .text(record.updatedAt)
             ]
         )
+        NotificationCenter.default.post(name: Self.didChangeNotification, object: nil)
     }
 
     func saveEntry(_ record: DialogueEntryRecord) throws {

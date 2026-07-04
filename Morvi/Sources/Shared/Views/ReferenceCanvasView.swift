@@ -82,6 +82,7 @@ final class ReferenceCanvasView: UIView {
     private weak var keyboardAvoidanceInputView: UIView?
     private weak var keyboardSyncedDialogueFlowListView: DialogueFlowListView?
     private weak var dialogueFlowListView: DialogueFlowListView?
+    private weak var dialogueCardListView: DialogueCardListView?
     private weak var overlayContentView: UIView?
     private weak var registrationAvatarImageView: UIImageView?
     private weak var uploadTitleField: UITextField?
@@ -148,6 +149,12 @@ final class ReferenceCanvasView: UIView {
             self,
             selector: #selector(handleCreativeWorkActivityDidChange),
             name: SQLiteCreativeWorkRepository.activityDidChangeNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDialogueRepositoryDidChange),
+            name: SQLiteDialogueRepository.didChangeNotification,
             object: nil
         )
         clipsToBounds = true
@@ -500,6 +507,7 @@ final class ReferenceCanvasView: UIView {
         addTopTitle("Chat")
         let statusBarHeight = currentStatusBarHeight()
         let listView = DialogueCardListView(entries: dialogueCardEntries())
+        dialogueCardListView = listView
         listView.didSelectEntry = { [weak self] entry in
             RouteContextStore.setTargetDialogueThread(key: entry.stableKey, title: entry.name)
             RouteContextStore.setTargetAccountKey(entry.counterpartAccountKey)
@@ -513,6 +521,13 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor, constant: statusBarHeight + 76),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    @objc private func handleDialogueRepositoryDidChange() {
+        guard page == .dialogueList else { return }
+        DispatchQueue.main.async { [weak self] in
+            self?.dialogueCardListView?.configure(entries: self?.dialogueCardEntries() ?? [])
+        }
     }
 
     private func dialogueCardEntries() -> [DialogueCardEntry] {

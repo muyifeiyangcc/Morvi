@@ -8,7 +8,7 @@ final class DialogueCardListView: UIView {
         static let itemHeight: CGFloat = 198
     }
 
-    private let entries: [DialogueCardEntry]
+    private var entries: [DialogueCardEntry]
     private let collectionView: UICollectionView
 
     init(entries: [DialogueCardEntry]) {
@@ -51,6 +51,12 @@ final class DialogueCardListView: UIView {
 
     required init?(coder: NSCoder) {
         nil
+    }
+
+    func configure(entries: [DialogueCardEntry]) {
+        self.entries = entries
+        collectionView.backgroundView = entries.isEmpty ? EmptyStateView(copy: "No chats yet") : nil
+        collectionView.reloadData()
     }
 }
 
