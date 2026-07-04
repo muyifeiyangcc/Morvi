@@ -43,6 +43,7 @@ final class ReferenceCanvasView: UIView {
     private static let assistantCompleteState = 0
     private static let assistantPendingState = 1
     private static let assistantThinkingText = "Thinking..."
+    private static let floatingDockClearance: CGFloat = 114
     private static var agreementConsentAccepted = true
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
     private static let ciContext = CIContext(options: nil)
@@ -498,7 +499,7 @@ final class ReferenceCanvasView: UIView {
         let scrollView = CancelFriendlyScrollView()
         scrollView.delegate = self
         scrollView.contentInsetAdjustmentBehavior = .never
-        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 24, right: 0)
+        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: Self.floatingDockClearance, right: 0)
         scrollView.scrollIndicatorInsets = scrollView.contentInset
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = true
@@ -1608,7 +1609,8 @@ final class ReferenceCanvasView: UIView {
         ]
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
-        gradient.frame = CGRect(x: 0, y: 0, width: adaptiveLayoutWidth, height: adaptiveLayoutHeight)
+        let screenHeight = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+        gradient.frame = CGRect(x: 0, y: 0, width: adaptiveLayoutWidth, height: max(adaptiveLayoutHeight, screenHeight))
         layer.insertSublayer(gradient, at: 0)
     }
 
