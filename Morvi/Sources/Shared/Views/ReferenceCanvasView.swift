@@ -1410,8 +1410,8 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderSignIn() {
+        let navigationBottom = currentStatusBarHeight() + 76
         let scrollView = CancelFriendlyScrollView()
-        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1423,7 +1423,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
@@ -1445,21 +1445,21 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = scrollContent
         addTopTitle("Sign in")
-        addLogo(top: 168)
-        addText("Morvi", size: 42, weight: .black, top: 308, centered: true)
-        addText("Email", size: 16, weight: .black, top: 388, left: 20)
-        addInputField("Please enter", top: 413, keyboardType: .emailAddress)
-        addText("Password", size: 16, weight: .black, top: 496, left: 20)
-        addInputField("Please enter", top: 523, isSecureTextEntry: true)
-        addUnderlinedText("Forgot ?", size: 12, top: 588, left: 303, color: .gray)
+        addLogo(top: 168 - navigationBottom)
+        addText("Morvi", size: 42, weight: .black, top: 308 - navigationBottom, centered: true)
+        addText("Email", size: 16, weight: .black, top: 388 - navigationBottom, left: 20)
+        addInputField("Please enter", top: 413 - navigationBottom, keyboardType: .emailAddress)
+        addText("Password", size: 16, weight: .black, top: 496 - navigationBottom, left: 20)
+        addInputField("Please enter", top: 523 - navigationBottom, isSecureTextEntry: true)
+        addUnderlinedText("Forgot ?", size: 12, top: 588 - navigationBottom, left: 303, color: .gray)
         activeLayoutContainer = nil
         let actionButton = addButton("Log in", bottom: 29, filled: true, usesOneFont: true)
         actionButton.addTarget(self, action: #selector(handlePrimaryAction), for: .touchUpInside)
     }
 
     private func renderSignUp() {
+        let navigationBottom = currentStatusBarHeight() + 76
         let scrollView = CancelFriendlyScrollView()
-        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1471,7 +1471,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
@@ -1493,11 +1493,11 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = scrollContent
         addTopTitle("Sign up")
-        addLogo(top: 168)
-        addText("Morvi", size: 42, weight: .black, top: 308, centered: true)
+        addLogo(top: 168 - navigationBottom)
+        addText("Morvi", size: 42, weight: .black, top: 308 - navigationBottom, centered: true)
         let fields = ["Email", "Password", "Enter the password again"]
         fields.enumerated().forEach { index, field in
-            let top = CGFloat(388 + index * 108)
+            let top = CGFloat(388 + index * 108) - navigationBottom
             addText(field, size: 16, weight: .bold, top: top, left: 20)
             addInputField(
                 "Please enter",
@@ -1512,8 +1512,8 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderResetAccess() {
+        let navigationBottom = currentStatusBarHeight() + 76
         let scrollView = CancelFriendlyScrollView()
-        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -1525,7 +1525,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
@@ -1549,7 +1549,7 @@ final class ReferenceCanvasView: UIView {
         addTopTitle("Forgot password")
         let fields = ["Email", "Password", "Enter the password again"]
         fields.enumerated().forEach { index, field in
-            let top = CGFloat(158 + index * 108)
+            let top = CGFloat(158 + index * 108) - navigationBottom
             addText(field, size: 16, weight: .bold, top: top, left: 20)
             let placeholder = index == 0 ? "Enter email address" : "Enter password"
             addInputField(
@@ -2062,8 +2062,8 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderPersonalDetail() {
+        let navigationBottom = currentStatusBarHeight() + 76
         let scrollView = CancelFriendlyScrollView()
-        scrollView.topClipInset = currentStatusBarHeight() + 76
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
         scrollView.scrollIndicatorInsets = .zero
@@ -2075,7 +2075,7 @@ final class ReferenceCanvasView: UIView {
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: topAnchor),
+            scrollView.topAnchor.constraint(equalTo: topAnchor, constant: navigationBottom),
             scrollView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
@@ -2096,8 +2096,8 @@ final class ReferenceCanvasView: UIView {
         installKeyboardAvoidance()
 
         activeLayoutContainer = scrollContent
-        registrationAvatarImageView = addAssetAvatar("default_avatar", top: 147, left: 145, size: 84)
-        addAvatarEditBadge(top: 210, left: 207)
+        registrationAvatarImageView = addAssetAvatar("default_avatar", top: 147 - navigationBottom, left: 145, size: 84)
+        addAvatarEditBadge(top: 210 - navigationBottom, left: 207)
         let items = [
             ("Nickname", "Please enter", CGFloat.zero),
             ("Gender", "Female", CGFloat(84)),
@@ -2105,7 +2105,7 @@ final class ReferenceCanvasView: UIView {
             ("Location", "Please enter", CGFloat(104))
         ]
         for index in items.indices {
-            let top = CGFloat(274 + index * 109)
+            let top = CGFloat(274 + index * 109) - navigationBottom
             addText(items[index].0, size: 17, weight: .black, top: top, left: 20)
             if items[index].2 > 0 {
                 addText(
