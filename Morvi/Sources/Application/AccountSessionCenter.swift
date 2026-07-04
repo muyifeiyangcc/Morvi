@@ -30,6 +30,7 @@ final class AccountSessionCenter {
     func registerLocalAccount(
         email: String,
         secretText: String,
+        displayName: String,
         genderText: String,
         birthDate: String?,
         locationText: String?
@@ -39,7 +40,7 @@ final class AccountSessionCenter {
         let profile = AccountProfileRecord(
             stableKey: key,
             email: email,
-            displayName: "Amelia",
+            displayName: displayName,
             genderCode: genderCode(from: genderText),
             birthDate: birthDate,
             locationText: locationText,

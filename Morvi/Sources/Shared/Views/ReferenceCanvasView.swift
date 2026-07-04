@@ -1827,18 +1827,28 @@ final class ReferenceCanvasView: UIView {
         installKeyboardAvoidance()
 
         activeLayoutContainer = scrollContent
-        addProfileAvatar(top: 147, left: 145, size: 84)
+        addAssetAvatar("default_avatar", top: 147, left: 145, size: 84)
         addAvatarEditBadge(top: 210, left: 207)
         let items = [
-            ("Email", "Please enter"),
-            ("Gender", "Female"),
-            ("Birthday (Optional)", "Please enter"),
-            ("Location (Optional)", "Please enter")
+            ("Nickname", "Please enter", false),
+            ("Gender", "Female", false),
+            ("Birthday", "Please enter", true),
+            ("Location", "Please enter", true)
         ]
         for index in items.indices {
             let top = CGFloat(274 + index * 109)
             addText(items[index].0, size: 17, weight: .black, top: top, left: 20)
-            addInputField(items[index].1, top: top + 27, keyboardType: index == 0 ? .emailAddress : .default)
+            if items[index].2 {
+                addText(
+                    "(optional)",
+                    size: 12,
+                    weight: .regular,
+                    top: top + 4,
+                    left: 88,
+                    color: UIColor.gray.withAlphaComponent(0.55)
+                )
+            }
+            addInputField(items[index].1, top: top + 27)
         }
         activeLayoutContainer = nil
         addButton("Sign up", top: 716, filled: true, usesOneFont: true)

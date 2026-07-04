@@ -2,6 +2,7 @@ import UIKit
 
 class ReferencePageController: BaseSceneController {
     private struct RegistrationDraft {
+        let emailText: String
         let secretText: String
     }
 
@@ -94,7 +95,7 @@ class ReferencePageController: BaseSceneController {
         }
 
         view.endEditing(true)
-        Self.registrationDraft = RegistrationDraft(secretText: passwordText)
+        Self.registrationDraft = RegistrationDraft(emailText: emailText, secretText: passwordText)
         push(.personalDetail)
     }
 
@@ -107,17 +108,17 @@ class ReferencePageController: BaseSceneController {
             .map(\.field)
 
         guard entries.count >= 4 else {
-            MorviToastView.show("Please enter email", in: view)
+            MorviToastView.show("Please enter nickname", in: view)
             return
         }
 
-        let emailText = trimmedText(entries[0])
+        let nicknameText = trimmedText(entries[0])
         let genderText = trimmedText(entries[1])
         let birthdayText = trimmedText(entries[2])
         let locationText = trimmedText(entries[3])
 
-        guard emailText.isEmpty == false else {
-            MorviToastView.show("Please enter email", in: view)
+        guard nicknameText.isEmpty == false else {
+            MorviToastView.show("Please enter nickname", in: view)
             return
         }
         guard genderText.isEmpty == false else {
@@ -134,8 +135,9 @@ class ReferencePageController: BaseSceneController {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             do {
                 try AccountSessionCenter.shared.registerLocalAccount(
-                    email: emailText,
+                    email: draft.emailText,
                     secretText: draft.secretText,
+                    displayName: nicknameText,
                     genderText: genderText,
                     birthDate: birthdayText.isEmpty ? nil : birthdayText,
                     locationText: locationText.isEmpty ? nil : locationText
