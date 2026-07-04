@@ -2507,21 +2507,28 @@ final class ReferenceCanvasView: UIView {
     }
 
     @objc private func confirmAssistantUnlock() {
-        let didConsume: Bool
-        do {
-            didConsume = try AccountSessionCenter.shared.consumeActiveWalletBalanceValue(
-                amount: Self.assistantUnlockCost
-            )
-        } catch {
-            didConsume = false
+        showProgressOverlay()
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let didConsume: Bool
+            do {
+                didConsume = try AccountSessionCenter.shared.consumeActiveWalletBalanceValue(
+                    amount: Self.assistantUnlockCost
+                )
+            } catch {
+                didConsume = false
+            }
+            self.hideProgressOverlay { [weak self] in
+                guard let self else { return }
+                guard didConsume else {
+                    self.didRequestOverlayPage?(.creditShortage)
+                    return
+                }
+                let controller = self.owningController()
+                self.removeFromSuperview()
+                controller?.navigationController?.pushViewController(RouteFactory.controller(for: .assistantDialogue), animated: true)
+            }
         }
-        guard didConsume else {
-            didRequestOverlayPage?(.creditShortage)
-            return
-        }
-        let controller = owningController()
-        removeFromSuperview()
-        controller?.navigationController?.pushViewController(RouteFactory.controller(for: .assistantDialogue), animated: true)
     }
 
     @objc private func openWalletFromPopup() {
