@@ -1437,7 +1437,7 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: adaptiveLayoutHeight)
+            scrollContent.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
         ])
 
         keyboardAwareScrollView = scrollView
@@ -1485,7 +1485,7 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: adaptiveLayoutHeight)
+            scrollContent.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
         ])
 
         keyboardAwareScrollView = scrollView
@@ -1539,7 +1539,7 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: adaptiveLayoutHeight)
+            scrollContent.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
         ])
 
         keyboardAwareScrollView = scrollView
@@ -2089,7 +2089,7 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: 700)
+            scrollContent.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
         ])
 
         keyboardAwareScrollView = scrollView
