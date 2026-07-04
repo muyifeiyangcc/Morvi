@@ -104,12 +104,15 @@ class ReferencePageController: BaseSceneController {
 
     func chooseRegistrationAvatar() {
         view.endEditing(true)
+        showProgressOverlay()
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         configuration.filter = .images
         configuration.selectionLimit = 1
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
-        present(picker, animated: true)
+        present(picker, animated: true) { [weak self] in
+            self?.hideProgressOverlay {}
+        }
     }
 
     func submitPersonalDetail() {
