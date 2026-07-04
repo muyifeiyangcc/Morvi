@@ -245,8 +245,8 @@ final class SQLiteDialogueRepository: DialogueRepository {
         if let bodyText, bodyText.isEmpty == false {
             return bodyText
         }
-        if entryKind == 2, let duration {
-            return "[voice] \(Int(duration))s"
+        if entryKind == 2 {
+            return "[voice]"
         }
         if entryKind == 1 {
             return "[photo]"
