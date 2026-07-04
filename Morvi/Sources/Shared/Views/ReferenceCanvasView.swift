@@ -3,6 +3,7 @@ import WebKit
 import CoreImage
 import CoreImage.CIFilterBuiltins
 import AVFoundation
+import ImageIO
 
 private final class PlayerLayerHostView: UIView {
     private let playerLayer: AVPlayerLayer
@@ -44,6 +45,7 @@ final class ReferenceCanvasView: UIView {
     private static let assistantPendingState = 1
     private static let assistantThinkingText = "Thinking..."
     private static let floatingDockClearance: CGFloat = 114
+    private static let visualAssetCache = NSCache<NSString, UIImage>()
     private static var agreementConsentAccepted = true
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
     private static let ciContext = CIContext(options: nil)
@@ -4099,10 +4101,20 @@ final class ReferenceCanvasView: UIView {
             .appendingPathComponent("Morvi", isDirectory: true)
             .appendingPathComponent(folderName, isDirectory: true)
             .appendingPathComponent(fileName)
-        guard let data = try? Data(contentsOf: fileURL) else {
-            return nil
+        let cacheKey = asset as NSString
+        if let cachedImage = Self.visualAssetCache.object(forKey: cacheKey) {
+            return cachedImage
         }
-        return UIImage(data: data)
+        guard let imageSource = CGImageSourceCreateWithURL(fileURL as CFURL, nil) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 1400
+        ]
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) else { return nil }
+        let image = UIImage(cgImage: cgImage)
+        Self.visualAssetCache.setObject(image, forKey: cacheKey)
+        return image
     }
 
     private func addAvatarEditBadge(top: CGFloat, left: CGFloat) {
