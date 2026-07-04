@@ -29,13 +29,17 @@ final class WeeklyFeelingHeaderView: UIView {
         ])
 
         let barTop = 60 + ceil(AppFont.source(24, weight: .bold).lineHeight) + 26
+        let sideInset: CGFloat = 20
+        let trackWidth: CGFloat = 40
+        let availableWidth = max(bounds.width, min(UIScreen.main.bounds.width, UIScreen.main.bounds.height))
+        let itemGap = max(0, (availableWidth - sideInset * 2 - trackWidth * CGFloat(days.count)) / CGFloat(days.count - 1))
         for index in days.indices {
             addBar(
                 day: days[index],
                 iconName: iconNames[index],
                 fillHeight: fillHeights[index],
                 top: barTop,
-                left: CGFloat(20 + index * 49)
+                left: sideInset + CGFloat(index) * (trackWidth + itemGap)
             )
         }
     }

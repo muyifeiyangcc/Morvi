@@ -32,7 +32,9 @@ final class WeeklyFeelingListView: UIView {
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
-        let headerView = WeeklyFeelingHeaderView(frame: CGRect(x: 0, y: 0, width: 375, height: 401))
+        let screenBounds = UIScreen.main.bounds
+        let headerWidth = min(screenBounds.width, screenBounds.height)
+        let headerView = WeeklyFeelingHeaderView(frame: CGRect(x: 0, y: 0, width: headerWidth, height: 401))
         tableView.tableHeaderView = headerView
     }
 

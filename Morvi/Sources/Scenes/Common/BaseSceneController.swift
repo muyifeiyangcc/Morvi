@@ -140,7 +140,7 @@ class BaseSceneController: UIViewController {
         if rawHeight > 0 {
             return rawHeight > 24 ? 44 : 20
         }
-        return UIScreen.main.bounds.height >= 812 ? 44 : 20
+        return 44
     }
 
     private func navigationTitleText() -> String? {

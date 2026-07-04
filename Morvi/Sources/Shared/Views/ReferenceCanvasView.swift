@@ -109,6 +109,24 @@ final class ReferenceCanvasView: UIView {
         return portraitHeight > 0 ? portraitHeight : 812
     }
 
+    private func adaptivePairLayout(leftInset: CGFloat = 20, rightInset: CGFloat = 20, gap: CGFloat = 12) -> (width: CGFloat, secondLeft: CGFloat) {
+        let availableWidth = max(0, adaptiveLayoutWidth - leftInset - rightInset - gap)
+        let itemWidth = floor(availableWidth / 2)
+        return (itemWidth, leftInset + itemWidth + gap)
+    }
+
+    private func currentStatusBarHeight() -> CGFloat {
+        let rawHeight = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? safeAreaInsets.top
+        if rawHeight > 0 {
+            return rawHeight > 24 ? 44 : 20
+        }
+        return 44
+    }
+
+    private func fillsReferenceTrailing(_ frame: CGRect, trailingInset: CGFloat = 20) -> Bool {
+        frame.minX <= trailingInset && frame.width >= 300
+    }
+
     private func render() {
         switch page {
         case .entry:
@@ -287,15 +305,16 @@ final class ReferenceCanvasView: UIView {
             shadowOpacity: 0,
             bottomPlateHeight: 3
         )
-        addFeatureCard(title: "Discover", top: 536, left: 20, tint: .forest, imageName: "home_discover")
-        addFeatureCard(title: "Recot Bot", top: 536, left: 192, tint: .night, imageName: "home_recot_bot")
+        let featureLayout = adaptivePairLayout(gap: 12)
+        addFeatureCard(title: "Discover", top: 536, left: 20, width: featureLayout.width, tint: .forest, imageName: "home_discover")
+        addFeatureCard(title: "Recot Bot", top: 536, left: featureLayout.secondLeft, width: featureLayout.width, tint: .night, imageName: "home_recot_bot")
         addHomeActionButton(frame: CGRect(x: 20, y: 458, width: 335, height: 52)) { [weak self] in
             self?.didRequestOverlayPage?(.feelingEditor)
         }
-        addHomeActionButton(frame: CGRect(x: 20, y: 536, width: 145, height: 145)) { [weak self] in
+        addHomeActionButton(frame: CGRect(x: 20, y: 536, width: featureLayout.width, height: 145)) { [weak self] in
             self?.didRequestPage?(.discover)
         }
-        addHomeActionButton(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in
+        addHomeActionButton(frame: CGRect(x: featureLayout.secondLeft, y: 536, width: featureLayout.width, height: 145)) { [weak self] in
             self?.requestAssistantEntry()
         }
         activeLayoutContainer = nil
@@ -350,7 +369,7 @@ final class ReferenceCanvasView: UIView {
     private func renderDialogueList() {
         addDecorativeBackground()
         addTopTitle("Chat")
-        let statusBarHeight: CGFloat = UIScreen.main.bounds.height >= 812 ? 44 : 20
+        let statusBarHeight = currentStatusBarHeight()
         let listView = DialogueCardListView()
         listView.didSelectEntry = { [weak self] in
             self?.didRequestPage?(.directDialogue)
@@ -393,14 +412,15 @@ final class ReferenceCanvasView: UIView {
 
         let cellTop: CGFloat = 348
         let cellGap: CGFloat = 15
-        let cellWidth: CGFloat = 160
+        let waterfallLayout = adaptivePairLayout(gap: cellGap)
+        let cellWidth = waterfallLayout.width
         let coverImageName = "discover_feed_cover"
         func proportionalCellHeight(for imageName: String, width: CGFloat) -> CGFloat {
             let imageSize = UIImage(named: imageName)?.size ?? .zero
             return imageSize.width > 0 ? ceil(width * imageSize.height / imageSize.width) : width
         }
         var columnBottoms = [cellTop, cellTop]
-        let columnLefts: [CGFloat] = [20, 195]
+        let columnLefts: [CGFloat] = [20, waterfallLayout.secondLeft]
         let waterfallItems: [(imageName: String, tint: MediaTint)] = [
             ("profile_avatar", .warm),
             (coverImageName, .coast),
@@ -429,10 +449,10 @@ final class ReferenceCanvasView: UIView {
         ])
 
         let baseHeight = contentHeight - 228
-        let base = addPanel(top: 228, left: 0, width: 375, height: baseHeight, alpha: 1)
+        let base = addPanel(top: 228, left: 0, width: 375, height: baseHeight, alpha: 1, trailing: 0)
         addThemeGradientBackground(
             to: base,
-            width: 375,
+            width: adaptiveLayoutWidth,
             height: baseHeight,
             cornerRadius: 20,
             maskedCorners: [.layerMinXMinYCorner, .layerMaxXMinYCorner]
@@ -478,7 +498,7 @@ final class ReferenceCanvasView: UIView {
         case .voice:
             addDialogueFlowList(top: 136, bottom: 696)
             addVoiceClip(top: 552)
-            let panel = addPanel(top: 586, left: 0, width: 375, height: 226, alpha: 1)
+            let panel = addPanel(top: 586, left: 0, width: 375, height: 226, alpha: 1, trailing: 0)
             panel.backgroundColor = UIColor(red: 1.0, green: 0.76, blue: 0.02, alpha: 1)
             panel.layer.borderWidth = 0
             addText("▦", size: 24, weight: .regular, top: 606, left: 20)
@@ -1052,7 +1072,8 @@ final class ReferenceCanvasView: UIView {
             radius: 14,
             fillAlpha: 0.4,
             blurRadius: 16,
-            backdropAssetName: "discover_feed_cover"
+            backdropAssetName: "discover_feed_cover",
+            trailing: 0
         )
         panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         addAssetAvatar("profile_avatar", top: 609, left: 20, size: 36)
@@ -1114,7 +1135,8 @@ final class ReferenceCanvasView: UIView {
         let buttonTop = statsTop + 80 + 22
         let cellTop = buttonTop + 40 + 24
         let cellGap: CGFloat = 15
-        let cellWidth: CGFloat = 160
+        let waterfallLayout = adaptivePairLayout(gap: cellGap)
+        let cellWidth = waterfallLayout.width
         let coverImageName = "discover_feed_cover"
         func proportionalCellHeight(for imageName: String) -> CGFloat {
             let imageSize = UIImage(named: imageName)?.size ?? .zero
@@ -1122,7 +1144,7 @@ final class ReferenceCanvasView: UIView {
                 ? ceil(cellWidth * imageSize.height / imageSize.width)
                 : cellWidth
         }
-        let columnLefts: [CGFloat] = [20, 195]
+        let columnLefts: [CGFloat] = [20, waterfallLayout.secondLeft]
         let waterfallItems: [(imageName: String, tint: MediaTint)] = [
             ("profile_avatar", .warm),
             (coverImageName, .coast),
@@ -1158,10 +1180,10 @@ final class ReferenceCanvasView: UIView {
         ])
 
         let baseHeight = contentHeight - 328
-        let base = addPanel(top: 328, left: 0, width: 375, height: baseHeight, alpha: 1)
+        let base = addPanel(top: 328, left: 0, width: 375, height: baseHeight, alpha: 1, trailing: 0)
         addThemeGradientBackground(
             to: base,
-            width: 375,
+            width: adaptiveLayoutWidth,
             height: baseHeight,
             cornerRadius: 20,
             maskedCorners: [.layerMinXMinYCorner, .layerMaxXMinYCorner]
@@ -1174,9 +1196,10 @@ final class ReferenceCanvasView: UIView {
         addProfileAvatar(top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(title, size: 26, weight: .bold, top: nameTop, centered: true)
         addStatsPanel(top: statsTop)
-        let dialogueButton = addPillButton("Chat", top: buttonTop, left: 20, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        let actionLayout = adaptivePairLayout(gap: 15)
+        let dialogueButton = addPillButton("Chat", top: buttonTop, left: 20, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         dialogueButton.addTarget(self, action: #selector(handlePersonaDialogueTap), for: .touchUpInside)
-        addPillButton("Follow", top: buttonTop, left: 195, width: 160, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
+        addPillButton("Follow", top: buttonTop, left: actionLayout.secondLeft, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         cellPlacements.forEach { placement in
             addMediaBlock(
                 top: placement.top,
@@ -1600,7 +1623,7 @@ final class ReferenceCanvasView: UIView {
         ])
 
         activeLayoutContainer = scrollContent
-        addNotchedPanel(top: 56, left: 20, width: 335, height: 122)
+        addNotchedPanel(top: 56, left: 20, width: 335, height: 122, trailing: 20)
         addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56, amountText: balanceText)
         for index in amounts.indices {
             let top = listTop + CGFloat(index) * rowStep
@@ -1657,17 +1680,22 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
-    private func addNotchedPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat) {
+    private func addNotchedPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, trailing: CGFloat? = nil) {
         let layoutContainer = activeLayoutContainer ?? self
         let panel = NotchedPanelView()
         layoutContainer.addSubview(panel)
         panel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var panelConstraints = [
             panel.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
             panel.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            panel.widthAnchor.constraint(equalToConstant: width),
             panel.heightAnchor.constraint(equalToConstant: height)
-        ])
+        ]
+        if let trailing {
+            panelConstraints.append(panel.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing))
+        } else {
+            panelConstraints.append(panel.widthAnchor.constraint(equalToConstant: width))
+        }
+        NSLayoutConstraint.activate(panelConstraints)
     }
 
     private func addWalletBalanceTextGroup(parent: UIView, cardTop: CGFloat, amountText: String) {
@@ -1747,8 +1775,8 @@ final class ReferenceCanvasView: UIView {
 
         NSLayoutConstraint.activate([
             cell.leadingAnchor.constraint(equalTo: parent.leadingAnchor, constant: 15),
+            cell.trailingAnchor.constraint(equalTo: parent.trailingAnchor, constant: -15),
             cell.topAnchor.constraint(equalTo: parent.topAnchor, constant: top),
-            cell.widthAnchor.constraint(equalToConstant: 345),
             cell.heightAnchor.constraint(equalToConstant: 68),
 
             iconView.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 15),
@@ -1894,7 +1922,7 @@ final class ReferenceCanvasView: UIView {
         var top: CGFloat = 142
         for section in sections {
             let height = CGFloat(section.count * 64 + 18)
-            _ = addPanel(top: top, left: 20, width: 335, height: height, alpha: 1)
+            _ = addPanel(top: top, left: 20, width: 335, height: height, alpha: 1, trailing: 20)
             var rowTop = top + 18
             section.forEach { row in
                 addRow(row, top: rowTop)
@@ -1947,7 +1975,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addSettingsCard(top: CGFloat, height: CGFloat, rows: [String]) {
-        let card = addPanel(top: top, left: 20, width: 335, height: height, alpha: 1)
+        let card = addPanel(top: top, left: 20, width: 335, height: height, alpha: 1, trailing: 20)
         card.layer.cornerRadius = 20
         card.layer.borderWidth = 1
         card.layer.borderColor = UIColor(white: 0.93, alpha: 1).cgColor
@@ -2979,7 +3007,7 @@ final class ReferenceCanvasView: UIView {
         bottom: CGFloat? = nil,
         left: CGFloat = 20,
         width: CGFloat = 335,
-        trailing: CGFloat? = nil,
+        trailing: CGFloat? = 20,
         filled: Bool,
         dark: Bool = false,
         usesOneFont: Bool = false,
@@ -3475,7 +3503,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, alpha: CGFloat) -> UIView {
+    private func addPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, alpha: CGFloat, trailing: CGFloat? = nil) -> UIView {
         let layoutContainer = activeLayoutContainer ?? self
         let panel: UIView
         if alpha < 1 {
@@ -3508,12 +3536,17 @@ final class ReferenceCanvasView: UIView {
         panel.layer.shadowRadius = 14
         layoutContainer.addSubview(panel)
         panel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var panelConstraints = [
             panel.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
             panel.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            panel.widthAnchor.constraint(equalToConstant: width),
             panel.heightAnchor.constraint(equalToConstant: height)
-        ])
+        ]
+        if let trailing {
+            panelConstraints.append(panel.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing))
+        } else {
+            panelConstraints.append(panel.widthAnchor.constraint(equalToConstant: width))
+        }
+        NSLayoutConstraint.activate(panelConstraints)
         return panel
     }
 
@@ -3525,7 +3558,8 @@ final class ReferenceCanvasView: UIView {
         radius: CGFloat,
         fillAlpha: CGFloat = 0.4,
         blurRadius: CGFloat = 16,
-        backdropAssetName: String? = nil
+        backdropAssetName: String? = nil,
+        trailing: CGFloat? = nil
     ) -> UIView {
         let panel = UIView()
         panel.backgroundColor = .clear
@@ -3533,12 +3567,17 @@ final class ReferenceCanvasView: UIView {
         panel.layer.masksToBounds = true
         addSubview(panel)
         panel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var panelConstraints = [
             panel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
             panel.topAnchor.constraint(equalTo: topAnchor, constant: top),
-            panel.widthAnchor.constraint(equalToConstant: width),
             panel.heightAnchor.constraint(equalToConstant: height)
-        ])
+        ]
+        if let trailing {
+            panelConstraints.append(panel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -trailing))
+        } else {
+            panelConstraints.append(panel.widthAnchor.constraint(equalToConstant: width))
+        }
+        NSLayoutConstraint.activate(panelConstraints)
 
         if let backdropAssetName, let backdropImage = blurredImage(named: backdropAssetName, radius: blurRadius) {
             let imageView = UIImageView(image: backdropImage)
@@ -4141,7 +4180,7 @@ final class ReferenceCanvasView: UIView {
         ]
         layer.startPoint = CGPoint(x: 0, y: 0)
         layer.endPoint = CGPoint(x: 1, y: 1)
-        layer.frame = CGRect(x: 0, y: 0, width: 375, height: height)
+        layer.frame = CGRect(x: 0, y: 0, width: adaptiveLayoutWidth, height: height)
         self.layer.insertSublayer(layer, at: 0)
     }
 
@@ -4287,8 +4326,8 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addFeatureCard(title: String, top: CGFloat, left: CGFloat, tint: MediaTint, imageName: String? = nil) {
-        addMediaBlock(top: top, left: left, width: 164, height: 144, title: title, tint: tint, action: .arrow, imageName: imageName)
+    private func addFeatureCard(title: String, top: CGFloat, left: CGFloat, width: CGFloat, tint: MediaTint, imageName: String? = nil) {
+        addMediaBlock(top: top, left: left, width: width, height: 144, title: title, tint: tint, action: .arrow, imageName: imageName)
     }
 
     private func addMediaBlock(
@@ -4307,7 +4346,8 @@ final class ReferenceCanvasView: UIView {
         destinationPage: ScenePage? = nil,
         playIconName: String = "video_play_icon",
         playIconSize: CGFloat = 40,
-        shadowOpacity: Float = 0.18
+        shadowOpacity: Float = 0.18,
+        trailing: CGFloat? = nil
     ) {
         let layoutContainer = activeLayoutContainer ?? self
         let shadowHost = UIView()
@@ -4318,12 +4358,17 @@ final class ReferenceCanvasView: UIView {
         shadowHost.layer.shadowRadius = 12
         layoutContainer.addSubview(shadowHost)
         shadowHost.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var mediaConstraints = [
             shadowHost.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
             shadowHost.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            shadowHost.widthAnchor.constraint(equalToConstant: width),
             shadowHost.heightAnchor.constraint(equalToConstant: height)
-        ])
+        ]
+        if let trailing {
+            mediaConstraints.append(shadowHost.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing))
+        } else {
+            mediaConstraints.append(shadowHost.widthAnchor.constraint(equalToConstant: width))
+        }
+        NSLayoutConstraint.activate(mediaConstraints)
         let block = UIView()
         block.backgroundColor = imageName == nil ? tint.baseColor : .clear
         block.layer.cornerRadius = cornerRadius
@@ -4356,7 +4401,7 @@ final class ReferenceCanvasView: UIView {
             ]
             gradient.startPoint = CGPoint(x: 0, y: 0)
             gradient.endPoint = CGPoint(x: 1, y: 1)
-            gradient.frame = CGRect(x: 0, y: 0, width: width, height: height)
+            gradient.frame = CGRect(x: 0, y: 0, width: trailing == nil ? width : max(0, adaptiveLayoutWidth - left - (trailing ?? 0)), height: height)
             block.layer.insertSublayer(gradient, at: 0)
         }
         if !title.isEmpty {
@@ -4459,7 +4504,8 @@ final class ReferenceCanvasView: UIView {
             cornerRadius: 24,
             titleSize: 16,
             titleTop: 286,
-            titleUsesOneFont: true
+            titleUsesOneFont: true,
+            trailing: 20
         )
         addProfileAvatar(
             top: top,
@@ -4489,14 +4535,38 @@ final class ReferenceCanvasView: UIView {
 
     private func addDiscoverActionButton(frame: CGRect, action: @escaping () -> Void) {
         let layoutContainer = activeLayoutContainer ?? self
-        let button = ClearTapButton(frame: frame, action: action)
+        let button = ClearTapButton(frame: .zero, action: action)
         layoutContainer.addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        var buttonConstraints = [
+            button.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: frame.minX),
+            button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: frame.minY),
+            button.heightAnchor.constraint(equalToConstant: frame.height)
+        ]
+        if fillsReferenceTrailing(frame) {
+            buttonConstraints.append(button.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20))
+        } else {
+            buttonConstraints.append(button.widthAnchor.constraint(equalToConstant: frame.width))
+        }
+        NSLayoutConstraint.activate(buttonConstraints)
     }
 
     private func addHomeActionButton(frame: CGRect, action: @escaping () -> Void) {
         let layoutContainer = activeLayoutContainer ?? self
-        let button = ClearTapButton(frame: frame, action: action)
+        let button = ClearTapButton(frame: .zero, action: action)
         layoutContainer.addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        var buttonConstraints = [
+            button.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: frame.minX),
+            button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: frame.minY),
+            button.heightAnchor.constraint(equalToConstant: frame.height)
+        ]
+        if fillsReferenceTrailing(frame) {
+            buttonConstraints.append(button.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20))
+        } else {
+            buttonConstraints.append(button.widthAnchor.constraint(equalToConstant: frame.width))
+        }
+        NSLayoutConstraint.activate(buttonConstraints)
     }
 
     private func addFeedStats(top: CGFloat) {
@@ -4629,7 +4699,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addStatsPanel(top: CGFloat) {
-        let panel = addPanel(top: top, left: 20, width: 335, height: 80, alpha: 1)
+        let panel = addPanel(top: top, left: 20, width: 335, height: 80, alpha: 1, trailing: 20)
         panel.layer.cornerRadius = 12
         let statsEntries = [("66", "Works"), ("166", "Followers"), ("266", "Following")]
         let colors = [
@@ -4637,7 +4707,23 @@ final class ReferenceCanvasView: UIView {
             UIColor(red: 1.0, green: 0.60, blue: 0.00, alpha: 1),
             UIColor(red: 0.12, green: 0.55, blue: 1.0, alpha: 1)
         ]
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .fill
+        stackView.distribution = .fillEqually
+        panel.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+            stackView.topAnchor.constraint(equalTo: panel.topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: panel.bottomAnchor)
+        ])
+
         for index in statsEntries.indices {
+            let columnView = UIView()
+            stackView.addArrangedSubview(columnView)
+
             let valueLabel = UILabel()
             valueLabel.text = statsEntries[index].0
             valueLabel.textColor = colors[index]
@@ -4650,15 +4736,14 @@ final class ReferenceCanvasView: UIView {
             titleLabel.font = AppFont.source(16)
             titleLabel.textAlignment = .center
 
-            panel.addSubview(valueLabel)
-            panel.addSubview(titleLabel)
+            columnView.addSubview(valueLabel)
+            columnView.addSubview(titleLabel)
             valueLabel.translatesAutoresizingMaskIntoConstraints = false
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-            let centerMultiplier = (CGFloat(index) * 2 + 1) / 3
             NSLayoutConstraint.activate([
-                valueLabel.centerXAnchor.constraint(equalTo: panel.leadingAnchor, constant: 335 * centerMultiplier / 2),
-                valueLabel.topAnchor.constraint(equalTo: panel.topAnchor, constant: 15),
+                valueLabel.centerXAnchor.constraint(equalTo: columnView.centerXAnchor),
+                valueLabel.topAnchor.constraint(equalTo: columnView.topAnchor, constant: 15),
                 valueLabel.heightAnchor.constraint(equalToConstant: 24),
 
                 titleLabel.centerXAnchor.constraint(equalTo: valueLabel.centerXAnchor),
