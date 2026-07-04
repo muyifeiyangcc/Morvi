@@ -18,6 +18,7 @@ struct WeeklyFeelingEntry {
     let moodTitle: String
     let bodyText: String
     let moodAsset: String
+    let portraitImage: UIImage?
     let dateText: String
     let style: Style
 }
@@ -88,7 +89,7 @@ final class WeeklyFeelingCell: UITableViewCell {
             noteView.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 20),
             noteView.topAnchor.constraint(equalTo: moodLabel.bottomAnchor, constant: 8),
             noteView.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -16),
-            noteView.trailingAnchor.constraint(lessThanOrEqualTo: cardView.trailingAnchor, constant: -20),
+            noteView.trailingAnchor.constraint(lessThanOrEqualTo: dateLabel.leadingAnchor, constant: -12),
 
             noteLabel.leadingAnchor.constraint(equalTo: noteView.leadingAnchor, constant: 16),
             noteLabel.trailingAnchor.constraint(equalTo: noteView.trailingAnchor, constant: -16),
@@ -118,7 +119,7 @@ final class WeeklyFeelingCell: UITableViewCell {
     func configure(with entry: WeeklyFeelingEntry, isLast: Bool) {
         moodLabel.text = entry.moodTitle
         noteLabel.text = entry.bodyText
-        avatarView.image = UIImage(named: entry.moodAsset)
+        avatarView.image = entry.portraitImage ?? UIImage(named: "default_avatar")
         dateLabel.text = entry.dateText
         gradientLayer.colors = [
             entry.style.tintColor.cgColor,

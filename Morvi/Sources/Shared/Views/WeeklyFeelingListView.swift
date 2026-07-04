@@ -5,11 +5,13 @@ final class WeeklyFeelingListView: UIView {
     private let entries: [WeeklyFeelingEntry]
 
     init(records: [MoodEntryRecord]) {
+        let portraitImage = Self.currentPortraitImage()
         entries = records.enumerated().map { index, record in
             WeeklyFeelingEntry(
                 moodTitle: record.moodTitle,
                 bodyText: record.bodyText,
                 moodAsset: record.moodAsset,
+                portraitImage: portraitImage,
                 dateText: Self.dateText(from: record.recordedAt),
                 style: index.isMultiple(of: 2) ? .lime : .aqua
             )
@@ -97,6 +99,37 @@ final class WeeklyFeelingListView: UIView {
     private static func dateText(from storedText: String) -> String {
         guard let date = LocalDateText.date(from: storedText) else { return storedText }
         return displayDateFormatter.string(from: date)
+    }
+
+    private static func currentPortraitImage() -> UIImage? {
+        guard let asset = AccountSessionCenter.shared.activeHeaderContent()?.avatarAsset,
+              asset.isEmpty == false else {
+            return UIImage(named: "default_avatar")
+        }
+        guard asset.hasPrefix("local-avatar/") else {
+            return UIImage(named: asset) ?? UIImage(named: "default_avatar")
+        }
+        return storedPortraitImage(asset: asset) ?? UIImage(named: "default_avatar")
+    }
+
+    private static func storedPortraitImage(asset: String) -> UIImage? {
+        let prefix = "local-avatar/"
+        let fileName = String(asset.dropFirst(prefix.count))
+        guard fileName.isEmpty == false,
+              let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+              ) else {
+            return nil
+        }
+        let fileURL = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("Avatars", isDirectory: true)
+            .appendingPathComponent(fileName)
+        guard let imageData = try? Data(contentsOf: fileURL) else { return nil }
+        return UIImage(data: imageData)
     }
 
     private static let displayDateFormatter: DateFormatter = {
