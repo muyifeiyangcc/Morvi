@@ -131,13 +131,20 @@ final class ReferenceCanvasView: UIView {
     private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
     private var animatedAssistantEntryKeys: Set<String> = []
     private let restrictionSubjectKey: String?
+    private let showsAgreementActionArea: Bool
     private var selectedSafetyReasonIndex = 0
     private weak var replyInputField: UITextField?
 
-    init(page: ScenePage, selectedMoodIndex: Int = 0, restrictionSubjectKey: String? = nil) {
+    init(
+        page: ScenePage,
+        selectedMoodIndex: Int = 0,
+        restrictionSubjectKey: String? = nil,
+        showsAgreementActionArea: Bool = false
+    ) {
         self.page = page
         self.selectedMoodIndex = selectedMoodIndex
         self.restrictionSubjectKey = restrictionSubjectKey
+        self.showsAgreementActionArea = showsAgreementActionArea
         super.init(frame: .zero)
         NotificationCenter.default.addObserver(
             self,
@@ -3206,38 +3213,51 @@ final class ReferenceCanvasView: UIView {
 
     private func renderAgreement() {
         addTopTitle("EULA")
-        let bottomBar = UIView()
-        bottomBar.backgroundColor = .clear
-        addSubview(bottomBar)
-        bottomBar.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            bottomBar.leadingAnchor.constraint(equalTo: leadingAnchor),
-            bottomBar.trailingAnchor.constraint(equalTo: trailingAnchor),
-            bottomBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32),
-            bottomBar.heightAnchor.constraint(equalToConstant: 96)
-        ])
+        let bottomBar: UIView?
+        if showsAgreementActionArea {
+            let actionBar = UIView()
+            actionBar.backgroundColor = .clear
+            addSubview(actionBar)
+            actionBar.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                actionBar.leadingAnchor.constraint(equalTo: leadingAnchor),
+                actionBar.trailingAnchor.constraint(equalTo: trailingAnchor),
+                actionBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32),
+                actionBar.heightAnchor.constraint(equalToConstant: 96)
+            ])
+            bottomBar = actionBar
+        } else {
+            bottomBar = nil
+        }
 
         let webView = WKWebView(frame: .zero)
         webView.backgroundColor = .clear
         webView.isOpaque = false
         webView.scrollView.backgroundColor = .clear
         webView.scrollView.contentInsetAdjustmentBehavior = .never
-        webView.scrollView.contentInset.bottom = 16
+        webView.scrollView.contentInset.bottom = showsAgreementActionArea ? 16 : 0
         webView.scrollView.showsVerticalScrollIndicator = false
         webView.navigationDelegate = self
         addSubview(webView)
         webView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+        var webConstraints = [
             webView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             webView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            webView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
-            webView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor, constant: -16)
-        ])
+            webView.topAnchor.constraint(equalTo: topAnchor, constant: 120)
+        ]
+        if let bottomBar {
+            webConstraints.append(webView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor, constant: -16))
+        } else {
+            webConstraints.append(webView.bottomAnchor.constraint(equalTo: bottomAnchor))
+        }
+        NSLayoutConstraint.activate(webConstraints)
 
-        addPillButton("Cancel", top: 0, left: 48, width: 124, dark: false, fontWeight: .medium, parent: bottomBar)
-        addPillButton("I agree", top: 0, left: 204, width: 124, dark: true, fontWeight: .medium, parent: bottomBar)
-        addAgreementConsentLine(top: 76, parent: bottomBar)
-        bringSubviewToFront(bottomBar)
+        if let bottomBar {
+            addPillButton("Cancel", top: 0, left: 48, width: 124, dark: false, fontWeight: .medium, parent: bottomBar)
+            addPillButton("I agree", top: 0, left: 204, width: 124, dark: true, fontWeight: .medium, parent: bottomBar)
+            addAgreementConsentLine(top: 76, parent: bottomBar)
+            bringSubviewToFront(bottomBar)
+        }
         showProgressOverlay()
         webView.loadHTMLString(agreementHTML(), baseURL: nil)
     }

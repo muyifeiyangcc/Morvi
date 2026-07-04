@@ -21,7 +21,7 @@ class BaseSceneController: UIViewController {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = .white
-        let canvasView = ReferenceCanvasView(page: page)
+        let canvasView = makeCanvasView(for: page)
         self.canvasView = canvasView
         canvasView.didRequestPage = { [weak self] targetPage in
             self?.pushCanvasPage(targetPage, restrictionSubjectKey: nil)
@@ -59,6 +59,10 @@ class BaseSceneController: UIViewController {
 
     func makeDecorativeLayer() -> UIView? {
         nil
+    }
+
+    func makeCanvasView(for page: ScenePage) -> ReferenceCanvasView {
+        ReferenceCanvasView(page: page)
     }
 
     private func installFullScreenBackdropIfNeeded() {
