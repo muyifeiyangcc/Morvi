@@ -121,6 +121,8 @@ final class ReferenceCanvasView: UIView {
     private weak var activeVoiceIconView: UIView?
     private var voiceElapsedSeconds = 0
     private var voiceTimer: Timer?
+    private var voiceRecorder: AVAudioRecorder?
+    private var activeVoiceAsset: String?
     private var personaMediaFrames: [CGRect] = []
     private var personaMediaTargets: [(frame: CGRect, workKey: String, accountKey: String)] = []
     private var personaBackdropBaseHeight: CGFloat = 0
@@ -948,7 +950,7 @@ final class ReferenceCanvasView: UIView {
         let rippleView = microphoneIcon.superview?.subviews.first { $0 is VoiceRippleView } as? VoiceRippleView
         switch recognizer.state {
         case .began:
-            startVoiceCapture(rippleView: rippleView, iconView: microphoneIcon)
+            guard startVoiceCapture(rippleView: rippleView, iconView: microphoneIcon) else { return }
             UIView.animate(withDuration: 0.16, delay: 0, options: [.curveEaseOut], animations: {
                 microphoneIcon.transform = CGAffineTransform(scaleX: 80 / 104, y: 80 / 104)
             }, completion: { _ in
@@ -965,17 +967,24 @@ final class ReferenceCanvasView: UIView {
         case .ended, .cancelled, .failed:
             let elapsedSeconds = voiceElapsedSeconds
             if voiceTimer != nil && elapsedSeconds < 1 {
+                stopVoiceCapture(keepsRecordedAudio: false)
                 MorviToastView.show("Audio is too short", in: self)
             } else if voiceTimer != nil {
-                appendDirectDialogueAudio(durationSeconds: elapsedSeconds)
+                let audioAsset = stopVoiceCapture(keepsRecordedAudio: true)
+                appendDirectDialogueAudio(durationSeconds: elapsedSeconds, audioAsset: audioAsset)
+            } else {
+                stopVoiceCapture(keepsRecordedAudio: false)
             }
-            stopVoiceCapture()
         default:
             break
         }
     }
 
-    private func startVoiceCapture(rippleView: VoiceRippleView?, iconView: UIView) {
+    private func startVoiceCapture(rippleView: VoiceRippleView?, iconView: UIView) -> Bool {
+        guard startVoiceRecorder() else {
+            MorviToastView.show("Recording failed", in: self)
+            return false
+        }
         stopVoiceTimer()
         activeVoiceRippleView = rippleView
         activeVoiceIconView = iconView
@@ -991,6 +1000,7 @@ final class ReferenceCanvasView: UIView {
             repeats: true
         )
         RunLoop.main.add(voiceTimer!, forMode: .common)
+        return true
     }
 
     @objc private func handleVoiceTimerTick() {
@@ -998,11 +1008,14 @@ final class ReferenceCanvasView: UIView {
         voiceDurationLabel?.text = "\(voiceElapsedSeconds)s"
         voiceDurationLabel?.isHidden = false
         if voiceElapsedSeconds >= 60 {
-            stopVoiceCapture()
+            let audioAsset = stopVoiceCapture(keepsRecordedAudio: true)
+            appendDirectDialogueAudio(durationSeconds: voiceElapsedSeconds, audioAsset: audioAsset)
         }
     }
 
-    private func stopVoiceCapture() {
+    @discardableResult
+    private func stopVoiceCapture(keepsRecordedAudio: Bool = false) -> String? {
+        let audioAsset = finishVoiceRecorder(keepsFile: keepsRecordedAudio)
         stopVoiceTimer()
         activeVoiceRippleView?.stopAnimating()
         if let iconView = activeVoiceIconView {
@@ -1014,6 +1027,7 @@ final class ReferenceCanvasView: UIView {
         voiceDurationLabel?.isHidden = true
         activeVoiceRippleView = nil
         activeVoiceIconView = nil
+        return audioAsset
     }
 
     private func stopVoiceTimer() {
@@ -1021,8 +1035,79 @@ final class ReferenceCanvasView: UIView {
         voiceTimer = nil
     }
 
+    private func startVoiceRecorder() -> Bool {
+        finishVoiceRecorder(keepsFile: false)
+        do {
+            let capture = try makeVoiceCaptureDestination()
+            try AVAudioSession.sharedInstance().setCategory(
+                .playAndRecord,
+                mode: .default,
+                options: [.defaultToSpeaker]
+            )
+            try AVAudioSession.sharedInstance().setActive(true)
+            let recorder = try AVAudioRecorder(
+                url: capture.url,
+                settings: [
+                    AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+                    AVSampleRateKey: 44_100,
+                    AVNumberOfChannelsKey: 1,
+                    AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+                ]
+            )
+            recorder.prepareToRecord()
+            guard recorder.record() else {
+                try? FileManager.default.removeItem(at: capture.url)
+                return false
+            }
+            voiceRecorder = recorder
+            activeVoiceAsset = capture.asset
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    @discardableResult
+    private func finishVoiceRecorder(keepsFile: Bool) -> String? {
+        let audioAsset = activeVoiceAsset
+        let audioURL = voiceRecorder?.url
+        voiceRecorder?.stop()
+        voiceRecorder = nil
+        activeVoiceAsset = nil
+        guard keepsFile else {
+            if let audioURL {
+                try? FileManager.default.removeItem(at: audioURL)
+            }
+            return nil
+        }
+        return audioAsset
+    }
+
+    private func makeVoiceCaptureDestination() throws -> (asset: String, url: URL) {
+        let directory = try voiceCaptureDirectory()
+        let fileName = "voice-\(UUID().uuidString.lowercased()).m4a"
+        return ("local-voice/\(fileName)", directory.appendingPathComponent(fileName))
+    }
+
+    private func voiceCaptureDirectory() throws -> URL {
+        let baseDirectory = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let directory = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("DialogueAudio", isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true
+        )
+        return directory
+    }
+
     @objc private func hideVoiceInputPanel() {
-        stopVoiceCapture()
+        stopVoiceCapture(keepsRecordedAudio: false)
         viewWithTag(9206)?.removeFromSuperview()
         resetVoicePanelAvoidance(animated: true)
     }
@@ -1077,10 +1162,10 @@ final class ReferenceCanvasView: UIView {
         let defaultEntries: [DialogueFlowEntry] = [
             .moment(DialogueMomentFormatter.title(for: adjustedDate, referenceDate: referenceDate, calendar: calendar)),
             .phrase(text: "Nice to meet you, nice\nto meet you!", side: .local, showsAvatar: true),
-            .audioClip(durationText: "5s", side: .remote, showsAvatar: true),
+            .audioClip(durationText: "5s", side: .remote, showsAvatar: true, audioAsset: nil),
             .portraitAsset(name: "profile_avatar", side: .local, showsAvatar: true),
             .phrase(text: "Nice to meet you.", side: .remote, showsAvatar: true),
-            .audioClip(durationText: "5s", side: .local, showsAvatar: true),
+            .audioClip(durationText: "5s", side: .local, showsAvatar: true, audioAsset: nil),
             .portraitAsset(name: "profile_avatar", side: .remote, showsAvatar: true)
         ]
         listView.didRequestImagePreview = { [weak self] assetName in
@@ -1181,7 +1266,12 @@ final class ReferenceCanvasView: UIView {
                 entries.append(.portraitAsset(name: record.mediaAsset ?? "profile_avatar", side: side, showsAvatar: showsAvatar))
             case 2:
                 let durationText = "\(Int(record.audioDuration ?? 1))s"
-                entries.append(.audioClip(durationText: durationText, side: side, showsAvatar: showsAvatar))
+                entries.append(.audioClip(
+                    durationText: durationText,
+                    side: side,
+                    showsAvatar: showsAvatar,
+                    audioAsset: record.mediaAsset
+                ))
             default:
                 entries.append(.phrase(text: record.bodyText ?? "", side: side, showsAvatar: showsAvatar))
             }
@@ -1235,9 +1325,10 @@ final class ReferenceCanvasView: UIView {
         reloadDirectDialogueList()
     }
 
-    private func appendDirectDialogueAudio(durationSeconds: Int) {
+    private func appendDirectDialogueAudio(durationSeconds: Int, audioAsset: String?) {
         guard appendDirectDialogueEntry(
             entryKind: 2,
+            mediaAsset: audioAsset,
             durationSeconds: TimeInterval(durationSeconds)
         ) else {
             MorviToastView.show("Audio send failed", in: self)

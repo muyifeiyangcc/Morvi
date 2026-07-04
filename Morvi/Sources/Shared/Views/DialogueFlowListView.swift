@@ -1,4 +1,5 @@
 import UIKit
+import AVFoundation
 
 final class DialogueFlowListView: UIView {
     private let tableView = CancelFriendlyTableView(frame: .zero, style: .plain)
@@ -6,6 +7,7 @@ final class DialogueFlowListView: UIView {
     private var consumedRevealIdentifiers: Set<String> = []
     private var activeAudioIndex: Int?
     private var audioPlaybackTimer: Timer?
+    private var audioPlayer: AVAudioPlayer?
     var didRequestImagePreview: ((String) -> Void)?
 
     override init(frame: CGRect) {
@@ -38,6 +40,7 @@ final class DialogueFlowListView: UIView {
 
     deinit {
         audioPlaybackTimer?.invalidate()
+        audioPlayer?.stop()
     }
 
     func configure(entries: [DialogueFlowEntry]) {
@@ -45,6 +48,8 @@ final class DialogueFlowListView: UIView {
         activeAudioIndex = nil
         audioPlaybackTimer?.invalidate()
         audioPlaybackTimer = nil
+        audioPlayer?.stop()
+        audioPlayer = nil
         tableView.reloadData()
         DispatchQueue.main.async { [weak self] in
             self?.scrollToEnd(animated: false)
@@ -79,8 +84,8 @@ extension DialogueFlowListView: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let entry = entries[indexPath.row]
         switch entry {
-        case .audioClip(let durationText, _, _):
-            playAudioClip(at: indexPath, durationText: durationText)
+        case .audioClip(let durationText, _, _, let audioAsset):
+            playAudioClip(at: indexPath, durationText: durationText, audioAsset: audioAsset)
         case .portraitAsset(let name, _, _):
             didRequestImagePreview?(name)
         default:
@@ -88,8 +93,10 @@ extension DialogueFlowListView: UITableViewDataSource, UITableViewDelegate {
         }
     }
 
-    private func playAudioClip(at indexPath: IndexPath, durationText: String) {
+    private func playAudioClip(at indexPath: IndexPath, durationText: String, audioAsset: String?) {
         audioPlaybackTimer?.invalidate()
+        audioPlayer?.stop()
+        audioPlayer = nil
         var rowsToReload = [indexPath]
         if let activeAudioIndex, activeAudioIndex != indexPath.row {
             rowsToReload.append(IndexPath(row: activeAudioIndex, section: 0))
@@ -97,12 +104,54 @@ extension DialogueFlowListView: UITableViewDataSource, UITableViewDelegate {
         activeAudioIndex = indexPath.row
         tableView.reloadRows(at: rowsToReload, with: .none)
 
-        let duration = playbackDuration(from: durationText)
+        let duration = startAudioPlayback(audioAsset: audioAsset) ?? playbackDuration(from: durationText)
         audioPlaybackTimer = Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { [weak self] _ in
             guard let self, self.activeAudioIndex == indexPath.row else { return }
+            self.audioPlayer?.stop()
+            self.audioPlayer = nil
             self.activeAudioIndex = nil
             self.tableView.reloadRows(at: [indexPath], with: .none)
         }
+    }
+
+    private func startAudioPlayback(audioAsset: String?) -> TimeInterval? {
+        guard let audioURL = resolvedAudioURL(for: audioAsset) else { return nil }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            let player = try AVAudioPlayer(contentsOf: audioURL)
+            player.prepareToPlay()
+            player.play()
+            audioPlayer = player
+            return max(player.duration, 0.4)
+        } catch {
+            return nil
+        }
+    }
+
+    private func resolvedAudioURL(for asset: String?) -> URL? {
+        guard let asset, asset.isEmpty == false else { return nil }
+        if asset.hasPrefix("local-voice/") {
+            guard let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+            ) else { return nil }
+            let fileName = String(asset.dropFirst("local-voice/".count))
+            let fileURL = baseDirectory
+                .appendingPathComponent("Morvi", isDirectory: true)
+                .appendingPathComponent("DialogueAudio", isDirectory: true)
+                .appendingPathComponent(fileName)
+            return FileManager.default.fileExists(atPath: fileURL.path) ? fileURL : nil
+        }
+        if asset.hasPrefix("file://"),
+           let fileURL = URL(string: asset),
+           FileManager.default.fileExists(atPath: fileURL.path) {
+            return fileURL
+        }
+        let fileURL = URL(fileURLWithPath: asset)
+        return FileManager.default.fileExists(atPath: fileURL.path) ? fileURL : nil
     }
 
     private func playbackDuration(from text: String) -> TimeInterval {

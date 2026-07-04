@@ -53,7 +53,7 @@ final class DialogueFlowCell: UITableViewCell {
             configurePhrase(text: text, side: side, showsAvatar: showsAvatar)
         case .roundedPhrase(let text, let side, let showsAvatar, let revealsCharacters, _):
             configureRoundedPhrase(text: text, side: side, showsAvatar: showsAvatar, revealsCharacters: revealsCharacters)
-        case .audioClip(let durationText, let side, let showsAvatar):
+        case .audioClip(let durationText, let side, let showsAvatar, _):
             configureAudioClip(
                 durationText: durationText,
                 side: side,
