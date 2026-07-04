@@ -267,9 +267,21 @@ final class ReferenceCanvasView: UIView {
             self?.didRequestPage?(.discover)
         }
         addHomeActionButton(frame: CGRect(x: 178, y: 536, width: 178, height: 145)) { [weak self] in
-            self?.didRequestPage?(.assistantDialogue)
+            self?.requestAssistantEntry()
         }
         activeLayoutContainer = nil
+    }
+
+    private func requestAssistantEntry() {
+        guard AccountSessionCenter.shared.isSignedIn else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+        guard AccountSessionCenter.shared.activeWalletBalanceValue() >= 200 else {
+            didRequestOverlayPage?(.creditShortage)
+            return
+        }
+        didRequestPage?(.assistantDialogue)
     }
 
     private func renderDiscover() {
