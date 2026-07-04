@@ -20,6 +20,7 @@ final class ReferenceCanvasView: UIView {
     private weak var keyboardSyncedDialogueFlowListView: DialogueFlowListView?
     private weak var dialogueFlowListView: DialogueFlowListView?
     private weak var overlayContentView: UIView?
+    private weak var registrationAvatarImageView: UIImageView?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
     private var dialogueFlowBottomConstraint: NSLayoutConstraint?
@@ -1827,7 +1828,7 @@ final class ReferenceCanvasView: UIView {
         installKeyboardAvoidance()
 
         activeLayoutContainer = scrollContent
-        addAssetAvatar("default_avatar", top: 147, left: 145, size: 84)
+        registrationAvatarImageView = addAssetAvatar("default_avatar", top: 147, left: 145, size: 84)
         addAvatarEditBadge(top: 210, left: 207)
         let items = [
             ("Nickname", "Please enter", CGFloat.zero),
@@ -4514,7 +4515,12 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addAssetAvatar(_ imageName: String, top: CGFloat, left: CGFloat, size: CGFloat) {
+    func updateRegistrationAvatar(_ image: UIImage) {
+        registrationAvatarImageView?.image = image
+    }
+
+    @discardableResult
+    private func addAssetAvatar(_ imageName: String, top: CGFloat, left: CGFloat, size: CGFloat) -> UIImageView {
         let layoutContainer = activeLayoutContainer ?? self
         let imageView = UIImageView(image: UIImage(named: imageName))
         imageView.contentMode = .scaleAspectFill
@@ -4528,6 +4534,7 @@ final class ReferenceCanvasView: UIView {
             imageView.widthAnchor.constraint(equalToConstant: size),
             imageView.heightAnchor.constraint(equalToConstant: size)
         ])
+        return imageView
     }
 
     private func addAssetIcon(_ imageName: String, top: CGFloat, left: CGFloat, size: CGFloat) {

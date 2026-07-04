@@ -70,7 +70,10 @@ enum RouteFactory {
             }
         case .personalDetail:
             return AuthSceneController(page: .personalDetail) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 716, width: 335, height: 56)) { scene.submitPersonalDetail() }]
+                [
+                    HitArea(frame: CGRect(x: 135, y: 137, width: 112, height: 112)) { scene.chooseRegistrationAvatar() },
+                    HitArea(frame: CGRect(x: 20, y: 716, width: 335, height: 56)) { scene.submitPersonalDetail() }
+                ]
             }
         default:
             return ReferencePageController(page: page)

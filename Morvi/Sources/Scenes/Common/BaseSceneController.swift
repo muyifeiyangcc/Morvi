@@ -4,6 +4,7 @@ class BaseSceneController: UIViewController {
     private let page: ScenePage
     private let topLayer = CustomTopLayerView()
     private let surfaceView = DesignSurfaceView()
+    weak var canvasView: ReferenceCanvasView?
 
     init(page: ScenePage) {
         self.page = page
@@ -21,6 +22,7 @@ class BaseSceneController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = .white
         let canvasView = ReferenceCanvasView(page: page)
+        self.canvasView = canvasView
         canvasView.didRequestPage = { [weak self] targetPage in
             if AccountSessionCenter.shared.requiresSignedInGate(for: targetPage),
                AccountSessionCenter.shared.isSignedIn == false {

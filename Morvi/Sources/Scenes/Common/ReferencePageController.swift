@@ -1,4 +1,5 @@
 import UIKit
+import PhotosUI
 
 class ReferencePageController: BaseSceneController {
     private struct RegistrationDraft {
@@ -7,6 +8,7 @@ class ReferencePageController: BaseSceneController {
     }
 
     private static var registrationDraft: RegistrationDraft?
+    private static var registrationAvatarAsset: String?
     private static var shouldShowRegistrationSuccessToast = false
 
     private let page: ScenePage
@@ -96,7 +98,18 @@ class ReferencePageController: BaseSceneController {
 
         view.endEditing(true)
         Self.registrationDraft = RegistrationDraft(emailText: emailText, secretText: passwordText)
+        Self.registrationAvatarAsset = nil
         push(.personalDetail)
+    }
+
+    func chooseRegistrationAvatar() {
+        view.endEditing(true)
+        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        configuration.filter = .images
+        configuration.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        present(picker, animated: true)
     }
 
     func submitPersonalDetail() {
@@ -125,6 +138,10 @@ class ReferencePageController: BaseSceneController {
             MorviToastView.show("Please enter gender", in: view)
             return
         }
+        guard let avatarAsset = Self.registrationAvatarAsset else {
+            MorviToastView.show("Please select avatar", in: view)
+            return
+        }
         guard let draft = Self.registrationDraft else {
             MorviToastView.show("Please enter password", in: view)
             return
@@ -139,12 +156,14 @@ class ReferencePageController: BaseSceneController {
                     secretText: draft.secretText,
                     displayName: nicknameText,
                     genderText: genderText,
+                    avatarAsset: avatarAsset,
                     birthDate: birthdayText.isEmpty ? nil : birthdayText,
                     locationText: locationText.isEmpty ? nil : locationText
                 )
                 DispatchQueue.main.async {
                     self?.hideProgressOverlay {
                         Self.registrationDraft = nil
+                        Self.registrationAvatarAsset = nil
                         self?.returnToAuthRootAfterRegistration()
                     }
                 }
@@ -234,5 +253,53 @@ class ReferencePageController: BaseSceneController {
             results.append(contentsOf: textFields(in: childView))
         }
         return results
+    }
+
+    private func storeAvatarImage(_ image: UIImage) throws -> String {
+        guard let imageData = image.jpegData(compressionQuality: 0.88) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+        let baseDirectory = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let avatarDirectory = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("Avatars", isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: avatarDirectory,
+            withIntermediateDirectories: true
+        )
+        let fileName = "avatar-\(UUID().uuidString.lowercased()).jpg"
+        let fileURL = avatarDirectory.appendingPathComponent(fileName)
+        try imageData.write(to: fileURL, options: .atomic)
+        return "local-avatar/\(fileName)"
+    }
+}
+
+extension ReferencePageController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let provider = results.first?.itemProvider,
+              provider.canLoadObject(ofClass: UIImage.self) else {
+            return
+        }
+        provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
+            guard let self,
+                  let image = object as? UIImage else { return }
+            do {
+                let avatarAsset = try self.storeAvatarImage(image)
+                DispatchQueue.main.async {
+                    Self.registrationAvatarAsset = avatarAsset
+                    self.canvasView?.updateRegistrationAvatar(image)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    MorviToastView.show("Avatar save failed", in: self.view)
+                }
+            }
+        }
     }
 }

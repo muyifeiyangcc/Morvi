@@ -32,6 +32,7 @@ final class AccountSessionCenter {
         secretText: String,
         displayName: String,
         genderText: String,
+        avatarAsset: String,
         birthDate: String?,
         locationText: String?
     ) throws {
@@ -44,7 +45,7 @@ final class AccountSessionCenter {
             genderCode: genderCode(from: genderText),
             birthDate: birthDate,
             locationText: locationText,
-            avatarAsset: "default_avatar",
+            avatarAsset: avatarAsset,
             coverAsset: "default_avatar",
             registrationState: 1,
             createdAt: now,
