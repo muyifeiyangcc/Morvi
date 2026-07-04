@@ -1830,21 +1830,21 @@ final class ReferenceCanvasView: UIView {
         addAssetAvatar("default_avatar", top: 147, left: 145, size: 84)
         addAvatarEditBadge(top: 210, left: 207)
         let items = [
-            ("Nickname", "Please enter", false),
-            ("Gender", "Female", false),
-            ("Birthday", "Please enter", true),
-            ("Location", "Please enter", true)
+            ("Nickname", "Please enter", CGFloat.zero),
+            ("Gender", "Female", CGFloat.zero),
+            ("Birthday", "Please enter", CGFloat(103)),
+            ("Location", "Please enter", CGFloat(104))
         ]
         for index in items.indices {
             let top = CGFloat(274 + index * 109)
             addText(items[index].0, size: 17, weight: .black, top: top, left: 20)
-            if items[index].2 {
+            if items[index].2 > 0 {
                 addText(
                     "(optional)",
                     size: 12,
                     weight: .regular,
                     top: top + 4,
-                    left: 88,
+                    left: items[index].2,
                     color: UIColor.gray.withAlphaComponent(0.55)
                 )
             }
