@@ -1,8 +1,6 @@
 import UIKit
 
 final class DesignSurfaceView: UIView {
-    static let baseSize = CGSize(width: 375, height: 812)
-
     let contentView = UIView()
 
     override init(frame: CGRect) {
@@ -11,20 +9,14 @@ final class DesignSurfaceView: UIView {
         addSubview(contentView)
         contentView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            contentView.widthAnchor.constraint(equalToConstant: Self.baseSize.width),
-            contentView.heightAnchor.constraint(equalToConstant: Self.baseSize.height),
-            contentView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            contentView.centerYAnchor.constraint(equalTo: centerYAnchor)
+            contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 
     required init?(coder: NSCoder) {
         nil
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        let scale = min(bounds.width / Self.baseSize.width, bounds.height / Self.baseSize.height)
-        contentView.transform = CGAffineTransform(scaleX: scale, y: scale)
     }
 }

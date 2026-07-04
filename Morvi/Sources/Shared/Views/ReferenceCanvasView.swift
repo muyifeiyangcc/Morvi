@@ -91,6 +91,24 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
+    private var adaptiveLayoutWidth: CGFloat {
+        if bounds.width > 0 {
+            return bounds.width
+        }
+        let screenBounds = UIScreen.main.bounds
+        let portraitWidth = min(screenBounds.width, screenBounds.height)
+        return portraitWidth > 0 ? portraitWidth : 375
+    }
+
+    private var adaptiveLayoutHeight: CGFloat {
+        if bounds.height > 0 {
+            return bounds.height
+        }
+        let screenBounds = UIScreen.main.bounds
+        let portraitHeight = max(screenBounds.width, screenBounds.height)
+        return portraitHeight > 0 ? portraitHeight : 812
+    }
+
     private func render() {
         switch page {
         case .entry:
@@ -400,7 +418,7 @@ final class ReferenceCanvasView: UIView {
         personaMediaFrames = cellPlacements.map {
             CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height)
         }
-        let contentHeight = max(812, (columnBottoms.max() ?? 812) - cellGap + 10)
+        let contentHeight = max(adaptiveLayoutHeight, (columnBottoms.max() ?? adaptiveLayoutHeight) - cellGap + 10)
         NSLayoutConstraint.activate([
             scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             scrollContent.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
@@ -1128,7 +1146,7 @@ final class ReferenceCanvasView: UIView {
         personaMediaFrames = cellPlacements.map {
             CGRect(x: $0.left, y: $0.top, width: $0.width, height: $0.height)
         }
-        let contentHeight = max(812, (columnBottoms.max() ?? 812) - cellGap + 32)
+        let contentHeight = max(adaptiveLayoutHeight, (columnBottoms.max() ?? adaptiveLayoutHeight) - cellGap + 32)
 
         NSLayoutConstraint.activate([
             scrollContent.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
@@ -1204,7 +1222,7 @@ final class ReferenceCanvasView: UIView {
         ]
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
-        gradient.frame = CGRect(x: 0, y: 0, width: 375, height: 812)
+        gradient.frame = CGRect(x: 0, y: 0, width: adaptiveLayoutWidth, height: adaptiveLayoutHeight)
         layer.insertSublayer(gradient, at: 0)
     }
 
@@ -1394,7 +1412,7 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: 812)
+            scrollContent.heightAnchor.constraint(equalToConstant: adaptiveLayoutHeight)
         ])
 
         keyboardAwareScrollView = scrollView
@@ -1440,7 +1458,7 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: 812)
+            scrollContent.heightAnchor.constraint(equalToConstant: adaptiveLayoutHeight)
         ])
 
         keyboardAwareScrollView = scrollView
@@ -1492,7 +1510,7 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: 812)
+            scrollContent.heightAnchor.constraint(equalToConstant: adaptiveLayoutHeight)
         ])
 
         keyboardAwareScrollView = scrollView
@@ -4204,8 +4222,8 @@ final class ReferenceCanvasView: UIView {
         let contentWidth = 40 + CGFloat(moodImageNames.count) * 100
             + CGFloat(max(0, moodImageNames.count - 1)) * 12
         let selectedOffset = min(
-            max(0, selectedCenterX - DesignSurfaceView.baseSize.width / 2),
-            max(0, contentWidth - DesignSurfaceView.baseSize.width)
+            max(0, selectedCenterX - adaptiveLayoutWidth / 2),
+            max(0, contentWidth - adaptiveLayoutWidth)
         )
         DispatchQueue.main.async {
             scrollView.setContentOffset(CGPoint(x: selectedOffset, y: 0), animated: false)
@@ -4533,7 +4551,7 @@ final class ReferenceCanvasView: UIView {
         let itemSpacing = tagItemSpacing
         let rowSpacing = tagRowSpacing
         let startX = left
-        let maxX = DesignSurfaceView.baseSize.width - right
+        let maxX = adaptiveLayoutWidth - right
         var cursorX = startX
         var cursorY = top
 
@@ -4586,7 +4604,7 @@ final class ReferenceCanvasView: UIView {
     private func measuredTagsHeight(left: CGFloat = 28, right: CGFloat = 20) -> CGFloat {
         let font = AppFont.source(12)
         let startX = left
-        let maxX = DesignSurfaceView.baseSize.width - right
+        let maxX = adaptiveLayoutWidth - right
         var cursorX = startX
         var rowCount: CGFloat = 1
 
