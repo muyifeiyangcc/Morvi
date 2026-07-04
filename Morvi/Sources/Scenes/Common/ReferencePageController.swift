@@ -833,14 +833,16 @@ class ReferencePageController: BaseSceneController {
 
 extension ReferencePageController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
         guard let provider = results.first?.itemProvider else {
-            photoSelectionTarget = nil
-            pendingWorkMediaSource = nil
+            picker.dismiss(animated: true) { [weak self] in
+                self?.photoSelectionTarget = nil
+                self?.pendingWorkMediaSource = nil
+            }
             return
         }
 
         if provider.canLoadObject(ofClass: UIImage.self) {
+            picker.dismiss(animated: true)
             provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
                 guard let self,
                       let image = object as? UIImage else { return }
@@ -850,15 +852,31 @@ extension ReferencePageController: PHPickerViewControllerDelegate {
         }
 
         if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
-            provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] fileURL, _ in
-                guard let self, let fileURL else { return }
-                self.applyPickedVideo(fileURL)
+            picker.dismiss(animated: true) { [weak self] in
+                guard let self else { return }
+                self.showProgressOverlay()
+                provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] fileURL, _ in
+                    guard let self else { return }
+                    guard let fileURL else {
+                        DispatchQueue.main.async {
+                            self.hideProgressOverlay {
+                                self.photoSelectionTarget = nil
+                                self.pendingWorkMediaSource = nil
+                                MorviToastView.show("Video save failed", in: self.view)
+                            }
+                        }
+                        return
+                    }
+                    self.applyPickedVideo(fileURL)
+                }
             }
             return
         }
 
-        photoSelectionTarget = nil
-        pendingWorkMediaSource = nil
+        picker.dismiss(animated: true) { [weak self] in
+            self?.photoSelectionTarget = nil
+            self?.pendingWorkMediaSource = nil
+        }
     }
 
     private func applyPickedImage(_ image: UIImage) {
@@ -907,22 +925,26 @@ extension ReferencePageController: PHPickerViewControllerDelegate {
             let storedCoverAsset = try storeWorkImage(previewImage)
             let duration = videoDurationSeconds(for: storedVideoURL)
             DispatchQueue.main.async {
-                (self.view.viewWithTag(9102) as? ReferenceCanvasView)?
-                    .updateUploadMedia(
-                        previewImage: previewImage,
-                        mediaAsset: storedMediaAsset,
-                        coverAsset: storedCoverAsset,
-                        mediaKind: 1,
-                        durationSeconds: duration.isFinite ? duration : nil
-                    )
-                self.photoSelectionTarget = nil
-                self.pendingWorkMediaSource = nil
+                self.hideProgressOverlay {
+                    (self.view.viewWithTag(9102) as? ReferenceCanvasView)?
+                        .updateUploadMedia(
+                            previewImage: previewImage,
+                            mediaAsset: storedMediaAsset,
+                            coverAsset: storedCoverAsset,
+                            mediaKind: 1,
+                            durationSeconds: duration.isFinite ? duration : nil
+                        )
+                    self.photoSelectionTarget = nil
+                    self.pendingWorkMediaSource = nil
+                }
             }
         } catch {
             DispatchQueue.main.async {
-                self.photoSelectionTarget = nil
-                self.pendingWorkMediaSource = nil
-                MorviToastView.show("Video save failed", in: self.view)
+                self.hideProgressOverlay {
+                    self.photoSelectionTarget = nil
+                    self.pendingWorkMediaSource = nil
+                    MorviToastView.show("Video save failed", in: self.view)
+                }
             }
         }
     }
@@ -933,14 +955,20 @@ extension ReferencePageController: UIImagePickerControllerDelegate, UINavigation
         _ picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
     ) {
-        picker.dismiss(animated: true)
         let mediaType = info[.mediaType] as? String
         if mediaType == UTType.movie.identifier,
            let videoURL = info[.mediaURL] as? URL {
-            applyPickedVideo(videoURL)
+            picker.dismiss(animated: true) { [weak self] in
+                guard let self else { return }
+                self.showProgressOverlay()
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    self?.applyPickedVideo(videoURL)
+                }
+            }
             return
         }
 
+        picker.dismiss(animated: true)
         if let image = info[.originalImage] as? UIImage {
             applyPickedImage(image)
             return
