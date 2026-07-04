@@ -6,6 +6,10 @@ final class UploadThemeFlowView: UIView {
     private var optionButtons: [UIButton] = []
     private var borderLayers: [UIButton: CAShapeLayer] = [:]
 
+    var selectedTitles: [String] {
+        values.filter { selectedValues.contains($0) }
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureOptions()

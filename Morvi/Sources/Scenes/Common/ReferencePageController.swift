@@ -9,6 +9,11 @@ class ReferencePageController: BaseSceneController {
         let secretText: String
     }
 
+    private enum PhotoSelectionTarget {
+        case registrationAvatar
+        case workCover
+    }
+
     private static var registrationDraft: RegistrationDraft?
     private static var registrationAvatarAsset: String?
     private static var shouldShowRegistrationSuccessToast = false
@@ -17,6 +22,8 @@ class ReferencePageController: BaseSceneController {
     private let areasBuilder: ((ReferencePageController) -> [HitArea])?
     private weak var progressOverlayView: MorviProgressOverlayView?
     private var appleSignInController: ASAuthorizationController?
+    private var photoSelectionTarget: PhotoSelectionTarget?
+    private let creativeRepository = SQLiteCreativeWorkRepository()
 
     init(page: ScenePage, areas: ((ReferencePageController) -> [HitArea])? = nil) {
         self.page = page
@@ -53,6 +60,9 @@ class ReferencePageController: BaseSceneController {
             default:
                 break
             }
+        }
+        canvasView?.didRequestOverlayPage = { [weak self] targetPage in
+            self?.showOverlay(targetPage)
         }
     }
 
@@ -272,6 +282,7 @@ class ReferencePageController: BaseSceneController {
 
     func chooseRegistrationAvatar() {
         view.endEditing(true)
+        photoSelectionTarget = .registrationAvatar
         showProgressOverlay()
         handlePhotoLibraryAccess(PHPhotoLibrary.authorizationStatus(for: .readWrite))
     }
@@ -279,7 +290,7 @@ class ReferencePageController: BaseSceneController {
     private func handlePhotoLibraryAccess(_ status: PHAuthorizationStatus) {
         switch status {
         case .authorized, .limited:
-            presentRegistrationAvatarPicker()
+            presentPhotoPicker()
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] updatedStatus in
                 DispatchQueue.main.async {
@@ -297,7 +308,7 @@ class ReferencePageController: BaseSceneController {
         }
     }
 
-    private func presentRegistrationAvatarPicker() {
+    private func presentPhotoPicker() {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         configuration.filter = .images
         configuration.selectionLimit = 1
@@ -311,7 +322,7 @@ class ReferencePageController: BaseSceneController {
     private func showPhotoLibrarySettingsGuide() {
         let alert = UIAlertController(
             title: "Photo access required",
-            message: "Please allow photo access in Settings to select an avatar.",
+            message: "Please allow photo access in Settings to select an image.",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
@@ -414,11 +425,71 @@ class ReferencePageController: BaseSceneController {
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
         }
+        overlayView.didRequestUploadMediaSelection = { [weak self] in
+            self?.chooseWorkCover()
+        }
+        overlayView.didSubmitUploadWork = { [weak self] draft in
+            self?.submitWorkUpload(draft, overlayView: overlayView)
+        }
         overlayView.didCompleteSignOut = { [weak self] in
             self?.navigationController?.setViewControllers([RootTabsController()], animated: false)
         }
         overlayView.didCompleteAccountRemoval = { [weak self] in
             self?.navigationController?.setViewControllers([RootTabsController()], animated: false)
+        }
+    }
+
+    private func chooseWorkCover() {
+        view.endEditing(true)
+        photoSelectionTarget = .workCover
+        showProgressOverlay()
+        handlePhotoLibraryAccess(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+    }
+
+    private func submitWorkUpload(
+        _ draft: ReferenceCanvasView.WorkUploadDraft,
+        overlayView: ReferenceCanvasView
+    ) {
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey else {
+            showOverlay(.accessGate)
+            return
+        }
+
+        view.endEditing(true)
+        showProgressOverlay()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self, weak overlayView] in
+            do {
+                let now = LocalDateText.now()
+                let record = CreativeWorkRecord(
+                    stableKey: "work-local-\(UUID().uuidString.lowercased())",
+                    ownerAccountKey: accountKey,
+                    title: draft.titleText,
+                    bodyText: draft.detailText,
+                    mediaKind: 0,
+                    mediaAsset: draft.mediaAsset,
+                    coverAsset: draft.mediaAsset,
+                    mediaWidth: Double(draft.mediaSize.width),
+                    mediaHeight: Double(draft.mediaSize.height),
+                    durationSeconds: nil,
+                    visibilityCode: 0,
+                    createdAt: now,
+                    updatedAt: now
+                )
+                try self?.creativeRepository.saveWithThemeTitles(record, themeTitles: draft.themeTitles)
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        overlayView?.removeFromSuperview()
+                        self?.canvasView?.reloadRenderedContent()
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let view = self?.view else { return }
+                        MorviToastView.show("Upload failed", in: view)
+                    }
+                }
+            }
         }
     }
 
@@ -555,6 +626,19 @@ class ReferencePageController: BaseSceneController {
     }
 
     private func storeAvatarImage(_ image: UIImage) throws -> String {
+        try storeLocalImage(image, folderName: "Avatars", filePrefix: "avatar", assetPrefix: "local-avatar")
+    }
+
+    private func storeWorkImage(_ image: UIImage) throws -> String {
+        try storeLocalImage(image, folderName: "WorkMedia", filePrefix: "work", assetPrefix: "local-work")
+    }
+
+    private func storeLocalImage(
+        _ image: UIImage,
+        folderName: String,
+        filePrefix: String,
+        assetPrefix: String
+    ) throws -> String {
         guard let imageData = image.jpegData(compressionQuality: 0.88) else {
             throw CocoaError(.fileWriteUnknown)
         }
@@ -564,17 +648,17 @@ class ReferencePageController: BaseSceneController {
             appropriateFor: nil,
             create: true
         )
-        let avatarDirectory = baseDirectory
+        let targetDirectory = baseDirectory
             .appendingPathComponent("Morvi", isDirectory: true)
-            .appendingPathComponent("Avatars", isDirectory: true)
+            .appendingPathComponent(folderName, isDirectory: true)
         try FileManager.default.createDirectory(
-            at: avatarDirectory,
+            at: targetDirectory,
             withIntermediateDirectories: true
         )
-        let fileName = "avatar-\(UUID().uuidString.lowercased()).jpg"
-        let fileURL = avatarDirectory.appendingPathComponent(fileName)
+        let fileName = "\(filePrefix)-\(UUID().uuidString.lowercased()).jpg"
+        let fileURL = targetDirectory.appendingPathComponent(fileName)
         try imageData.write(to: fileURL, options: .atomic)
-        return "local-avatar/\(fileName)"
+        return "\(assetPrefix)/\(fileName)"
     }
 }
 
@@ -583,20 +667,36 @@ extension ReferencePageController: PHPickerViewControllerDelegate {
         picker.dismiss(animated: true)
         guard let provider = results.first?.itemProvider,
               provider.canLoadObject(ofClass: UIImage.self) else {
+            photoSelectionTarget = nil
             return
         }
         provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
             guard let self,
                   let image = object as? UIImage else { return }
             do {
-                let avatarAsset = try self.storeAvatarImage(image)
+                let target = self.photoSelectionTarget
+                let storedAsset: String
+                switch target {
+                case .workCover:
+                    storedAsset = try self.storeWorkImage(image)
+                default:
+                    storedAsset = try self.storeAvatarImage(image)
+                }
                 DispatchQueue.main.async {
-                    Self.registrationAvatarAsset = avatarAsset
-                    self.canvasView?.updateRegistrationAvatar(image)
+                    switch target {
+                    case .workCover:
+                        (self.view.viewWithTag(9102) as? ReferenceCanvasView)?
+                            .updateUploadMedia(image: image, asset: storedAsset)
+                    default:
+                        Self.registrationAvatarAsset = storedAsset
+                        self.canvasView?.updateRegistrationAvatar(image)
+                    }
+                    self.photoSelectionTarget = nil
                 }
             } catch {
                 DispatchQueue.main.async {
-                    MorviToastView.show("Avatar save failed", in: self.view)
+                    self.photoSelectionTarget = nil
+                    MorviToastView.show("Image save failed", in: self.view)
                 }
             }
         }

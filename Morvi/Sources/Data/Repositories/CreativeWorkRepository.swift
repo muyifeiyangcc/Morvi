@@ -21,6 +21,7 @@ struct DiscoveryWorkEntry {
 
 protocol CreativeWorkRepository {
     func save(_ record: CreativeWorkRecord) throws
+    func saveWithThemeTitles(_ record: CreativeWorkRecord, themeTitles: [String]) throws
     func count() throws -> Int
     func discoveryProfiles(limit: Int) throws -> [DiscoveryProfileEntry]
     func discoveryWorks(limit: Int) throws -> [DiscoveryWorkEntry]
@@ -69,6 +70,28 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 .text(record.updatedAt)
             ]
         )
+    }
+
+    func saveWithThemeTitles(_ record: CreativeWorkRecord, themeTitles: [String]) throws {
+        try store.transaction {
+            try save(record)
+            try store.write(
+                "DELETE FROM work_theme_link WHERE work_key = ?;",
+                bindings: [.text(record.stableKey)]
+            )
+            for title in themeTitles {
+                try store.write(
+                    """
+                    INSERT OR IGNORE INTO work_theme_link (work_key, theme_id)
+                    SELECT ?, id
+                    FROM theme_catalog
+                    WHERE title = ?
+                    LIMIT 1;
+                    """,
+                    bindings: [.text(record.stableKey), .text(title)]
+                )
+            }
+        }
     }
 
     func count() throws -> Int {
@@ -137,15 +160,7 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
             JOIN account_profile p ON p.stable_key = w.owner_account_key
             WHERE w.removed_at IS NULL
                 AND w.visibility_code = 0
-            ORDER BY
-                CASE w.stable_key
-                    WHEN 'work-local-victoria' THEN 0
-                    WHEN 'work-local-rowan' THEN 1
-                    WHEN 'work-local-sophia' THEN 2
-                    WHEN 'work-local-jasper' THEN 3
-                    ELSE 4
-                END,
-                w.created_at DESC
+            ORDER BY w.created_at DESC, w.id DESC
             LIMIT ?;
             """,
             bindings: [.int(limit)]

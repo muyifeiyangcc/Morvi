@@ -4,6 +4,14 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 final class ReferenceCanvasView: UIView {
+    struct WorkUploadDraft {
+        let titleText: String
+        let detailText: String
+        let themeTitles: [String]
+        let mediaAsset: String
+        let mediaSize: CGSize
+    }
+
     private static let assistantUnlockCost = 200
     private static let assistantThreadKind = 2
     private static let assistantLocalSpeakerKind = 0
@@ -26,6 +34,8 @@ final class ReferenceCanvasView: UIView {
     var didRequestPage: ((ScenePage) -> Void)?
     var didRequestOverlayPage: ((ScenePage) -> Void)?
     var didRequestPrimaryAction: (() -> Void)?
+    var didRequestUploadMediaSelection: (() -> Void)?
+    var didSubmitUploadWork: ((WorkUploadDraft) -> Void)?
     var didChooseMood: ((Int) -> Void)?
     var didCompleteSignOut: (() -> Void)?
     var didCompleteAccountRemoval: (() -> Void)?
@@ -36,6 +46,13 @@ final class ReferenceCanvasView: UIView {
     private weak var dialogueFlowListView: DialogueFlowListView?
     private weak var overlayContentView: UIView?
     private weak var registrationAvatarImageView: UIImageView?
+    private weak var uploadTitleField: UITextField?
+    private weak var uploadDetailTextView: UITextView?
+    private weak var uploadThemeFlowView: UploadThemeFlowView?
+    private weak var uploadMediaPreviewImageView: UIImageView?
+    private weak var uploadMediaIconView: UIImageView?
+    private var uploadMediaAsset: String?
+    private var uploadMediaSize: CGSize?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
     private var dialogueFlowBottomConstraint: NSLayoutConstraint?
@@ -1905,6 +1922,7 @@ final class ReferenceCanvasView: UIView {
             shadowOpacity: 0,
             bottomPlateHeight: 3
         )
+        uploadButton.addTarget(self, action: #selector(handleUploadWorkAction), for: .touchUpInside)
         activeLayoutContainer = nil
 
         let scrollView = CancelFriendlyScrollView()
@@ -1936,7 +1954,7 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = formView
         addText("Title of work:", size: 17, weight: .regular, top: 0, left: 20)
-        addInputField(
+        uploadTitleField = addInputField(
             "Enter the title",
             top: 32,
             fieldBackgroundColor: UIColor(
@@ -1950,8 +1968,12 @@ final class ReferenceCanvasView: UIView {
         addText("Theme:", size: 17, weight: .regular, top: 99, left: 20)
         addUploadThemeChoices(top: 131)
         addText("Description:", size: 17, weight: .regular, top: 246, left: 20)
-        addLargeField("Say something", top: 278)
-        addUploadBox(top: 393)
+        addLargeField("Say something", top: 278) { [weak self] textView in
+            self?.uploadDetailTextView = textView
+        }
+        addUploadBox(top: 393) { [weak self] in
+            self?.didRequestUploadMediaSelection?()
+        }
         activeLayoutContainer = nil
 
         keyboardAwareScrollView = scrollView
@@ -2165,6 +2187,45 @@ final class ReferenceCanvasView: UIView {
 
     @objc private func handlePrimaryAction() {
         didRequestPrimaryAction?()
+    }
+
+    @objc private func handleUploadWorkAction() {
+        endEditing(true)
+        let titleText = (uploadTitleField?.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard titleText.isEmpty == false else {
+            MorviToastView.show("Please enter the title", in: self)
+            return
+        }
+
+        let themeTitles = uploadThemeFlowView?.selectedTitles ?? []
+        guard themeTitles.isEmpty == false else {
+            MorviToastView.show("Please select theme", in: self)
+            return
+        }
+
+        let detailText = (uploadDetailTextView?.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        guard detailText.isEmpty == false, detailText != "Say something" else {
+            MorviToastView.show("Please enter description", in: self)
+            return
+        }
+
+        guard let uploadMediaAsset,
+              let uploadMediaSize,
+              uploadMediaSize.width > 0,
+              uploadMediaSize.height > 0 else {
+            MorviToastView.show("Please upload image", in: self)
+            return
+        }
+
+        didSubmitUploadWork?(
+            WorkUploadDraft(
+                titleText: titleText,
+                detailText: detailText,
+                themeTitles: themeTitles,
+                mediaAsset: uploadMediaAsset,
+                mediaSize: uploadMediaSize
+            )
+        )
     }
 
     private func renderRestrictedList() {
@@ -3470,13 +3531,32 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func resolveAccountAvatar(_ asset: String?) -> UIImage? {
+        resolveVisualAsset(asset)
+    }
+
+    private func resolveVisualAsset(_ asset: String?) -> UIImage? {
         guard let asset, asset.isEmpty == false else {
             return nil
         }
-        guard asset.hasPrefix("local-avatar/") else {
+        guard asset.hasPrefix("local-avatar/") || asset.hasPrefix("local-work/") else {
             return UIImage(named: asset)
         }
-        let fileName = String(asset.dropFirst("local-avatar/".count))
+        return resolveStoredImage(asset)
+    }
+
+    private func resolveStoredImage(_ asset: String) -> UIImage? {
+        let prefix: String
+        let folderName: String
+        if asset.hasPrefix("local-avatar/") {
+            prefix = "local-avatar/"
+            folderName = "Avatars"
+        } else if asset.hasPrefix("local-work/") {
+            prefix = "local-work/"
+            folderName = "WorkMedia"
+        } else {
+            return nil
+        }
+        let fileName = String(asset.dropFirst(prefix.count))
         guard fileName.isEmpty == false,
               let baseDirectory = try? FileManager.default.url(
                 for: .applicationSupportDirectory,
@@ -3488,7 +3568,7 @@ final class ReferenceCanvasView: UIView {
         }
         let fileURL = baseDirectory
             .appendingPathComponent("Morvi", isDirectory: true)
-            .appendingPathComponent("Avatars", isDirectory: true)
+            .appendingPathComponent(folderName, isDirectory: true)
             .appendingPathComponent(fileName)
         guard let data = try? Data(contentsOf: fileURL) else {
             return nil
@@ -3811,6 +3891,7 @@ final class ReferenceCanvasView: UIView {
     private func addUploadThemeChoices(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let flowView = UploadThemeFlowView()
+        uploadThemeFlowView = flowView
         layoutContainer.addSubview(flowView)
         flowView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -3830,7 +3911,8 @@ final class ReferenceCanvasView: UIView {
         horizontalMargin: CGFloat = 20,
         parent: UIView? = nil,
         bottomAnchor: NSLayoutYAxisAnchor? = nil,
-        bottomInset: CGFloat = 0
+        bottomInset: CGFloat = 0,
+        textViewHandler: ((UITextView) -> Void)? = nil
     ) -> UIView {
         let layoutContainer = parent ?? activeLayoutContainer ?? self
         let field = AdaptiveInputView(
@@ -3861,6 +3943,7 @@ final class ReferenceCanvasView: UIView {
         inputView.backgroundColor = .clear
         inputView.textContainerInset = .zero
         inputView.textContainer.lineFragmentPadding = 0
+        textViewHandler?(inputView)
         field.addSubview(inputView)
         inputView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -4046,6 +4129,22 @@ final class ReferenceCanvasView: UIView {
             box.widthAnchor.constraint(equalToConstant: 92),
             box.heightAnchor.constraint(equalToConstant: 115)
         ])
+        let previewView = UIImageView()
+        previewView.contentMode = .scaleAspectFill
+        previewView.clipsToBounds = true
+        previewView.layer.cornerRadius = 10
+        previewView.layer.masksToBounds = true
+        previewView.isHidden = true
+        box.addSubview(previewView)
+        previewView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            previewView.leadingAnchor.constraint(equalTo: box.leadingAnchor),
+            previewView.trailingAnchor.constraint(equalTo: box.trailingAnchor),
+            previewView.topAnchor.constraint(equalTo: box.topAnchor),
+            previewView.bottomAnchor.constraint(equalTo: box.bottomAnchor)
+        ])
+        uploadMediaPreviewImageView = previewView
+
         let icon = UIImageView(image: UIImage(named: "upload_media_icon"))
         icon.contentMode = .scaleAspectFit
         box.addSubview(icon)
@@ -4056,6 +4155,7 @@ final class ReferenceCanvasView: UIView {
             icon.widthAnchor.constraint(equalToConstant: 28),
             icon.heightAnchor.constraint(equalToConstant: 28)
         ])
+        uploadMediaIconView = icon
 
         let actionButton = UIButton(type: .custom)
         actionButton.addAction(UIAction { _ in action?() }, for: .touchUpInside)
@@ -4457,7 +4557,7 @@ final class ReferenceCanvasView: UIView {
             block.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
         ])
         if let imageName {
-            let imageView = UIImageView(image: UIImage(named: imageName))
+            let imageView = UIImageView(image: resolveVisualAsset(imageName))
             imageView.contentMode = .scaleAspectFill
             imageView.clipsToBounds = true
             block.addSubview(imageView)
@@ -5105,10 +5205,37 @@ final class ReferenceCanvasView: UIView {
         registrationAvatarImageView?.image = image
     }
 
+    func updateUploadMedia(image: UIImage, asset: String) {
+        uploadMediaAsset = asset
+        uploadMediaSize = image.size
+        uploadMediaPreviewImageView?.image = image
+        uploadMediaPreviewImageView?.isHidden = false
+        uploadMediaIconView?.isHidden = true
+    }
+
+    func reloadRenderedContent() {
+        subviews.forEach { $0.removeFromSuperview() }
+        activeLayoutContainer = nil
+        keyboardAwareScrollView = nil
+        keyboardAvoidanceInputView = nil
+        keyboardSyncedDialogueFlowListView = nil
+        dialogueFlowListView = nil
+        overlayContentView = nil
+        registrationAvatarImageView = nil
+        uploadTitleField = nil
+        uploadDetailTextView = nil
+        uploadThemeFlowView = nil
+        uploadMediaPreviewImageView = nil
+        uploadMediaIconView = nil
+        uploadMediaAsset = nil
+        uploadMediaSize = nil
+        render()
+    }
+
     @discardableResult
     private func addAssetAvatar(_ imageName: String, top: CGFloat, left: CGFloat, size: CGFloat) -> UIImageView {
         let layoutContainer = activeLayoutContainer ?? self
-        let imageView = UIImageView(image: UIImage(named: imageName))
+        let imageView = UIImageView(image: resolveVisualAsset(imageName))
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = size / 2
