@@ -217,6 +217,7 @@ final class RootTabsController: UIViewController {
     func showPersonaRoot() {
         currentPage = .persona
         renderCurrentPage()
+        dockView.selectedItem = .persona
     }
 
     private func dockItem(for page: ScenePage) -> FloatingDockView.Item {
@@ -249,6 +250,10 @@ final class RootTabsController: UIViewController {
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
             showOverlay(.accessGate)
+            return
+        }
+        if page == .persona {
+            showPersonaRoot()
             return
         }
         if page == .publicPersona,

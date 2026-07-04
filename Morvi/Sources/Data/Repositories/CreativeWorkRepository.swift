@@ -29,6 +29,7 @@ struct PersonaDetailEntry {
     let displayName: String
     let avatarAsset: String
     let coverAsset: String
+    let worksText: String
     let followersText: String
     let followingText: String
 }
@@ -256,6 +257,13 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 COALESCE(cover_asset, avatar_asset, 'discover_feed_cover'),
                 (
                     SELECT COUNT(*)
+                    FROM creative_work cw
+                    WHERE cw.owner_account_key = account_profile.stable_key
+                        AND cw.removed_at IS NULL
+                        AND cw.visibility_code = 0
+                ),
+                (
+                    SELECT COUNT(*)
                     FROM account_relation ar
                     WHERE ar.target_account_key = account_profile.stable_key
                 ),
@@ -271,7 +279,7 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
             bindings: [.text(accountKey)]
         )
         guard let row = rows.first,
-              row.count >= 6,
+              row.count >= 7,
               let key = row[0].textValue,
               let displayName = row[1].textValue,
               let avatarAsset = row[2].textValue,
@@ -283,8 +291,9 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
             displayName: displayName,
             avatarAsset: avatarAsset,
             coverAsset: coverAsset,
-            followersText: "\(row[4].intValue)",
-            followingText: "\(row[5].intValue)"
+            worksText: "\(row[4].intValue)",
+            followersText: "\(row[5].intValue)",
+            followingText: "\(row[6].intValue)"
         )
     }
 

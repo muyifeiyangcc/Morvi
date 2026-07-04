@@ -97,6 +97,7 @@ final class ReferenceCanvasView: UIView {
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
     private weak var assistantInputField: UITextField?
+    private var galleryPreviewPlayer: AVPlayer?
     private weak var voiceDurationLabel: UILabel?
     private weak var activeVoiceRippleView: VoiceRippleView?
     private weak var activeVoiceIconView: UIView?
@@ -571,7 +572,13 @@ final class ReferenceCanvasView: UIView {
         base.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         addProfileAvatar(image: resolveAccountAvatar(detail.avatarAsset), top: 198, left: 36, size: 74, showsBorder: false, showsShadow: false)
         addText(detail.displayName, size: 20, weight: .medium, top: 275, left: 36)
-        addPersonaMetricLine(top: 311, left: 20, followersText: detail.followersText, followingText: detail.followingText)
+        addPersonaMetricLine(
+            top: 311,
+            left: 20,
+            worksText: detail.worksText,
+            followersText: detail.followersText,
+            followingText: detail.followingText
+        )
         addAssetIcon("persona_settings_icon", top: 247, left: 214, size: 30)
         addPersonaSettingsAction(top: 240, left: 204)
         addPersonaEditAction(top: 244, left: 256)
@@ -603,8 +610,9 @@ final class ReferenceCanvasView: UIView {
             displayName: fallbackName,
             avatarAsset: "default_avatar",
             coverAsset: "discover_feed_cover",
-            followersText: "77",
-            followingText: "99"
+            worksText: "0",
+            followersText: "0",
+            followingText: "0"
         )
     }
 
@@ -1236,7 +1244,7 @@ final class ReferenceCanvasView: UIView {
             top: reactionsTop,
             left: 22,
             parent: self,
-            iconTint: isWorkReacted(item.stableKey) ? UIColor(red: 0.70, green: 0.96, blue: 0.22, alpha: 1) : nil
+            iconTint: isWorkReacted(item.stableKey) ? UIColor(red: 0.39, green: 0.68, blue: 0.02, alpha: 1) : nil
         )
         addFeedStat(iconName: "feed_reply_icon", text: "\(item.replyCount) Comments", top: reactionsTop, left: 130, parent: self)
         addDiscoverActionButton(frame: CGRect(x: 20, y: reactionsTop - 12, width: 106, height: 44)) { [weak self] in
@@ -1275,6 +1283,7 @@ final class ReferenceCanvasView: UIView {
         }
 
         let player = AVPlayer(url: mediaURL)
+        galleryPreviewPlayer = player
         let playerLayer = AVPlayerLayer(player: player)
         playerLayer.videoGravity = .resizeAspect
         let hostView = PlayerLayerHostView(playerLayer: playerLayer)
@@ -1308,6 +1317,8 @@ final class ReferenceCanvasView: UIView {
     }
 
     @objc private func closeGalleryPreview() {
+        galleryPreviewPlayer?.pause()
+        galleryPreviewPlayer = nil
         removeFromSuperview()
     }
 
@@ -1476,7 +1487,7 @@ final class ReferenceCanvasView: UIView {
         base.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         addProfileAvatar(image: resolveAccountAvatar(detail.avatarAsset), top: 268, left: 128, size: 120, showsBorder: false, showsShadow: false)
         addText(detail.displayName, size: 26, weight: .bold, top: nameTop, centered: true)
-        addStatsPanel(top: statsTop)
+        addStatsPanel(top: statsTop, detail: detail)
         let actionLayout = adaptivePairLayout(gap: 15)
         let dialogueButton = addPillButton("Chat", top: buttonTop, left: 20, width: actionLayout.width, height: 40, dark: true, fontSize: 16, fontWeight: .medium)
         dialogueButton.addTarget(self, action: #selector(handlePersonaDialogueTap), for: .touchUpInside)
@@ -1654,14 +1665,25 @@ final class ReferenceCanvasView: UIView {
     private func addPersonaMetricLine(
         top: CGFloat,
         left: CGFloat,
+        worksText: String = "0",
         followersText: String = "77",
         followingText: String = "99"
     ) {
         let layoutContainer = activeLayoutContainer ?? self
         let font = AppFont.source(14, weight: .regular)
+        let worksValue = UILabel()
+        worksValue.text = worksText
+        worksValue.textColor = UIColor(red: 0.36, green: 0.83, blue: 0.12, alpha: 1)
+        worksValue.font = font
+
+        let worksTitle = UILabel()
+        worksTitle.text = "Works"
+        worksTitle.textColor = .darkGray
+        worksTitle.font = font
+
         let firstValue = UILabel()
         firstValue.text = followersText
-        firstValue.textColor = UIColor(red: 0.36, green: 0.83, blue: 0.12, alpha: 1)
+        firstValue.textColor = UIColor(red: 1.0, green: 0.60, blue: 0.00, alpha: 1)
         firstValue.font = font
 
         let firstText = UILabel()
@@ -1679,23 +1701,29 @@ final class ReferenceCanvasView: UIView {
         secondText.textColor = .darkGray
         secondText.font = font
 
-        [firstValue, firstText, secondValue, secondText].forEach {
+        [worksValue, worksTitle, firstValue, firstText, secondValue, secondText].forEach {
             layoutContainer.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
 
         NSLayoutConstraint.activate([
-            firstValue.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            firstValue.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            worksValue.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            worksValue.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+
+            worksTitle.leadingAnchor.constraint(equalTo: worksValue.trailingAnchor, constant: 4),
+            worksTitle.centerYAnchor.constraint(equalTo: worksValue.centerYAnchor),
+
+            firstValue.leadingAnchor.constraint(equalTo: worksTitle.trailingAnchor, constant: 12),
+            firstValue.centerYAnchor.constraint(equalTo: worksValue.centerYAnchor),
 
             firstText.leadingAnchor.constraint(equalTo: firstValue.trailingAnchor, constant: 4),
-            firstText.centerYAnchor.constraint(equalTo: firstValue.centerYAnchor),
+            firstText.centerYAnchor.constraint(equalTo: worksValue.centerYAnchor),
 
-            secondValue.leadingAnchor.constraint(equalTo: firstText.trailingAnchor, constant: 18),
-            secondValue.centerYAnchor.constraint(equalTo: firstValue.centerYAnchor),
+            secondValue.leadingAnchor.constraint(equalTo: firstText.trailingAnchor, constant: 12),
+            secondValue.centerYAnchor.constraint(equalTo: worksValue.centerYAnchor),
 
             secondText.leadingAnchor.constraint(equalTo: secondValue.trailingAnchor, constant: 4),
-            secondText.centerYAnchor.constraint(equalTo: firstValue.centerYAnchor),
+            secondText.centerYAnchor.constraint(equalTo: worksValue.centerYAnchor),
             secondText.trailingAnchor.constraint(lessThanOrEqualTo: layoutContainer.trailingAnchor, constant: -20)
         ])
     }
@@ -5371,7 +5399,7 @@ final class ReferenceCanvasView: UIView {
             top: top,
             left: 22,
             parent: layoutContainer,
-            iconTint: reacted ? UIColor(red: 0.70, green: 0.96, blue: 0.22, alpha: 1) : nil
+            iconTint: reacted ? UIColor(red: 0.39, green: 0.68, blue: 0.02, alpha: 1) : nil
         )
         addFeedStat(iconName: "feed_reply_icon", text: "\(replies) Comments", top: top, left: 130, parent: layoutContainer)
     }
@@ -5519,10 +5547,14 @@ final class ReferenceCanvasView: UIView {
         addMediaBlock(top: top + 174, left: 192, width: 164, height: 190, title: "", tint: .night, action: .play)
     }
 
-    private func addStatsPanel(top: CGFloat) {
+    private func addStatsPanel(top: CGFloat, detail: PersonaDetailEntry) {
         let panel = addPanel(top: top, left: 20, width: 335, height: 80, alpha: 1, trailing: 20)
         panel.layer.cornerRadius = 12
-        let statsEntries = [("66", "Works"), ("166", "Followers"), ("266", "Following")]
+        let statsEntries = [
+            (detail.worksText, "Works"),
+            (detail.followersText, "Followers"),
+            (detail.followingText, "Following")
+        ]
         let colors = [
             UIColor(red: 0.22, green: 0.78, blue: 0.10, alpha: 1),
             UIColor(red: 1.0, green: 0.60, blue: 0.00, alpha: 1),
@@ -5814,6 +5846,8 @@ final class ReferenceCanvasView: UIView {
     }
 
     func reloadRenderedContent() {
+        galleryPreviewPlayer?.pause()
+        galleryPreviewPlayer = nil
         subviews.forEach { $0.removeFromSuperview() }
         activeLayoutContainer = nil
         keyboardAwareScrollView = nil
