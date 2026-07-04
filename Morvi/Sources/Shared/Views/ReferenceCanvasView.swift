@@ -4852,8 +4852,10 @@ final class ReferenceCanvasView: UIView {
         iconView.translatesAutoresizingMaskIntoConstraints = false
         agreementConsentIconView = iconView
 
-        let label = UILabel()
-        label.numberOfLines = 1
+        let agreementControl = UIButton(type: .custom)
+        agreementControl.contentHorizontalAlignment = .leading
+        agreementControl.addTarget(self, action: #selector(openAgreementPage), for: .touchUpInside)
+        agreementControl.accessibilityLabel = "User Agreement and Privacy Policy"
         let text = "Agree with  User Agreement and Privacy Policy"
         let value = NSMutableAttributedString(
             string: text,
@@ -4868,12 +4870,12 @@ final class ReferenceCanvasView: UIView {
         value.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: second)
         value.addAttribute(.foregroundColor, value: UIColor.darkGray, range: first)
         value.addAttribute(.foregroundColor, value: UIColor.darkGray, range: second)
-        label.attributedText = value
-        container.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
+        agreementControl.setAttributedTitle(value, for: .normal)
+        container.addSubview(agreementControl)
+        agreementControl.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             iconControl.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 36.5),
-            iconControl.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+            iconControl.centerYAnchor.constraint(equalTo: agreementControl.centerYAnchor),
             iconControl.widthAnchor.constraint(equalToConstant: 40),
             iconControl.heightAnchor.constraint(equalToConstant: 40),
 
@@ -4882,10 +4884,14 @@ final class ReferenceCanvasView: UIView {
             iconView.widthAnchor.constraint(equalToConstant: 17),
             iconView.heightAnchor.constraint(equalToConstant: 17),
 
-            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 70),
-            label.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+            agreementControl.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 70),
+            agreementControl.centerYAnchor.constraint(equalTo: container.centerYAnchor)
         ])
         return container
+    }
+
+    @objc private func openAgreementPage() {
+        didRequestPage?(.agreement)
     }
 
     @objc private func handleAgreementConsentToggle() {

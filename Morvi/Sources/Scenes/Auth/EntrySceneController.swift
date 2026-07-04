@@ -11,9 +11,7 @@ final class EntrySceneController: ReferencePageController {
                 HitArea(frame: CGRect(x: 20, y: 486, width: 335, height: 56)) { scene.push(.signUp) },
                 HitArea(frame: CGRect(x: 235, y: 560, width: 70, height: 44)) { scene.push(.signUp) },
                 HitArea(frame: CGRect(x: 120, y: 600, width: 135, height: 34)) { scene.submitGuestSignIn() },
-                HitArea(frame: CGRect(x: 164, y: 636, width: 48, height: 48)) { scene.submitAppleSignIn() },
-                HitArea(frame: CGRect(x: 100, y: 720, width: 100, height: 50)) { scene.push(.agreement) },
-                HitArea(frame: CGRect(x: 200, y: 720, width: 120, height: 50)) { scene.push(.agreement) }
+                HitArea(frame: CGRect(x: 164, y: 636, width: 48, height: 48)) { scene.submitAppleSignIn() }
             ]
         }
     }
