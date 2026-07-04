@@ -238,6 +238,11 @@ final class ReferenceCanvasView: UIView {
         )
         addText("Welcome back", size: 17, weight: .black, top: 68, left: 96)
         addText(displayName, size: 16, weight: .regular, top: 98, left: 96)
+        if headerContent == nil {
+            addHomeActionButton(frame: CGRect(x: 0, y: 48, width: 260, height: 84)) { [weak self] in
+                self?.didRequestOverlayPage?(.accessGate)
+            }
+        }
         addText(greetingText, size: 30, weight: .regular, top: 146, left: 20)
         addText("Choose your mood today", size: 20, weight: .bold, top: 303, left: 20)
         addMoodRow(top: 340)
