@@ -189,9 +189,12 @@ final class ReferenceCanvasView: UIView {
 
     private func renderHome() {
         let headerContent = AccountSessionCenter.shared.activeHeaderContent()
-        let displayName = headerContent?.displayName ?? "Amelia"
+        let displayName = headerContent?.displayName ?? "Log in"
         let avatarImage = resolveAccountAvatar(headerContent?.avatarAsset)
-            ?? UIImage(named: "profile_avatar")
+            ?? UIImage(named: "default_avatar")
+        let greetingText = headerContent == nil
+            ? "Hello!\nDid everything go\nsmoothly today?"
+            : "Hello, \(displayName)!\nDid everything go\nsmoothly today?"
         let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -235,7 +238,7 @@ final class ReferenceCanvasView: UIView {
         )
         addText("Welcome back", size: 17, weight: .black, top: 68, left: 96)
         addText(displayName, size: 16, weight: .regular, top: 98, left: 96)
-        addText("Hello, \(displayName)!\nDid everything go\nsmoothly today?", size: 30, weight: .regular, top: 146, left: 20)
+        addText(greetingText, size: 30, weight: .regular, top: 146, left: 20)
         addText("Choose your mood today", size: 20, weight: .bold, top: 303, left: 20)
         addMoodRow(top: 340)
         addButton(
