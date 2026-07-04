@@ -2650,7 +2650,8 @@ final class ReferenceCanvasView: UIView {
             renderRosterList(
                 title: "Followers",
                 entries: AccountSessionCenter.shared.inboundConnectionRoster(),
-                accessoryImageName: "dialogue_card_action_dark"
+                accessoryImageName: "dialogue_card_action_dark",
+                allowsDialogueAction: true
             )
         }
     }
@@ -2659,6 +2660,7 @@ final class ReferenceCanvasView: UIView {
         title: String,
         entries: [RelationRosterRecord],
         accessoryImageName: String? = nil,
+        allowsDialogueAction: Bool = false,
         allowsOutboundConnectionRemoval: Bool = false,
         allowsRestrictionRemoval: Bool = false
     ) {
@@ -2676,6 +2678,11 @@ final class ReferenceCanvasView: UIView {
         )
         listView.didSelectEntry = { [weak self] entry in
             self?.requestPublicPersona(subjectKey: entry.accountKey)
+        }
+        if allowsDialogueAction {
+            listView.didTapAction = { [weak self] entry in
+                self?.requestRosterDialogue(accountKey: entry.accountKey)
+            }
         }
         if allowsOutboundConnectionRemoval {
             listView.didTapAction = { [weak self] entry in
@@ -2695,6 +2702,27 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func requestRosterDialogue(accountKey: String) {
+        guard AccountSessionCenter.shared.isSignedIn else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+        guard AccountSessionCenter.shared.isActiveAccount(accountKey) == false else {
+            MorviToastView.show("You cannot chat with yourself.", in: self)
+            return
+        }
+        guard AccountSessionCenter.shared.hasMutualConnection(with: accountKey) else {
+            MorviToastView.show("You need to follow each other first.", in: self)
+            return
+        }
+        RouteContextStore.setTargetAccountKey(accountKey)
+        if let didRequestSubjectPage {
+            didRequestSubjectPage(.directDialogue, accountKey)
+        } else {
+            didRequestPage?(.directDialogue)
+        }
     }
 
     private func removeOutboundConnectionRosterEntry(accountKey: String) {
