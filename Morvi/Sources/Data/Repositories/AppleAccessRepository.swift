@@ -3,7 +3,7 @@ import Foundation
 final class AppleAccessRepository {
     private let store: LocalStore
     private let profileRepository: AccountProfileRepository
-    private let accountAnchorKey = "apple_account_anchor"
+    private let accountAnchorPrefix = "apple_account_anchor_"
 
     init(
         store: LocalStore = .shared,
@@ -13,10 +13,20 @@ final class AppleAccessRepository {
         self.profileRepository = profileRepository
     }
 
-    func resolveAccountKey() throws -> String {
+    func resolveAccountKey(
+        subjectText: String,
+        emailText: String?,
+        fullNameText: String?
+    ) throws -> String {
+        let normalizedSubject = subjectText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalizedSubject.isEmpty == false else {
+            throw LocalStoreError.executionFailed("Missing Apple account identity.")
+        }
+
         var resolvedKey = ""
         try store.transaction {
-            if let accountKey = try storedAccountKey(),
+            let anchorKey = "\(accountAnchorPrefix)\(normalizedSubject)"
+            if let accountKey = try storedAccountKey(anchorKey: anchorKey),
                try profileExists(stableKey: accountKey) {
                 resolvedKey = accountKey
                 return
@@ -24,10 +34,14 @@ final class AppleAccessRepository {
 
             let accountKey = "acct-apple-\(UUID().uuidString.lowercased())"
             let now = LocalDateText.now()
+            let displayName = resolvedDisplayName(
+                fullNameText: fullNameText,
+                emailText: emailText
+            )
             let profile = AccountProfileRecord(
                 stableKey: accountKey,
-                email: nil,
-                displayName: "Apple",
+                email: normalizedOptional(emailText),
+                displayName: displayName,
                 genderCode: nil,
                 birthDate: nil,
                 locationText: nil,
@@ -48,7 +62,7 @@ final class AppleAccessRepository {
                     updated_at = excluded.updated_at;
                 """,
                 bindings: [
-                    .text(accountAnchorKey),
+                    .text(anchorKey),
                     .text(accountKey),
                     .text(now)
                 ]
@@ -58,11 +72,28 @@ final class AppleAccessRepository {
         return resolvedKey
     }
 
-    private func storedAccountKey() throws -> String? {
+    private func storedAccountKey(anchorKey: String) throws -> String? {
         try store.readText(
             "SELECT text_value FROM local_identity_state WHERE stable_key = ? LIMIT 1;",
-            bindings: [.text(accountAnchorKey)]
+            bindings: [.text(anchorKey)]
         )
+    }
+
+    private func normalizedOptional(_ text: String?) -> String? {
+        let normalizedText = (text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return normalizedText.isEmpty ? nil : normalizedText
+    }
+
+    private func resolvedDisplayName(fullNameText: String?, emailText: String?) -> String {
+        if let fullName = normalizedOptional(fullNameText) {
+            return fullName
+        }
+        if let emailText = normalizedOptional(emailText),
+           let prefix = emailText.split(separator: "@").first,
+           prefix.isEmpty == false {
+            return String(prefix)
+        }
+        return "Apple"
     }
 
     private func profileExists(stableKey: String) throws -> Bool {

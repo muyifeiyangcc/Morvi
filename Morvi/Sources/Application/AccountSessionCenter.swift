@@ -43,8 +43,16 @@ final class AccountSessionCenter {
         try activateSession(accountKey: accountKey, accessKind: 1)
     }
 
-    func signInWithApple() throws {
-        let accountKey = try appleRepository.resolveAccountKey()
+    func signInWithApple(
+        subjectText: String,
+        emailText: String?,
+        fullNameText: String?
+    ) throws {
+        let accountKey = try appleRepository.resolveAccountKey(
+            subjectText: subjectText,
+            emailText: emailText,
+            fullNameText: fullNameText
+        )
         try activateSession(accountKey: accountKey, accessKind: 2)
     }
 

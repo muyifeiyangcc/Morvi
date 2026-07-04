@@ -1,6 +1,7 @@
 import UIKit
 import Photos
 import PhotosUI
+import AuthenticationServices
 
 class ReferencePageController: BaseSceneController {
     private struct RegistrationDraft {
@@ -15,6 +16,7 @@ class ReferencePageController: BaseSceneController {
     private let page: ScenePage
     private let areasBuilder: ((ReferencePageController) -> [HitArea])?
     private weak var progressOverlayView: MorviProgressOverlayView?
+    private var appleSignInController: ASAuthorizationController?
 
     init(page: ScenePage, areas: ((ReferencePageController) -> [HitArea])? = nil) {
         self.page = page
@@ -334,23 +336,53 @@ class ReferencePageController: BaseSceneController {
     }
 
     func submitAppleSignIn() {
+        view.endEditing(true)
         showProgressOverlay()
+        let provider = ASAuthorizationAppleIDProvider()
+        let request = provider.createRequest()
+        request.requestedScopes = [.fullName, .email]
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        appleSignInController = controller
+        controller.performRequests()
+    }
+
+    private func completeAppleSignIn(
+        subjectText: String,
+        emailText: String?,
+        fullNameText: String?
+    ) {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             do {
-                try AccountSessionCenter.shared.signInWithApple()
+                try AccountSessionCenter.shared.signInWithApple(
+                    subjectText: subjectText,
+                    emailText: emailText,
+                    fullNameText: fullNameText
+                )
                 DispatchQueue.main.async {
                     self?.hideProgressOverlay {
+                        self?.appleSignInController = nil
                         self?.finishAuthFlow(successToastText: "Login successful")
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
                     self?.hideProgressOverlay {
+                        self?.appleSignInController = nil
                         guard let view = self?.view else { return }
-                        MorviToastView.show("Login failed", in: view)
+                        MorviToastView.show("Apple login failed", in: view)
                     }
                 }
             }
+        }
+    }
+
+    private func failAppleSignIn() {
+        appleSignInController = nil
+        hideProgressOverlay { [weak self] in
+            guard let view = self?.view else { return }
+            MorviToastView.show("Apple login failed", in: view)
         }
     }
 
@@ -453,5 +485,38 @@ extension ReferencePageController: PHPickerViewControllerDelegate {
                 }
             }
         }
+    }
+}
+
+extension ReferencePageController: ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        view.window ?? ASPresentationAnchor()
+    }
+
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithAuthorization authorization: ASAuthorization
+    ) {
+        guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+              credential.user.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
+            failAppleSignIn()
+            return
+        }
+
+        let fullNameText = credential.fullName.map {
+            PersonNameComponentsFormatter().string(from: $0)
+        }
+        completeAppleSignIn(
+            subjectText: credential.user,
+            emailText: credential.email,
+            fullNameText: fullNameText
+        )
+    }
+
+    func authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithError error: Error
+    ) {
+        failAppleSignIn()
     }
 }

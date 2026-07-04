@@ -128,6 +128,7 @@
 		100000000000000000000023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		100000000000000000000024 /* Morvi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Morvi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000025 /* MorviProgressOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorviProgressOverlayView.swift; sourceTree = "<group>"; };
+		100000000000000000000029 /* Morvi.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Morvi.entitlements; sourceTree = "<group>"; };
 		100000000000000000000026 /* DiscoverStoryStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverStoryStripView.swift; sourceTree = "<group>"; };
 		100000000000000000000027 /* AdaptiveInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveInputView.swift; sourceTree = "<group>"; };
 		100000000000000000000028 /* GradientActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientActionButton.swift; sourceTree = "<group>"; };
@@ -228,6 +229,7 @@
 				100000000000000000000021 /* Assets.xcassets */,
 				100000000000000000000022 /* LaunchScreen.storyboard */,
 				100000000000000000000023 /* Info.plist */,
+				100000000000000000000029 /* Morvi.entitlements */,
 			);
 			path = Morvi;
 			sourceTree = "<group>";
@@ -767,6 +769,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Morvi/Morvi.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -789,6 +792,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Morvi/Morvi.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
