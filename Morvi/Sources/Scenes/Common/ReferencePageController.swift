@@ -162,11 +162,16 @@ class ReferencePageController: BaseSceneController {
     }
 
     private func closeAuthFlowAfterRegistration() {
-        if navigationController?.presentingViewController != nil {
-            navigationController?.dismiss(animated: true)
+        guard let navigationController else { return }
+        if navigationController.viewControllers.count > 1 {
+            navigationController.popViewController(animated: true)
             return
         }
-        navigationController?.setViewControllers([RootTabsController()], animated: true)
+        if navigationController.presentingViewController != nil {
+            navigationController.dismiss(animated: true)
+            return
+        }
+        navigationController.setViewControllers([RootTabsController()], animated: true)
     }
 
     private func textFields(in rootView: UIView) -> [UITextField] {
