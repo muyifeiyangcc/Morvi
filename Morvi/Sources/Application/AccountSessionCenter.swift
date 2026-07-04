@@ -55,10 +55,13 @@ final class AccountSessionCenter {
     }
 
     func signInLocalAccount(email: String, secretText: String) throws -> Bool {
-        guard let accountKey = try profileRepository.accountKey(
-            email: email,
-            secretText: secretText
-        ) else {
+        guard let storedSecretText = try profileRepository.secretText(email: email) else {
+            return false
+        }
+        guard storedSecretText == secretText else {
+            return false
+        }
+        guard let accountKey = try profileRepository.accountKey(email: email) else {
             return false
         }
         try activateSession(accountKey: accountKey)
