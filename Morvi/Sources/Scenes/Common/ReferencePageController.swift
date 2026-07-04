@@ -134,10 +134,6 @@ class ReferencePageController: BaseSceneController {
             MorviToastView.show("Please enter nickname", in: view)
             return
         }
-        guard genderText.isEmpty == false else {
-            MorviToastView.show("Please enter gender", in: view)
-            return
-        }
         guard let avatarAsset = Self.registrationAvatarAsset else {
             MorviToastView.show("Please select avatar", in: view)
             return

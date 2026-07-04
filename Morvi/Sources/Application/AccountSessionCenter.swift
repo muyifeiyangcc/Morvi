@@ -54,8 +54,11 @@ final class AccountSessionCenter {
         try profileRepository.register(profile, secretText: secretText)
     }
 
-    private func genderCode(from text: String) -> Int {
+    private func genderCode(from text: String) -> Int? {
         let normalizedText = text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if normalizedText.isEmpty {
+            return nil
+        }
         if normalizedText == "male" {
             return 0
         }

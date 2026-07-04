@@ -1832,7 +1832,7 @@ final class ReferenceCanvasView: UIView {
         addAvatarEditBadge(top: 210, left: 207)
         let items = [
             ("Nickname", "Please enter", CGFloat.zero),
-            ("Gender", "Female", CGFloat.zero),
+            ("Gender", "Female", CGFloat(84)),
             ("Birthday", "Please enter", CGFloat(103)),
             ("Location", "Please enter", CGFloat(104))
         ]
