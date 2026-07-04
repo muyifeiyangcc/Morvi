@@ -2733,51 +2733,83 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func requestRosterDialogue(accountKey: String) {
+        showProgressOverlay()
         guard AccountSessionCenter.shared.isSignedIn else {
-            didRequestOverlayPage?(.accessGate)
+            hideProgressOverlay { [weak self] in
+                self?.didRequestOverlayPage?(.accessGate)
+            }
             return
         }
         guard AccountSessionCenter.shared.isActiveAccount(accountKey) == false else {
-            MorviToastView.show("You cannot chat with yourself.", in: self)
+            hideProgressOverlay { [weak self] in
+                guard let self else { return }
+                MorviToastView.show("You cannot chat with yourself.", in: self)
+            }
             return
         }
         guard AccountSessionCenter.shared.hasMutualConnection(with: accountKey) else {
-            MorviToastView.show("You need to follow each other first.", in: self)
+            hideProgressOverlay { [weak self] in
+                guard let self else { return }
+                MorviToastView.show("You need to follow each other first.", in: self)
+            }
             return
         }
         RouteContextStore.setTargetAccountKey(accountKey)
-        if let didRequestSubjectPage {
-            didRequestSubjectPage(.directDialogue, accountKey)
-        } else {
-            didRequestPage?(.directDialogue)
+        hideProgressOverlay { [weak self] in
+            guard let self else { return }
+            if let didRequestSubjectPage {
+                didRequestSubjectPage(.directDialogue, accountKey)
+            } else {
+                didRequestPage?(.directDialogue)
+            }
         }
     }
 
     private func removeOutboundConnectionRosterEntry(accountKey: String) {
+        showProgressOverlay()
         do {
             let didRemove = try AccountSessionCenter.shared.removeOutboundConnectionFromRoster(accountKey: accountKey)
             guard didRemove else {
-                MorviToastView.show("Unable to update following.", in: self)
+                hideProgressOverlay { [weak self] in
+                    guard let self else { return }
+                    MorviToastView.show("Unable to update following.", in: self)
+                }
                 return
             }
-            MorviToastView.show("Removed from following.", in: self)
-            reloadRenderedContent()
+            hideProgressOverlay { [weak self] in
+                guard let self else { return }
+                MorviToastView.show("Removed from following.", in: self)
+                reloadRenderedContent()
+            }
         } catch {
-            MorviToastView.show("Unable to update following.", in: self)
+            hideProgressOverlay { [weak self] in
+                guard let self else { return }
+                MorviToastView.show("Unable to update following.", in: self)
+            }
         }
     }
 
     private func removeRestrictionRosterEntry(accountKey: String) {
+        showProgressOverlay()
         do {
             let didRemove = try AccountSessionCenter.shared.removeRestrictionFromRoster(accountKey: accountKey)
             guard didRemove else {
-                MorviToastView.show("Unable to update blacklist.", in: self)
+                hideProgressOverlay { [weak self] in
+                    guard let self else { return }
+                    MorviToastView.show("Unable to update blacklist.", in: self)
+                }
                 return
             }
-            MorviToastView.show("Removed from blacklist.", in: self)
-            reloadRenderedContent()
+            hideProgressOverlay { [weak self] in
+                guard let self else { return }
+                MorviToastView.show("Removed from blacklist.", in: self)
+                reloadRenderedContent()
+            }
         } catch {
-            MorviToastView.show("Unable to update blacklist.", in: self)
+            hideProgressOverlay { [weak self] in
+                guard let self else { return }
+                MorviToastView.show("Unable to update blacklist.", in: self)
+            }
         }
     }
 
