@@ -4,6 +4,7 @@ final class DialogueFlowCell: UITableViewCell {
     static let reuseIdentifier = "DialogueFlowCell"
     private let revealFeedbackGenerator = UISelectionFeedbackGenerator()
     private var revealTimer: Timer?
+    private var thinkingTimer: Timer?
     private var revealCharacters: [Character] = []
     private var revealIndex = 0
 
@@ -23,12 +24,16 @@ final class DialogueFlowCell: UITableViewCell {
         super.prepareForReuse()
         revealTimer?.invalidate()
         revealTimer = nil
+        thinkingTimer?.invalidate()
+        thinkingTimer = nil
         contentView.subviews.forEach { $0.removeFromSuperview() }
     }
 
     func configure(with entry: DialogueFlowEntry) {
         revealTimer?.invalidate()
         revealTimer = nil
+        thinkingTimer?.invalidate()
+        thinkingTimer = nil
         contentView.subviews.forEach { $0.removeFromSuperview() }
         switch entry {
         case .moment(let title):
@@ -148,7 +153,8 @@ final class DialogueFlowCell: UITableViewCell {
         bubble.translatesAutoresizingMaskIntoConstraints = false
 
         let label = UILabel()
-        label.text = revealsCharacters ? "" : text
+        let isThinking = text == "Thinking..."
+        label.text = revealsCharacters && isThinking == false ? "" : text
         label.numberOfLines = 0
         label.textColor = UIColor(red: 0.17, green: 0.22, blue: 0.18, alpha: 1)
         label.font = AppFont.source(16)
@@ -192,8 +198,25 @@ final class DialogueFlowCell: UITableViewCell {
 
         NSLayoutConstraint.activate(constraints)
         addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
-        if revealsCharacters {
+        if isThinking {
+            beginThinkingAnimation(label: label)
+        } else if revealsCharacters {
             beginCharacterReveal(text: text, label: label)
+        }
+    }
+
+    private func beginThinkingAnimation(label: UILabel) {
+        thinkingTimer?.invalidate()
+        var dotCount = 1
+        label.text = "Thinking."
+        thinkingTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: true) { [weak self, weak label] timer in
+            guard let self, let label else {
+                timer.invalidate()
+                return
+            }
+            dotCount = dotCount == 3 ? 1 : dotCount + 1
+            label.text = "Thinking" + String(repeating: ".", count: dotCount)
+            self.thinkingTimer = timer
         }
     }
 
