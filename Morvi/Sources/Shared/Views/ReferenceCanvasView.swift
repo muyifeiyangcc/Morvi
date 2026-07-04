@@ -5926,7 +5926,7 @@ final class ReferenceCanvasView: UIView {
 
                 titleLabel.centerXAnchor.constraint(equalTo: valueLabel.centerXAnchor),
                 titleLabel.topAnchor.constraint(equalTo: valueLabel.bottomAnchor, constant: 6),
-                titleLabel.heightAnchor.constraint(equalToConstant: 20)
+                titleLabel.heightAnchor.constraint(equalToConstant: 24)
             ])
         }
     }
