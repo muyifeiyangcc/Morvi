@@ -48,6 +48,18 @@ final class AccountSessionCenter {
         return (try? walletRepository.balanceValue(accountKey: accountKey)) ?? 0
     }
 
+    func updateActiveEditableInfo(displayName: String, avatarAsset: String) throws {
+        guard let accountKey = activeAccountKey else {
+            return
+        }
+        try profileRepository.updateEditableInfo(
+            stableKey: accountKey,
+            displayName: displayName,
+            avatarAsset: avatarAsset
+        )
+        notifySessionChange()
+    }
+
     func safetyProfile(accountKey: String) -> SafetyProfileRecord? {
         try? profileRepository.safetyProfile(stableKey: accountKey)
     }

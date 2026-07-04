@@ -1,4 +1,6 @@
 import UIKit
+import Photos
+import PhotosUI
 
 final class RootTabsController: UIViewController {
     private var currentPage: ScenePage
@@ -6,6 +8,7 @@ final class RootTabsController: UIViewController {
     private var canvasView: ReferenceCanvasView?
     private let dockView = FloatingDockView()
     private var surfaceView = DesignSurfaceView()
+    private weak var activeProfileEditOverlayView: ReferenceCanvasView?
 
     init(initialPage: ScenePage = .home) {
         self.currentPage = initialPage
@@ -319,6 +322,17 @@ final class RootTabsController: UIViewController {
         overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
             self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
+        if page == .profileEditor {
+            activeProfileEditOverlayView = overlayView
+            overlayView.didRequestProfileAvatarSelection = { [weak self, weak overlayView] in
+                guard let overlayView else { return }
+                self?.chooseProfileEditAvatar(from: overlayView)
+            }
+            overlayView.didSubmitProfileEdit = { [weak self, weak overlayView] draft in
+                guard let overlayView else { return }
+                self?.submitProfileEdit(draft, overlayView: overlayView)
+            }
+        }
         overlayView.didCompleteSignOut = { [weak self] in
             self?.resetAfterSignOut()
         }
@@ -329,6 +343,127 @@ final class RootTabsController: UIViewController {
 
     private func dismissActiveOverlay() {
         view.viewWithTag(9102)?.removeFromSuperview()
+        activeProfileEditOverlayView = nil
+    }
+
+    private func chooseProfileEditAvatar(from overlayView: ReferenceCanvasView) {
+        view.endEditing(true)
+        overlayView.showBlockingProgress()
+        handleProfilePhotoLibraryStatus(
+            PHPhotoLibrary.authorizationStatus(for: .readWrite),
+            overlayView: overlayView
+        )
+    }
+
+    private func handleProfilePhotoLibraryStatus(
+        _ status: PHAuthorizationStatus,
+        overlayView: ReferenceCanvasView
+    ) {
+        switch status {
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self, weak overlayView] updatedStatus in
+                DispatchQueue.main.async {
+                    guard let overlayView else { return }
+                    self?.handleProfilePhotoLibraryStatus(updatedStatus, overlayView: overlayView)
+                }
+            }
+        case .authorized, .limited:
+            presentProfilePhotoPicker(from: overlayView)
+        default:
+            overlayView.hideBlockingProgress { [weak self] in
+                self?.showProfilePhotoPermissionGuide()
+            }
+        }
+    }
+
+    private func presentProfilePhotoPicker(from overlayView: ReferenceCanvasView) {
+        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        configuration.filter = .images
+        configuration.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        present(picker, animated: true) {
+            overlayView.hideBlockingProgress()
+        }
+    }
+
+    private func showProfilePhotoPermissionGuide() {
+        let alertController = UIAlertController(
+            title: nil,
+            message: "Please allow photo access in Settings.",
+            preferredStyle: .alert
+        )
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alertController.addAction(UIAlertAction(title: "Settings", style: .default) { _ in
+            guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+            UIApplication.shared.open(settingsURL)
+        })
+        present(alertController, animated: true)
+    }
+
+    private func submitProfileEdit(
+        _ draft: ReferenceCanvasView.ProfileEditDraft,
+        overlayView: ReferenceCanvasView
+    ) {
+        let displayName = draft.displayNameText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard displayName.isEmpty == false else {
+            MorviToastView.show("Please enter username.", in: view)
+            return
+        }
+        guard let avatarAsset = draft.avatarAsset,
+              avatarAsset.isEmpty == false,
+              avatarAsset != "default_avatar" else {
+            MorviToastView.show("Please select avatar.", in: view)
+            return
+        }
+
+        overlayView.showBlockingProgress()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = Result {
+                try AccountSessionCenter.shared.updateActiveEditableInfo(
+                    displayName: displayName,
+                    avatarAsset: avatarAsset
+                )
+            }
+            DispatchQueue.main.async { [weak self, weak overlayView] in
+                guard let self,
+                      let overlayView else { return }
+                overlayView.hideBlockingProgress {
+                    switch result {
+                    case .success:
+                        overlayView.removeFromSuperview()
+                        self.activeProfileEditOverlayView = nil
+                        self.renderCurrentPage()
+                        MorviToastView.show("Profile updated.", in: self.view)
+                    case .failure:
+                        MorviToastView.show("Profile update failed.", in: self.view)
+                    }
+                }
+            }
+        }
+    }
+
+    private func storeProfileAvatarImage(_ image: UIImage) throws -> String {
+        guard let imageData = image.jpegData(compressionQuality: 0.88) else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+        let baseDirectory = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let targetDirectory = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("Avatars", isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: targetDirectory,
+            withIntermediateDirectories: true
+        )
+        let fileName = "avatar-\(UUID().uuidString.lowercased()).jpg"
+        let fileURL = targetDirectory.appendingPathComponent(fileName)
+        try imageData.write(to: fileURL, options: .atomic)
+        return "local-avatar/\(fileName)"
     }
 
     @objc private func handleTopLeadingTap() {
@@ -337,6 +472,43 @@ final class RootTabsController: UIViewController {
     @objc private func handleTopTrailingTap() {
         if currentPage == .persona {
             show(.settings)
+        }
+    }
+}
+
+extension RootTabsController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let overlayView = activeProfileEditOverlayView else { return }
+        guard let provider = results.first?.itemProvider,
+              provider.canLoadObject(ofClass: UIImage.self) else {
+            return
+        }
+
+        overlayView.showBlockingProgress()
+        provider.loadObject(ofClass: UIImage.self) { [weak self, weak overlayView] object, _ in
+            guard let self,
+                  let overlayView else { return }
+            let loadedImage = object as? UIImage
+            DispatchQueue.global(qos: .userInitiated).async {
+                let result = Result { () -> (UIImage, String) in
+                    guard let loadedImage else {
+                        throw CocoaError(.fileReadUnknown)
+                    }
+                    let asset = try self.storeProfileAvatarImage(loadedImage)
+                    return (loadedImage, asset)
+                }
+                DispatchQueue.main.async {
+                    overlayView.hideBlockingProgress {
+                        switch result {
+                        case let .success((image, asset)):
+                            overlayView.updateProfileEditorAvatar(image: image, asset: asset)
+                        case .failure:
+                            MorviToastView.show("Avatar upload failed.", in: self.view)
+                        }
+                    }
+                }
+            }
         }
     }
 }

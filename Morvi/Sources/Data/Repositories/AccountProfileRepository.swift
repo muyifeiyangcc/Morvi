@@ -12,6 +12,7 @@ protocol AccountProfileRepository {
     func accountKey(email: String) throws -> String?
     func secretText(email: String) throws -> String?
     func updateSecret(email: String, secretText: String) throws -> Bool
+    func updateEditableInfo(stableKey: String, displayName: String, avatarAsset: String) throws
     func displayName(stableKey: String) throws -> String?
     func avatarAsset(stableKey: String) throws -> String?
     func safetyProfile(stableKey: String) throws -> SafetyProfileRecord?
@@ -139,6 +140,26 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
             ]
         )
         return true
+    }
+
+    func updateEditableInfo(stableKey: String, displayName: String, avatarAsset: String) throws {
+        try store.write(
+            """
+            UPDATE account_profile
+            SET display_name = ?,
+                avatar_asset = ?,
+                cover_asset = ?,
+                updated_at = ?
+            WHERE stable_key = ?;
+            """,
+            bindings: [
+                .text(displayName),
+                .text(avatarAsset),
+                .text(avatarAsset),
+                .text(LocalDateText.now()),
+                .text(stableKey)
+            ]
+        )
     }
 
     func displayName(stableKey: String) throws -> String? {

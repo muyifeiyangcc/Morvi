@@ -36,6 +36,11 @@ final class ReferenceCanvasView: UIView {
         let durationSeconds: TimeInterval?
     }
 
+    struct ProfileEditDraft {
+        let displayNameText: String
+        let avatarAsset: String?
+    }
+
     private static let assistantUnlockCost = 200
     private static let assistantThreadKind = 2
     private static let assistantLocalSpeakerKind = 0
@@ -65,6 +70,8 @@ final class ReferenceCanvasView: UIView {
     var didRequestPrimaryAction: (() -> Void)?
     var didRequestUploadMediaSelection: (() -> Void)?
     var didSubmitUploadWork: ((WorkUploadDraft) -> Void)?
+    var didRequestProfileAvatarSelection: (() -> Void)?
+    var didSubmitProfileEdit: ((ProfileEditDraft) -> Void)?
     var didChooseMood: ((Int) -> Void)?
     var didCompleteSignOut: (() -> Void)?
     var didCompleteAccountRemoval: (() -> Void)?
@@ -81,11 +88,14 @@ final class ReferenceCanvasView: UIView {
     private weak var uploadMediaPreviewImageView: UIImageView?
     private weak var uploadMediaIconView: UIImageView?
     private weak var uploadMediaPlayIconView: UIImageView?
+    private weak var profileEditAvatarImageView: UIImageView?
+    private weak var profileEditNameField: UITextField?
     private var uploadMediaAsset: String?
     private var uploadCoverAsset: String?
     private var uploadMediaSize: CGSize?
     private var uploadMediaKind = 0
     private var uploadDurationSeconds: TimeInterval?
+    private var profileEditAvatarAsset: String?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
     private var dialogueFlowBottomConstraint: NSLayoutConstraint?
@@ -2724,6 +2734,14 @@ final class ReferenceCanvasView: UIView {
         progressOverlayView = nil
     }
 
+    func showBlockingProgress() {
+        showProgressOverlay()
+    }
+
+    func hideBlockingProgress(completion: (() -> Void)? = nil) {
+        hideProgressOverlay(completion: completion)
+    }
+
     private func renderFeelingEditor() {
         backgroundColor = UIColor.black.withAlphaComponent(0.58)
         let sheet = UIView()
@@ -2833,6 +2851,8 @@ final class ReferenceCanvasView: UIView {
 
     private func renderProfileEditor() {
         backgroundColor = UIColor.black.withAlphaComponent(0.58)
+        let currentHeader = AccountSessionCenter.shared.activeHeaderContent()
+        profileEditAvatarAsset = currentHeader?.avatarAsset
 
         let sheet = UIView()
         sheet.backgroundColor = .white
@@ -2872,7 +2892,9 @@ final class ReferenceCanvasView: UIView {
             titleLabel.topAnchor.constraint(equalTo: sheet.topAnchor, constant: 34)
         ])
 
-        let avatarView = UIImageView(image: UIImage(named: "default_avatar"))
+        let avatarView = UIImageView(
+            image: resolveAccountAvatar(currentHeader?.avatarAsset) ?? UIImage(named: "default_avatar")
+        )
         avatarView.backgroundColor = UIColor(white: 0.95, alpha: 1)
         avatarView.contentMode = .scaleAspectFill
         avatarView.clipsToBounds = true
@@ -2900,6 +2922,18 @@ final class ReferenceCanvasView: UIView {
             editMark.heightAnchor.constraint(equalToConstant: 24)
         ])
 
+        let avatarTapArea = UIButton(type: .custom)
+        avatarTapArea.backgroundColor = .clear
+        sheet.addSubview(avatarTapArea)
+        avatarTapArea.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            avatarTapArea.centerXAnchor.constraint(equalTo: avatarView.centerXAnchor),
+            avatarTapArea.centerYAnchor.constraint(equalTo: avatarView.centerYAnchor),
+            avatarTapArea.widthAnchor.constraint(equalToConstant: 112),
+            avatarTapArea.heightAnchor.constraint(equalToConstant: 112)
+        ])
+        avatarTapArea.addTarget(self, action: #selector(handleProfileAvatarTap), for: .touchUpInside)
+
         let nameLabel = UILabel()
         nameLabel.text = "Username:"
         nameLabel.font = AppFont.source(16, weight: .medium)
@@ -2920,6 +2954,7 @@ final class ReferenceCanvasView: UIView {
             fieldBackgroundColor: UIColor(red: 212 / 255, green: 1, blue: 59 / 255, alpha: 0.3),
             usesGradient: false
         )
+        nameInput.text = currentHeader?.displayName
         let uploadButton = addButton(
             "Upload",
             top: nil,
@@ -2933,12 +2968,33 @@ final class ReferenceCanvasView: UIView {
         )
         activeLayoutContainer = nil
 
+        uploadButton.addTarget(self, action: #selector(handleProfileEditUploadTap), for: .touchUpInside)
+        profileEditAvatarImageView = avatarView
+        profileEditNameField = nameInput
         uploadButton.topAnchor.constraint(equalTo: nameInput.bottomAnchor, constant: 32).isActive = true
         keyboardAvoidanceBottomConstraint = sheetBottomConstraint
         keyboardAvoidanceBaseBottomConstant = 0
         keyboardAvoidanceInputView = nameInput
         installKeyboardAvoidance()
         installBlankAreaKeyboardDismissal()
+    }
+
+    func updateProfileEditorAvatar(image: UIImage, asset: String) {
+        profileEditAvatarAsset = asset
+        profileEditAvatarImageView?.image = image
+    }
+
+    @objc private func handleProfileAvatarTap() {
+        didRequestProfileAvatarSelection?()
+    }
+
+    @objc private func handleProfileEditUploadTap() {
+        didSubmitProfileEdit?(
+            ProfileEditDraft(
+                displayNameText: profileEditNameField?.text ?? "",
+                avatarAsset: profileEditAvatarAsset
+            )
+        )
     }
 
     private func renderRepliesPanel() {
@@ -5920,11 +5976,14 @@ final class ReferenceCanvasView: UIView {
         uploadMediaPreviewImageView = nil
         uploadMediaIconView = nil
         uploadMediaPlayIconView = nil
+        profileEditAvatarImageView = nil
+        profileEditNameField = nil
         uploadMediaAsset = nil
         uploadCoverAsset = nil
         uploadMediaSize = nil
         uploadMediaKind = 0
         uploadDurationSeconds = nil
+        profileEditAvatarAsset = nil
         render()
     }
 
