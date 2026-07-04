@@ -2665,21 +2665,21 @@ final class ReferenceCanvasView: UIView {
 
     private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool, showsWordmark: Bool = false) {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
-        let panelTop: CGFloat = portrait ? 245 : 307
-        let titleTop = panelTop + 39
-        let portraitAvatarTop: CGFloat = 286
-        let portraitAvatarLeft: CGFloat = 150
+        let titleTop: CGFloat = 39
+        let portraitAvatarTop: CGFloat = 41
+        let portraitAvatarLeft: CGFloat = 120
         let portraitAvatarSize: CGFloat = 76
         let titleHeight = title == nil ? 0 : AppFont.fredoka(31).lineHeight
         let textTop: CGFloat = portrait
             ? portraitAvatarTop + portraitAvatarSize + restrictPopupNamePillHeight() / 2 + 20
-            : (title == nil ? panelTop + 39 : titleTop + titleHeight + 24)
+            : (title == nil ? 39 : titleTop + titleHeight + 24)
         let textHeight = CGFloat(text.components(separatedBy: "\n").count) * sourceFont(for: text, size: 17, weight: .regular).lineHeight
         let buttonTop: CGFloat = textTop + textHeight + 24
-        let panelHeight: CGFloat = portrait ? 340 : buttonTop + 50 + 36 - panelTop
-        let panel = addPanel(top: panelTop, left: 30, width: 322, height: panelHeight, alpha: 1)
+        let panelHeight: CGFloat = portrait ? 340 : buttonTop + 50 + 36
+        let panel = addCenteredPanel(width: 322, height: panelHeight, alpha: 1)
         panel.backgroundColor = .clear
         panel.layer.borderWidth = 0
+        overlayContentView = panel
         let backgroundImageView = UIImageView(image: popupBackgroundImage())
         backgroundImageView.contentMode = .scaleToFill
         backgroundImageView.clipsToBounds = true
@@ -2694,6 +2694,7 @@ final class ReferenceCanvasView: UIView {
         if showsWordmark {
             addPopupWordmark(to: panel)
         }
+        activeLayoutContainer = panel
         if portrait {
             addRestrictPopupAvatar(top: portraitAvatarTop, left: portraitAvatarLeft, size: portraitAvatarSize)
         }
@@ -2719,6 +2720,7 @@ final class ReferenceCanvasView: UIView {
         } else if page == .exitConfirm {
             confirmButton.addTarget(self, action: #selector(confirmAccountRemoval), for: .touchUpInside)
         }
+        activeLayoutContainer = nil
     }
 
     @objc private func closePopupOverlay() {
@@ -2830,14 +2832,15 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addRestrictPopupAvatar(top: CGFloat, left: CGFloat, size: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let ringInset: CGFloat = 6
         let ringView = UIImageView(image: UIImage(named: "restrict_avatar_ring"))
         ringView.contentMode = .scaleAspectFit
-        addSubview(ringView)
+        layoutContainer.addSubview(ringView)
         ringView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            ringView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left - ringInset),
-            ringView.topAnchor.constraint(equalTo: topAnchor, constant: top - ringInset),
+            ringView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left - ringInset),
+            ringView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top - ringInset),
             ringView.widthAnchor.constraint(equalToConstant: size + ringInset * 2),
             ringView.heightAnchor.constraint(equalToConstant: size + ringInset * 2)
         ])
@@ -2846,17 +2849,18 @@ final class ReferenceCanvasView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = size / 2
         imageView.layer.masksToBounds = true
-        addSubview(imageView)
+        layoutContainer.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            imageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            imageView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            imageView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            imageView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             imageView.widthAnchor.constraint(equalToConstant: size),
             imageView.heightAnchor.constraint(equalToConstant: size)
         ])
     }
 
     private func addRestrictPopupNamePill(_ text: String, avatarTop: CGFloat, avatarLeft: CGFloat, avatarSize: CGFloat) {
+        let layoutContainer = activeLayoutContainer ?? self
         let font = AppFont.source(16, weight: .medium)
         let horizontalPadding: CGFloat = 30
         let topPadding: CGFloat = 0
@@ -2872,11 +2876,11 @@ final class ReferenceCanvasView: UIView {
         shadowView.backgroundColor = UIColor(red: 0.37, green: 0.68, blue: 0.03, alpha: 1)
         shadowView.layer.cornerRadius = height / 2
         shadowView.layer.cornerCurve = .continuous
-        addSubview(shadowView)
+        layoutContainer.addSubview(shadowView)
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            shadowView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            shadowView.topAnchor.constraint(equalTo: topAnchor, constant: top + shadowDrop),
+            shadowView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            shadowView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top + shadowDrop),
             shadowView.widthAnchor.constraint(equalToConstant: width),
             shadowView.heightAnchor.constraint(equalToConstant: height)
         ])
@@ -2885,11 +2889,11 @@ final class ReferenceCanvasView: UIView {
         pillView.layer.cornerRadius = height / 2
         pillView.layer.cornerCurve = .continuous
         pillView.layer.masksToBounds = true
-        addSubview(pillView)
+        layoutContainer.addSubview(pillView)
         pillView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            pillView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: left),
-            pillView.topAnchor.constraint(equalTo: topAnchor, constant: top),
+            pillView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            pillView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
             pillView.widthAnchor.constraint(equalToConstant: width),
             pillView.heightAnchor.constraint(equalToConstant: height)
         ])
@@ -3505,6 +3509,38 @@ final class ReferenceCanvasView: UIView {
 
     private func addPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, alpha: CGFloat, trailing: CGFloat? = nil) -> UIView {
         let layoutContainer = activeLayoutContainer ?? self
+        let panel = makePanel(alpha: alpha)
+        layoutContainer.addSubview(panel)
+        panel.translatesAutoresizingMaskIntoConstraints = false
+        var panelConstraints = [
+            panel.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
+            panel.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            panel.heightAnchor.constraint(equalToConstant: height)
+        ]
+        if let trailing {
+            panelConstraints.append(panel.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing))
+        } else {
+            panelConstraints.append(panel.widthAnchor.constraint(equalToConstant: width))
+        }
+        NSLayoutConstraint.activate(panelConstraints)
+        return panel
+    }
+
+    private func addCenteredPanel(width: CGFloat, height: CGFloat, alpha: CGFloat) -> UIView {
+        let layoutContainer = activeLayoutContainer ?? self
+        let panel = makePanel(alpha: alpha)
+        layoutContainer.addSubview(panel)
+        panel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            panel.centerXAnchor.constraint(equalTo: layoutContainer.centerXAnchor),
+            panel.centerYAnchor.constraint(equalTo: layoutContainer.centerYAnchor),
+            panel.widthAnchor.constraint(equalToConstant: min(width, max(0, adaptiveLayoutWidth - 60))),
+            panel.heightAnchor.constraint(equalToConstant: height)
+        ])
+        return panel
+    }
+
+    private func makePanel(alpha: CGFloat) -> UIView {
         let panel: UIView
         if alpha < 1 {
             let holder = UIView()
@@ -3534,19 +3570,6 @@ final class ReferenceCanvasView: UIView {
         panel.layer.shadowOpacity = 0.12
         panel.layer.shadowOffset = CGSize(width: 0, height: 4)
         panel.layer.shadowRadius = 14
-        layoutContainer.addSubview(panel)
-        panel.translatesAutoresizingMaskIntoConstraints = false
-        var panelConstraints = [
-            panel.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left),
-            panel.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            panel.heightAnchor.constraint(equalToConstant: height)
-        ]
-        if let trailing {
-            panelConstraints.append(panel.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing))
-        } else {
-            panelConstraints.append(panel.widthAnchor.constraint(equalToConstant: width))
-        }
-        NSLayoutConstraint.activate(panelConstraints)
         return panel
     }
 
