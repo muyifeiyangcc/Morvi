@@ -4,6 +4,9 @@ final class DialogueFlowListView: UIView {
     private let tableView = CancelFriendlyTableView(frame: .zero, style: .plain)
     private var entries: [DialogueFlowEntry] = []
     private var consumedRevealIdentifiers: Set<String> = []
+    private var activeAudioIndex: Int?
+    private var audioPlaybackTimer: Timer?
+    var didRequestImagePreview: ((String) -> Void)?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,8 +36,15 @@ final class DialogueFlowListView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        audioPlaybackTimer?.invalidate()
+    }
+
     func configure(entries: [DialogueFlowEntry]) {
         self.entries = entries
+        activeAudioIndex = nil
+        audioPlaybackTimer?.invalidate()
+        audioPlaybackTimer = nil
         tableView.reloadData()
         DispatchQueue.main.async { [weak self] in
             self?.scrollToEnd(animated: false)
@@ -59,8 +69,46 @@ extension DialogueFlowListView: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: DialogueFlowCell.reuseIdentifier, for: indexPath)
-        (cell as? DialogueFlowCell)?.configure(with: preparedEntry(at: indexPath.row))
+        (cell as? DialogueFlowCell)?.configure(
+            with: preparedEntry(at: indexPath.row),
+            isAudioPlaying: activeAudioIndex == indexPath.row
+        )
         return cell
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let entry = entries[indexPath.row]
+        switch entry {
+        case .audioClip(let durationText, _, _):
+            playAudioClip(at: indexPath, durationText: durationText)
+        case .portraitAsset(let name, _, _):
+            didRequestImagePreview?(name)
+        default:
+            break
+        }
+    }
+
+    private func playAudioClip(at indexPath: IndexPath, durationText: String) {
+        audioPlaybackTimer?.invalidate()
+        var rowsToReload = [indexPath]
+        if let activeAudioIndex, activeAudioIndex != indexPath.row {
+            rowsToReload.append(IndexPath(row: activeAudioIndex, section: 0))
+        }
+        activeAudioIndex = indexPath.row
+        tableView.reloadRows(at: rowsToReload, with: .none)
+
+        let duration = playbackDuration(from: durationText)
+        audioPlaybackTimer = Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { [weak self] _ in
+            guard let self, self.activeAudioIndex == indexPath.row else { return }
+            self.activeAudioIndex = nil
+            self.tableView.reloadRows(at: [indexPath], with: .none)
+        }
+    }
+
+    private func playbackDuration(from text: String) -> TimeInterval {
+        let digits = text.filter(\.isNumber)
+        let seconds = TimeInterval(digits).flatMap { $0 > 0 ? $0 : nil } ?? 1
+        return min(max(seconds, 1), 60)
     }
 
     private func preparedEntry(at index: Int) -> DialogueFlowEntry {

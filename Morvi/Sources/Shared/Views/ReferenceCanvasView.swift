@@ -1083,6 +1083,9 @@ final class ReferenceCanvasView: UIView {
             .audioClip(durationText: "5s", side: .local, showsAvatar: true),
             .portraitAsset(name: "profile_avatar", side: .remote, showsAvatar: true)
         ]
+        listView.didRequestImagePreview = { [weak self] assetName in
+            self?.presentDialogueImagePreview(named: assetName)
+        }
         listView.configure(entries: entries ?? defaultEntries)
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
@@ -1104,6 +1107,19 @@ final class ReferenceCanvasView: UIView {
         if bottomAnchor != nil {
             keyboardSyncedDialogueFlowListView = listView
         }
+    }
+
+    private func presentDialogueImagePreview(named assetName: String) {
+        let overlayView = MediaPreviewOverlayView(image: resolveVisualAsset(assetName))
+        let hostView = owningController()?.view ?? self
+        hostView.addSubview(overlayView)
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            overlayView.leadingAnchor.constraint(equalTo: hostView.leadingAnchor),
+            overlayView.trailingAnchor.constraint(equalTo: hostView.trailingAnchor),
+            overlayView.topAnchor.constraint(equalTo: hostView.topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: hostView.bottomAnchor)
+        ])
     }
 
     private func assistantDialogueEntries() -> [DialogueFlowEntry] {

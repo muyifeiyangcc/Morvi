@@ -5,6 +5,7 @@ final class AudioClipBubbleView: UIView {
     private let waveformView = UIView()
     private let durationLabel = UILabel()
     private let pointerSide: ArrowBubbleView.PointerSide
+    private var barViews: [UIView] = []
 
     init(
         durationText: String,
@@ -65,6 +66,7 @@ final class AudioClipBubbleView: UIView {
             barView.backgroundColor = barColor
             barView.layer.cornerRadius = 1
             waveformView.addSubview(barView)
+            barViews.append(barView)
             barView.translatesAutoresizingMaskIntoConstraints = false
 
             var constraints = [
@@ -81,6 +83,22 @@ final class AudioClipBubbleView: UIView {
             previousBar = barView
         }
         previousBar?.trailingAnchor.constraint(equalTo: waveformView.trailingAnchor).isActive = true
+    }
+
+    func setPlaying(_ isPlaying: Bool) {
+        barViews.enumerated().forEach { index, barView in
+            barView.layer.removeAnimation(forKey: "morvi.voice.playing")
+            barView.transform = .identity
+            guard isPlaying else { return }
+            let animation = CABasicAnimation(keyPath: "transform.scale.y")
+            animation.fromValue = 0.45
+            animation.toValue = 1.35
+            animation.duration = 0.32
+            animation.autoreverses = true
+            animation.repeatCount = .infinity
+            animation.beginTime = CACurrentMediaTime() + Double(index) * 0.08
+            barView.layer.add(animation, forKey: "morvi.voice.playing")
+        }
     }
 
     private func bubblePath(in bounds: CGRect) -> UIBezierPath {

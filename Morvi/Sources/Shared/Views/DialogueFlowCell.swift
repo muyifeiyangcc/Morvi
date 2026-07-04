@@ -38,7 +38,7 @@ final class DialogueFlowCell: UITableViewCell {
         contentView.subviews.forEach { $0.removeFromSuperview() }
     }
 
-    func configure(with entry: DialogueFlowEntry) {
+    func configure(with entry: DialogueFlowEntry, isAudioPlaying: Bool = false) {
         revealTimer?.invalidate()
         revealTimer = nil
         thinkingTimer?.invalidate()
@@ -54,7 +54,12 @@ final class DialogueFlowCell: UITableViewCell {
         case .roundedPhrase(let text, let side, let showsAvatar, let revealsCharacters, _):
             configureRoundedPhrase(text: text, side: side, showsAvatar: showsAvatar, revealsCharacters: revealsCharacters)
         case .audioClip(let durationText, let side, let showsAvatar):
-            configureAudioClip(durationText: durationText, side: side, showsAvatar: showsAvatar)
+            configureAudioClip(
+                durationText: durationText,
+                side: side,
+                showsAvatar: showsAvatar,
+                isPlaying: isAudioPlaying
+            )
         case .portraitAsset(let name, let side, let showsAvatar):
             configurePortraitAsset(name: name, side: side, showsAvatar: showsAvatar)
         }
@@ -130,14 +135,14 @@ final class DialogueFlowCell: UITableViewCell {
 
         if side == .local {
             constraints.append(bubble.trailingAnchor.constraint(
-                equalTo: showsAvatar ? localAvatarLeadingAnchor() : contentView.trailingAnchor,
-                constant: showsAvatar ? -LayoutMetric.avatarGap : -LayoutMetric.sideInset
+                equalTo: localAvatarLeadingAnchor(),
+                constant: -LayoutMetric.avatarGap
             ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
         } else {
             constraints.append(bubble.leadingAnchor.constraint(
-                equalTo: showsAvatar ? remoteAvatarTrailingAnchor() : contentView.leadingAnchor,
-                constant: showsAvatar ? LayoutMetric.avatarGap : LayoutMetric.sideInset
+                equalTo: remoteAvatarTrailingAnchor(),
+                constant: LayoutMetric.avatarGap
             ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
         }
@@ -257,7 +262,12 @@ final class DialogueFlowCell: UITableViewCell {
         }
     }
 
-    private func configureAudioClip(durationText: String, side: DialogueFlowSide, showsAvatar: Bool) {
+    private func configureAudioClip(
+        durationText: String,
+        side: DialogueFlowSide,
+        showsAvatar: Bool,
+        isPlaying: Bool
+    ) {
         let bubble = AudioClipBubbleView(
             durationText: durationText,
             pointerSide: side == .local ? .right : .left,
@@ -280,18 +290,19 @@ final class DialogueFlowCell: UITableViewCell {
 
         if side == .local {
             constraints.append(bubble.trailingAnchor.constraint(
-                equalTo: showsAvatar ? localAvatarLeadingAnchor() : contentView.trailingAnchor,
-                constant: showsAvatar ? -LayoutMetric.avatarGap : -LayoutMetric.sideInset
+                equalTo: localAvatarLeadingAnchor(),
+                constant: -LayoutMetric.avatarGap
             ))
         } else {
             constraints.append(bubble.leadingAnchor.constraint(
-                equalTo: showsAvatar ? remoteAvatarTrailingAnchor() : contentView.leadingAnchor,
-                constant: showsAvatar ? LayoutMetric.avatarGap : LayoutMetric.sideInset
+                equalTo: remoteAvatarTrailingAnchor(),
+                constant: LayoutMetric.avatarGap
             ))
         }
 
         NSLayoutConstraint.activate(constraints)
         addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
+        bubble.setPlaying(isPlaying)
     }
 
     private func configurePortraitAsset(name: String, side: DialogueFlowSide, showsAvatar: Bool) {
@@ -315,14 +326,14 @@ final class DialogueFlowCell: UITableViewCell {
 
         if side == .local {
             constraints.append(imageView.trailingAnchor.constraint(
-                equalTo: showsAvatar ? localAvatarLeadingAnchor() : contentView.trailingAnchor,
-                constant: showsAvatar ? -LayoutMetric.avatarGap : -LayoutMetric.sideInset
+                equalTo: localAvatarLeadingAnchor(),
+                constant: -LayoutMetric.avatarGap
             ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: imageView.topAnchor)
         } else {
             constraints.append(imageView.leadingAnchor.constraint(
-                equalTo: showsAvatar ? remoteAvatarTrailingAnchor() : contentView.leadingAnchor,
-                constant: showsAvatar ? LayoutMetric.avatarGap : LayoutMetric.sideInset
+                equalTo: remoteAvatarTrailingAnchor(),
+                constant: LayoutMetric.avatarGap
             ))
             addAvatarIfNeeded(showsAvatar, side: side, topAnchor: imageView.topAnchor)
         }

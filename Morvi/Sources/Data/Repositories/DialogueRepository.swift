@@ -243,10 +243,10 @@ final class SQLiteDialogueRepository: DialogueRepository {
             return bodyText
         }
         if entryKind == 2, let duration {
-            return "\(Int(duration))s"
+            return "[voice] \(Int(duration))s"
         }
         if entryKind == 1 {
-            return "Photo"
+            return "[photo]"
         }
         return "Say something"
     }
