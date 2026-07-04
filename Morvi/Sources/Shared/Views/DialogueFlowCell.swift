@@ -207,16 +207,15 @@ final class DialogueFlowCell: UITableViewCell {
 
     private func beginThinkingAnimation(label: UILabel) {
         thinkingTimer?.invalidate()
-        var dotCount = 1
-        label.text = "Thinking."
-        thinkingTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: true) { [weak self, weak label] timer in
-            guard let self, let label else {
+        var dotCount = 0
+        label.text = "Thinking"
+        thinkingTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: true) { [weak label] timer in
+            guard let label else {
                 timer.invalidate()
                 return
             }
-            dotCount = dotCount == 3 ? 1 : dotCount + 1
+            dotCount = (dotCount + 1) % 4
             label.text = "Thinking" + String(repeating: ".", count: dotCount)
-            self.thinkingTimer = timer
         }
     }
 
