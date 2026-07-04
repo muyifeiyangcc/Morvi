@@ -1404,6 +1404,12 @@ final class ReferenceCanvasView: UIView {
     private func renderWallet() {
         addTopTitle("Wallet")
         let balanceText = "\(AccountSessionCenter.shared.activeWalletBalanceValue())"
+        let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900", "29400", "34500", "63700"]
+        let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99", "$49.99", "$69.99", "$99.99"]
+        let listTop: CGFloat = 188
+        let rowStep: CGFloat = 80
+        let rowHeight: CGFloat = 68
+        let contentHeight = listTop + CGFloat(amounts.count - 1) * rowStep + rowHeight + 40
         let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -1430,16 +1436,14 @@ final class ReferenceCanvasView: UIView {
             scrollContent.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             scrollContent.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             scrollContent.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            scrollContent.heightAnchor.constraint(equalToConstant: 760)
+            scrollContent.heightAnchor.constraint(equalToConstant: contentHeight)
         ])
 
         activeLayoutContainer = scrollContent
         addNotchedPanel(top: 56, left: 20, width: 335, height: 122)
         addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56, amountText: balanceText)
-        let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900"]
-        let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99"]
         for index in amounts.indices {
-            let top = CGFloat(188 + index * 80)
+            let top = listTop + CGFloat(index) * rowStep
             let rowAction: (() -> Void)?
             if index == 0 {
                 rowAction = { [weak self] in self?.didRequestOverlayPage?(.spendConfirm) }
