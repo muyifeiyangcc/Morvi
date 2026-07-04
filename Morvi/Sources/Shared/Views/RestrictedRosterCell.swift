@@ -7,6 +7,8 @@ final class RestrictedRosterCell: UICollectionViewCell {
     private let avatarView = UIImageView()
     private let nameLabel = UILabel()
     private let actionIconView = UIImageView(image: UIImage(named: "restricted_restore_icon"))
+    private let actionButton = UIButton(type: .custom)
+    var didTapAction: (() -> Void)?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,11 +26,14 @@ final class RestrictedRosterCell: UICollectionViewCell {
         super.prepareForReuse()
         avatarView.image = nil
         nameLabel.text = nil
+        didTapAction = nil
+        setActionVisible(false)
     }
 
-    func configure(name: String, avatarAsset: String?) {
+    func configure(name: String, avatarAsset: String?, showsAction: Bool) {
         nameLabel.text = name
         avatarView.image = resolveAvatarImage(avatarAsset) ?? UIImage(named: "default_avatar")
+        setActionVisible(showsAction)
     }
 
     private func configureCell() {
@@ -75,13 +80,33 @@ final class RestrictedRosterCell: UICollectionViewCell {
     private func configureActionIcon() {
         actionIconView.contentMode = .scaleAspectFit
         contentView.addSubview(actionIconView)
+        contentView.addSubview(actionButton)
         actionIconView.translatesAutoresizingMaskIntoConstraints = false
+        actionButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             actionIconView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             actionIconView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             actionIconView.widthAnchor.constraint(equalToConstant: 60),
-            actionIconView.heightAnchor.constraint(equalToConstant: 28)
+            actionIconView.heightAnchor.constraint(equalToConstant: 28),
+
+            actionButton.centerXAnchor.constraint(equalTo: actionIconView.centerXAnchor),
+            actionButton.centerYAnchor.constraint(equalTo: actionIconView.centerYAnchor),
+            actionButton.widthAnchor.constraint(equalToConstant: 72),
+            actionButton.heightAnchor.constraint(equalToConstant: 44)
         ])
+        actionButton.backgroundColor = .clear
+        actionButton.addTarget(self, action: #selector(handleActionTap), for: .touchUpInside)
+        setActionVisible(false)
+    }
+
+    private func setActionVisible(_ isVisible: Bool) {
+        actionIconView.isHidden = !isVisible
+        actionButton.isHidden = !isVisible
+        actionButton.isUserInteractionEnabled = isVisible
+    }
+
+    @objc private func handleActionTap() {
+        didTapAction?()
     }
 
     private func resolveAvatarImage(_ asset: String?) -> UIImage? {

@@ -2631,7 +2631,8 @@ final class ReferenceCanvasView: UIView {
     private func renderRestrictedList() {
         renderRosterList(
             title: "Blacklist",
-            entries: AccountSessionCenter.shared.restrictedRoster()
+            entries: AccountSessionCenter.shared.restrictedRoster(),
+            allowsRestrictionRemoval: true
         )
     }
 
@@ -2650,7 +2651,11 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
-    private func renderRosterList(title: String, entries: [RelationRosterRecord]) {
+    private func renderRosterList(
+        title: String,
+        entries: [RelationRosterRecord],
+        allowsRestrictionRemoval: Bool = false
+    ) {
         addTopTitle(title)
         let listEntries = entries.map {
             RestrictedRosterListView.Entry(
@@ -2663,6 +2668,11 @@ final class ReferenceCanvasView: UIView {
         listView.didSelectEntry = { [weak self] entry in
             self?.requestPublicPersona(subjectKey: entry.accountKey)
         }
+        if allowsRestrictionRemoval {
+            listView.didTapAction = { [weak self] entry in
+                self?.removeRestrictionRosterEntry(accountKey: entry.accountKey)
+            }
+        }
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -2671,6 +2681,20 @@ final class ReferenceCanvasView: UIView {
             listView.topAnchor.constraint(equalTo: topAnchor, constant: 120),
             listView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    private func removeRestrictionRosterEntry(accountKey: String) {
+        do {
+            let didRemove = try AccountSessionCenter.shared.removeRestrictionFromRoster(accountKey: accountKey)
+            guard didRemove else {
+                MorviToastView.show("Unable to update blacklist.", in: self)
+                return
+            }
+            MorviToastView.show("Removed from blacklist.", in: self)
+            reloadRenderedContent()
+        } catch {
+            MorviToastView.show("Unable to update blacklist.", in: self)
+        }
     }
 
     private func renderAgreement() {

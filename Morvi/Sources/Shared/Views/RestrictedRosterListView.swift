@@ -9,6 +9,7 @@ final class RestrictedRosterListView: UIView {
 
     private let entries: [Entry]
     var didSelectEntry: ((Entry) -> Void)?
+    var didTapAction: ((Entry) -> Void)?
 
     private let collectionView: UICollectionView
 
@@ -61,7 +62,10 @@ extension RestrictedRosterListView: UICollectionViewDataSource, UICollectionView
             return UICollectionViewCell()
         }
         let entry = entries[indexPath.item]
-        cell.configure(name: entry.name, avatarAsset: entry.avatarAsset)
+        cell.configure(name: entry.name, avatarAsset: entry.avatarAsset, showsAction: didTapAction != nil)
+        cell.didTapAction = { [weak self] in
+            self?.didTapAction?(entry)
+        }
         return cell
     }
 

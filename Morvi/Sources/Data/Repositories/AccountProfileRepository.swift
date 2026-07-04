@@ -23,6 +23,7 @@ protocol AccountProfileRepository {
     func avatarAsset(stableKey: String) throws -> String?
     func safetyProfile(stableKey: String) throws -> SafetyProfileRecord?
     func addRestriction(originKey: String, subjectKey: String) throws
+    func removeRestriction(originKey: String, subjectKey: String) throws
     func addSafetyNotice(originKey: String, subjectKey: String, reasonCode: Int, detailText: String?) throws
     func hasSafetyBarrier(originKey: String, subjectKey: String) throws -> Bool
     func connect(originKey: String, subjectKey: String) throws
@@ -220,6 +221,17 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
                 .text(subjectKey),
                 .text(LocalDateText.now())
             ]
+        )
+    }
+
+    func removeRestriction(originKey: String, subjectKey: String) throws {
+        try store.write(
+            """
+            DELETE FROM restricted_relation
+            WHERE owner_account_key = ?
+                AND target_account_key = ?;
+            """,
+            bindings: [.text(originKey), .text(subjectKey)]
         )
     }
 

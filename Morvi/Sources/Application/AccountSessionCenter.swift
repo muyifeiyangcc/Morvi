@@ -127,6 +127,16 @@ final class AccountSessionCenter {
         return (try? profileRepository.inboundConnectionRoster(targetKey: activeKey)) ?? []
     }
 
+    func removeRestrictionFromRoster(accountKey: String) throws -> Bool {
+        guard let activeKey = activeAccountKey,
+              activeKey != accountKey else {
+            return false
+        }
+        try profileRepository.removeRestriction(originKey: activeKey, subjectKey: accountKey)
+        notifySessionChange()
+        return true
+    }
+
     func toggleConnectionToAccount(accountKey: String) throws -> Bool? {
         guard let activeKey = activeAccountKey,
               activeKey != accountKey else {
