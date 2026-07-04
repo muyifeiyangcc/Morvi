@@ -5,6 +5,13 @@ import CoreImage.CIFilterBuiltins
 
 final class ReferenceCanvasView: UIView {
     private static let assistantUnlockCost = 200
+    private static let assistantThreadKind = 2
+    private static let assistantLocalSpeakerKind = 0
+    private static let assistantRemoteSpeakerKind = 1
+    private static let assistantTextEntryKind = 0
+    private static let assistantCompleteState = 0
+    private static let assistantPendingState = 1
+    private static let assistantThinkingText = "Thinking..."
     private static var agreementConsentAccepted = true
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
     private static let ciContext = CIContext(options: nil)
@@ -37,8 +44,10 @@ final class ReferenceCanvasView: UIView {
     private var keyboardBaseContentOffset: CGPoint?
     private var keyboardIsVisible = false
     private let replyListDataSource = ReplyListDataSource()
+    private let dialogueRepository = SQLiteDialogueRepository()
     private weak var agreementConsentIconView: UIImageView?
     private weak var progressOverlayView: MorviProgressOverlayView?
+    private weak var assistantInputField: UITextField?
     private weak var voiceDurationLabel: UILabel?
     private weak var activeVoiceRippleView: VoiceRippleView?
     private weak var activeVoiceIconView: UIView?
@@ -48,6 +57,7 @@ final class ReferenceCanvasView: UIView {
     private var personaBackdropBaseHeight: CGFloat = 0
     private var personaBackdropHeightConstraint: NSLayoutConstraint?
     private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
+    private var animatedAssistantEntryKeys: Set<String> = []
 
     init(page: ScenePage, selectedMoodIndex: Int = 0) {
         self.page = page
@@ -470,7 +480,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addDialogueInputDock(showsAccessoryButtons: Bool = true) -> UIView {
+    private func addDialogueInputDock(showsAccessoryButtons: Bool = true, onSubmit: (() -> Void)? = nil) -> UIView {
         let dockView = UIView()
         dockView.backgroundColor = .clear
         addSubview(dockView)
@@ -500,7 +510,13 @@ final class ReferenceCanvasView: UIView {
             bottom: 0,
             text: "Say something",
             trailing: "➤",
-            in: dockView
+            in: dockView,
+            textFieldHandler: { [weak self] textField in
+                guard showsAccessoryButtons == false else { return }
+                self?.assistantInputField = textField
+                textField.addTarget(self, action: #selector(ReferenceCanvasView.submitAssistantText), for: .editingDidEndOnExit)
+            },
+            actionHandler: onSubmit
         )
         if showsAccessoryButtons {
             NSLayoutConstraint.activate([
@@ -789,13 +805,138 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func assistantDialogueEntries() -> [DialogueFlowEntry] {
-        [
+        let records = storedAssistantEntries()
+        let hasRemoteRecord = records.contains { $0.speakerKind == Self.assistantRemoteSpeakerKind }
+        var entries: [DialogueFlowEntry] = [
             .wideAsset(
                 name: "assistant_intro_card_background",
                 title: "Hello!\nHow can I help you?",
-                revealsCharacters: true
+                revealsCharacters: hasRemoteRecord == false,
+                revealIdentifier: "assistant-intro"
             )
         ]
+        entries.append(contentsOf: records.compactMap { record in
+            guard let text = record.bodyText, text.isEmpty == false else { return nil }
+            let isRemote = record.speakerKind == Self.assistantRemoteSpeakerKind
+            let shouldReveal = isRemote && animatedAssistantEntryKeys.remove(record.stableKey) != nil
+            return .roundedPhrase(
+                text: text,
+                side: isRemote ? .remote : .local,
+                showsAvatar: false,
+                revealsCharacters: shouldReveal,
+                revealIdentifier: record.stableKey
+            )
+        })
+        return entries
+    }
+
+    private func storedAssistantEntries() -> [DialogueEntryRecord] {
+        guard let threadKey = activeAssistantThreadKey else { return [] }
+        return (try? dialogueRepository.entries(threadKey: threadKey)) ?? []
+    }
+
+    private var activeAssistantThreadKey: String? {
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey else { return nil }
+        return "assistant-\(accountKey)"
+    }
+
+    private func reloadAssistantDialogueList() {
+        dialogueFlowListView?.configure(entries: assistantDialogueEntries())
+    }
+
+    @objc private func submitAssistantText() {
+        let text = assistantInputField?.text?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard text.isEmpty == false else { return }
+        guard let accountKey = AccountSessionCenter.shared.activeAccountKey else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+
+        assistantInputField?.text = nil
+        do {
+            try storeAssistantExchange(text: text, accountKey: accountKey)
+            reloadAssistantDialogueList()
+        } catch {
+            MorviToastView.show("Send failed", in: self)
+        }
+    }
+
+    private func storeAssistantExchange(text: String, accountKey: String) throws {
+        let now = LocalDateText.now()
+        let threadKey = "assistant-\(accountKey)"
+        try dialogueRepository.saveThread(
+            DialogueThreadRecord(
+                stableKey: threadKey,
+                threadKind: Self.assistantThreadKind,
+                counterpartAccountKey: nil,
+                title: "Recot Bot",
+                avatarAsset: nil,
+                latestEntryKey: nil,
+                latestEntryAt: now,
+                lastReadAt: nil,
+                isArchived: false,
+                createdAt: now,
+                updatedAt: now
+            )
+        )
+        try dialogueRepository.removePendingAssistantEntries(threadKey: threadKey)
+
+        var sequenceNumber = try dialogueRepository.nextSequenceNumber(threadKey: threadKey)
+        let localKey = "assistant-local-\(UUID().uuidString.lowercased())"
+        try dialogueRepository.saveEntry(
+            DialogueEntryRecord(
+                stableKey: localKey,
+                threadKey: threadKey,
+                authorAccountKey: accountKey,
+                speakerKind: Self.assistantLocalSpeakerKind,
+                entryKind: Self.assistantTextEntryKind,
+                bodyText: text,
+                mediaAsset: nil,
+                mediaWidth: nil,
+                mediaHeight: nil,
+                audioDuration: nil,
+                sequenceNumber: sequenceNumber,
+                deliveryState: Self.assistantCompleteState,
+                createdAt: now
+            )
+        )
+        sequenceNumber += 1
+
+        let pendingKey = "assistant-thinking-\(UUID().uuidString.lowercased())"
+        try dialogueRepository.saveEntry(
+            DialogueEntryRecord(
+                stableKey: pendingKey,
+                threadKey: threadKey,
+                authorAccountKey: nil,
+                speakerKind: Self.assistantRemoteSpeakerKind,
+                entryKind: Self.assistantTextEntryKind,
+                bodyText: Self.assistantThinkingText,
+                mediaAsset: nil,
+                mediaWidth: nil,
+                mediaHeight: nil,
+                audioDuration: nil,
+                sequenceNumber: sequenceNumber,
+                deliveryState: Self.assistantPendingState,
+                createdAt: now
+            )
+        )
+        try dialogueRepository.saveThread(
+            DialogueThreadRecord(
+                stableKey: threadKey,
+                threadKind: Self.assistantThreadKind,
+                counterpartAccountKey: nil,
+                title: "Recot Bot",
+                avatarAsset: nil,
+                latestEntryKey: pendingKey,
+                latestEntryAt: now,
+                lastReadAt: nil,
+                isArchived: false,
+                createdAt: now,
+                updatedAt: now
+            )
+        )
+        animatedAssistantEntryKeys = [pendingKey]
     }
 
     private func addInputToolbarIcons(top: CGFloat) {
@@ -866,7 +1007,9 @@ final class ReferenceCanvasView: UIView {
 
     private func renderAssistantDialogue() {
         addTopTitle("Recot Bot")
-        let dockView = addDialogueInputDock(showsAccessoryButtons: false)
+        let dockView = addDialogueInputDock(showsAccessoryButtons: false) { [weak self] in
+            self?.submitAssistantText()
+        }
         addDialogueFlowList(
             top: 136,
             bottomAnchor: dockView.topAnchor,
@@ -2314,11 +2457,12 @@ final class ReferenceCanvasView: UIView {
             text: "Say something",
             trailing: "",
             usesDashedBorder: true,
-            in: self
-        ) { [weak self] bottomConstraint in
-            self?.keyboardAvoidanceBottomConstraint = bottomConstraint
-            self?.keyboardAvoidanceBaseBottomConstant = -29
-        }
+            in: self,
+            bottomConstraintHandler: { [weak self] bottomConstraint in
+                self?.keyboardAvoidanceBottomConstraint = bottomConstraint
+                self?.keyboardAvoidanceBaseBottomConstant = -29
+            }
+        )
         let voiceButton = UIButton(type: .custom)
         voiceButton.setImage(UIImage(named: "input_voice_icon"), for: .normal)
         voiceButton.imageView?.contentMode = .scaleAspectFit
@@ -3597,9 +3741,25 @@ final class ReferenceCanvasView: UIView {
     }
 
     @discardableResult
-    private func addInputBar(top: CGFloat, text: String, trailing: String, usesDashedBorder: Bool = false) -> UIView {
+    private func addInputBar(
+        top: CGFloat,
+        text: String,
+        trailing: String,
+        usesDashedBorder: Bool = false,
+        textFieldHandler: ((UITextField) -> Void)? = nil,
+        actionHandler: (() -> Void)? = nil
+    ) -> UIView {
         let layoutContainer = activeLayoutContainer ?? self
-        return addInputBar(top: top, bottom: nil, text: text, trailing: trailing, usesDashedBorder: usesDashedBorder, in: layoutContainer)
+        return addInputBar(
+            top: top,
+            bottom: nil,
+            text: text,
+            trailing: trailing,
+            usesDashedBorder: usesDashedBorder,
+            in: layoutContainer,
+            textFieldHandler: textFieldHandler,
+            actionHandler: actionHandler
+        )
     }
 
     private func addInputBar(
@@ -3608,6 +3768,8 @@ final class ReferenceCanvasView: UIView {
         trailing: String,
         usesDashedBorder: Bool = false,
         in layoutContainer: UIView,
+        textFieldHandler: ((UITextField) -> Void)? = nil,
+        actionHandler: (() -> Void)? = nil,
         bottomConstraintHandler: ((NSLayoutConstraint) -> Void)? = nil
     ) -> UIView {
         addInputBar(
@@ -3617,6 +3779,8 @@ final class ReferenceCanvasView: UIView {
             trailing: trailing,
             usesDashedBorder: usesDashedBorder,
             in: layoutContainer,
+            textFieldHandler: textFieldHandler,
+            actionHandler: actionHandler,
             bottomConstraintHandler: bottomConstraintHandler
         )
     }
@@ -3628,6 +3792,8 @@ final class ReferenceCanvasView: UIView {
         trailing: String,
         usesDashedBorder: Bool,
         in layoutContainer: UIView,
+        textFieldHandler: ((UITextField) -> Void)? = nil,
+        actionHandler: (() -> Void)? = nil,
         bottomConstraintHandler: ((NSLayoutConstraint) -> Void)? = nil
     ) -> UIView {
         let bar: UIView
@@ -3694,6 +3860,7 @@ final class ReferenceCanvasView: UIView {
         prompt.backgroundColor = .clear
         prompt.borderStyle = .none
         prompt.returnKeyType = .send
+        textFieldHandler?(prompt)
         inputSurface.addSubview(prompt)
         prompt.translatesAutoresizingMaskIntoConstraints = false
         let usesSendIcon = trailing.isEmpty || trailing == "➤"
@@ -3711,6 +3878,17 @@ final class ReferenceCanvasView: UIView {
         }
         inputSurface.addSubview(action)
         action.translatesAutoresizingMaskIntoConstraints = false
+        if let actionHandler {
+            let button = ClearTapButton(frame: .zero, action: actionHandler)
+            inputSurface.addSubview(button)
+            button.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                button.leadingAnchor.constraint(equalTo: action.leadingAnchor, constant: -12),
+                button.trailingAnchor.constraint(equalTo: inputSurface.trailingAnchor),
+                button.topAnchor.constraint(equalTo: inputSurface.topAnchor),
+                button.bottomAnchor.constraint(equalTo: inputSurface.bottomAnchor)
+            ])
+        }
         NSLayoutConstraint.activate([
             prompt.leadingAnchor.constraint(equalTo: inputSurface.leadingAnchor, constant: 16),
             prompt.trailingAnchor.constraint(equalTo: action.leadingAnchor, constant: -12),

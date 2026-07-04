@@ -3,6 +3,9 @@ import Foundation
 protocol DialogueRepository {
     func saveThread(_ record: DialogueThreadRecord) throws
     func saveEntry(_ record: DialogueEntryRecord) throws
+    func entries(threadKey: String) throws -> [DialogueEntryRecord]
+    func nextSequenceNumber(threadKey: String) throws -> Int
+    func removePendingAssistantEntries(threadKey: String) throws
     func threadCount() throws -> Int
     func entryCount() throws -> Int
 }
@@ -82,11 +85,109 @@ final class SQLiteDialogueRepository: DialogueRepository {
         )
     }
 
+    func entries(threadKey: String) throws -> [DialogueEntryRecord] {
+        let rows = try store.readRows(
+            """
+            SELECT stable_key, thread_key, author_account_key, speaker_kind, entry_kind,
+                body_text, media_asset, media_width, media_height, audio_duration,
+                sequence_number, delivery_state, created_at
+            FROM dialogue_entry
+            WHERE thread_key = ?
+                AND removed_at IS NULL
+            ORDER BY sequence_number ASC, id ASC;
+            """,
+            bindings: [.text(threadKey)]
+        )
+        return rows.compactMap { row in
+            guard row.count == 13 else { return nil }
+            return DialogueEntryRecord(
+                stableKey: textValue(row[0]) ?? "",
+                threadKey: textValue(row[1]) ?? "",
+                authorAccountKey: textValue(row[2]),
+                speakerKind: intValue(row[3]),
+                entryKind: intValue(row[4]),
+                bodyText: textValue(row[5]),
+                mediaAsset: textValue(row[6]),
+                mediaWidth: doubleValue(row[7]),
+                mediaHeight: doubleValue(row[8]),
+                audioDuration: doubleValue(row[9]),
+                sequenceNumber: intValue(row[10]),
+                deliveryState: intValue(row[11]),
+                createdAt: textValue(row[12]) ?? ""
+            )
+        }
+    }
+
+    func nextSequenceNumber(threadKey: String) throws -> Int {
+        try store.readInt(
+            """
+            SELECT IFNULL(MAX(sequence_number), 0) + 1
+            FROM dialogue_entry
+            WHERE thread_key = ?
+                AND removed_at IS NULL;
+            """,
+            bindings: [.text(threadKey)]
+        )
+    }
+
+    func removePendingAssistantEntries(threadKey: String) throws {
+        try store.write(
+            """
+            UPDATE dialogue_entry
+            SET removed_at = datetime('now')
+            WHERE thread_key = ?
+                AND speaker_kind = 1
+                AND delivery_state = 1
+                AND removed_at IS NULL;
+            """,
+            bindings: [.text(threadKey)]
+        )
+    }
+
     func threadCount() throws -> Int {
         try store.readInt("SELECT COUNT(*) FROM dialogue_thread;")
     }
 
     func entryCount() throws -> Int {
         try store.readInt("SELECT COUNT(*) FROM dialogue_entry;")
+    }
+
+    private func textValue(_ value: LocalStoreValue) -> String? {
+        switch value {
+        case .text(let text):
+            return text
+        case .int(let number):
+            return "\(number)"
+        case .double(let number):
+            return "\(number)"
+        case .null:
+            return nil
+        }
+    }
+
+    private func intValue(_ value: LocalStoreValue) -> Int {
+        switch value {
+        case .int(let number):
+            return number
+        case .double(let number):
+            return Int(number)
+        case .text(let text):
+            return Int(text) ?? 0
+        case .null:
+            return 0
+        }
+    }
+
+    private func doubleValue(_ value: LocalStoreValue) -> Double? {
+        switch value {
+        case .double(let number):
+            return number
+        case .int(let number):
+            return Double(number)
+        case .text(let text):
+            return Double(text)
+        case .null:
+            return nil
+        }
     }
 }

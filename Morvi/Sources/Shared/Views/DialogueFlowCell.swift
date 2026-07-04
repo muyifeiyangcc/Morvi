@@ -2,6 +2,10 @@ import UIKit
 
 final class DialogueFlowCell: UITableViewCell {
     static let reuseIdentifier = "DialogueFlowCell"
+    private let revealFeedbackGenerator = UISelectionFeedbackGenerator()
+    private var revealTimer: Timer?
+    private var revealCharacters: [Character] = []
+    private var revealIndex = 0
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -17,20 +21,24 @@ final class DialogueFlowCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        revealTimer?.invalidate()
+        revealTimer = nil
         contentView.subviews.forEach { $0.removeFromSuperview() }
     }
 
     func configure(with entry: DialogueFlowEntry) {
+        revealTimer?.invalidate()
+        revealTimer = nil
         contentView.subviews.forEach { $0.removeFromSuperview() }
         switch entry {
         case .moment(let title):
             configureMoment(title)
-        case .wideAsset(let name, let title, let revealsCharacters):
+        case .wideAsset(let name, let title, let revealsCharacters, _):
             configureWideAsset(name: name, title: title, revealsCharacters: revealsCharacters)
         case .phrase(let text, let side, let showsAvatar):
             configurePhrase(text: text, side: side, showsAvatar: showsAvatar)
-        case .roundedPhrase(let text, let side, let showsAvatar):
-            configureRoundedPhrase(text: text, side: side, showsAvatar: showsAvatar)
+        case .roundedPhrase(let text, let side, let showsAvatar, let revealsCharacters, _):
+            configureRoundedPhrase(text: text, side: side, showsAvatar: showsAvatar, revealsCharacters: revealsCharacters)
         case .audioClip(let durationText, let side, let showsAvatar):
             configureAudioClip(durationText: durationText, side: side, showsAvatar: showsAvatar)
         case .portraitAsset(let name, let side, let showsAvatar):
@@ -117,7 +125,12 @@ final class DialogueFlowCell: UITableViewCell {
         NSLayoutConstraint.activate(constraints)
     }
 
-    private func configureRoundedPhrase(text: String, side: DialogueFlowSide, showsAvatar: Bool) {
+    private func configureRoundedPhrase(
+        text: String,
+        side: DialogueFlowSide,
+        showsAvatar: Bool,
+        revealsCharacters: Bool
+    ) {
         let bubble = UIView()
         bubble.backgroundColor = side == .local
             ? UIColor(red: 0.92, green: 1, blue: 0.78, alpha: 1)
@@ -135,12 +148,21 @@ final class DialogueFlowCell: UITableViewCell {
         bubble.translatesAutoresizingMaskIntoConstraints = false
 
         let label = UILabel()
-        label.text = text
+        label.text = revealsCharacters ? "" : text
         label.numberOfLines = 0
         label.textColor = UIColor(red: 0.17, green: 0.22, blue: 0.18, alpha: 1)
         label.font = AppFont.source(16)
         bubble.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
+
+        let sizingLabel = UILabel()
+        sizingLabel.text = text
+        sizingLabel.numberOfLines = 0
+        sizingLabel.textColor = label.textColor
+        sizingLabel.font = label.font
+        sizingLabel.alpha = 0
+        bubble.addSubview(sizingLabel)
+        sizingLabel.translatesAutoresizingMaskIntoConstraints = false
 
         var constraints = [
             bubble.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
@@ -149,7 +171,11 @@ final class DialogueFlowCell: UITableViewCell {
             label.leadingAnchor.constraint(equalTo: bubble.leadingAnchor, constant: 14),
             label.trailingAnchor.constraint(equalTo: bubble.trailingAnchor, constant: -14),
             label.topAnchor.constraint(equalTo: bubble.topAnchor, constant: 10),
-            label.bottomAnchor.constraint(equalTo: bubble.bottomAnchor, constant: -10)
+            label.bottomAnchor.constraint(equalTo: bubble.bottomAnchor, constant: -10),
+            sizingLabel.leadingAnchor.constraint(equalTo: label.leadingAnchor),
+            sizingLabel.trailingAnchor.constraint(equalTo: label.trailingAnchor),
+            sizingLabel.topAnchor.constraint(equalTo: label.topAnchor),
+            sizingLabel.bottomAnchor.constraint(equalTo: label.bottomAnchor)
         ]
 
         if side == .local {
@@ -166,6 +192,32 @@ final class DialogueFlowCell: UITableViewCell {
 
         NSLayoutConstraint.activate(constraints)
         addAvatarIfNeeded(showsAvatar, side: side, topAnchor: bubble.topAnchor)
+        if revealsCharacters {
+            beginCharacterReveal(text: text, label: label)
+        }
+    }
+
+    private func beginCharacterReveal(text: String, label: UILabel) {
+        revealTimer?.invalidate()
+        revealCharacters = Array(text)
+        revealIndex = 0
+        label.text = ""
+        revealFeedbackGenerator.prepare()
+        revealTimer = Timer.scheduledTimer(withTimeInterval: 0.045, repeats: true) { [weak self, weak label] timer in
+            guard let self, let label else {
+                timer.invalidate()
+                return
+            }
+            if self.revealIndex >= self.revealCharacters.count {
+                timer.invalidate()
+                self.revealTimer = nil
+                return
+            }
+            self.revealIndex += 1
+            label.text = String(self.revealCharacters.prefix(self.revealIndex))
+            self.revealFeedbackGenerator.selectionChanged()
+            self.revealFeedbackGenerator.prepare()
+        }
     }
 
     private func configureAudioClip(durationText: String, side: DialogueFlowSide, showsAvatar: Bool) {
