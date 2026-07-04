@@ -189,7 +189,7 @@ final class ReferenceCanvasView: UIView {
 
     private func renderHome() {
         let headerContent = AccountSessionCenter.shared.activeHeaderContent()
-        let displayName = headerContent?.displayName ?? "Log in"
+        let displayName = headerContent?.displayName ?? "Please log in first"
         let avatarImage = resolveAccountAvatar(headerContent?.avatarAsset)
             ?? UIImage(named: "default_avatar")
         let greetingText = headerContent == nil
