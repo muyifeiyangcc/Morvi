@@ -1324,27 +1324,46 @@ final class ReferenceCanvasView: UIView {
 
     private func resolvedMediaURL(for asset: String?) -> URL? {
         guard let asset, asset.isEmpty == false else { return nil }
-        if asset.hasPrefix("local-work/") {
-            let prefix = "local-work/"
-            let fileName = String(asset.dropFirst(prefix.count))
-            guard fileName.isEmpty == false,
-                  let baseDirectory = try? FileManager.default.url(
-                    for: .applicationSupportDirectory,
-                    in: .userDomainMask,
-                    appropriateFor: nil,
-                    create: false
-                  ) else {
-                return nil
-            }
-            return baseDirectory
-                .appendingPathComponent("Morvi", isDirectory: true)
-                .appendingPathComponent("WorkMedia", isDirectory: true)
-                .appendingPathComponent(fileName)
+        let localPrefixes = ["local-work-video/", "local-work/"]
+        for prefix in localPrefixes where asset.hasPrefix(prefix) {
+            guard let localURL = localWorkMediaURL(
+                fileName: String(asset.dropFirst(prefix.count))
+            ) else { return nil }
+            return localURL
+        }
+        if asset.hasPrefix("file://"),
+           let fileURL = URL(string: asset),
+           FileManager.default.fileExists(atPath: fileURL.path) {
+            return fileURL
         }
         let url = URL(fileURLWithPath: asset)
+        if url.isFileURL,
+           FileManager.default.fileExists(atPath: url.path) {
+            return url
+        }
         let resourceName = url.deletingPathExtension().lastPathComponent
         let fileExtension = url.pathExtension.isEmpty ? "mp4" : url.pathExtension
         return Bundle.main.url(forResource: resourceName, withExtension: fileExtension)
+    }
+
+    private func localWorkMediaURL(fileName: String) -> URL? {
+        guard fileName.isEmpty == false,
+              let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+              ) else {
+            return nil
+        }
+        let fileURL = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("WorkMedia", isDirectory: true)
+            .appendingPathComponent(fileName)
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            return nil
+        }
+        return fileURL
     }
 
     private func addFullscreenGalleryCover(item: DiscoveryWorkEntry) {
