@@ -52,10 +52,10 @@ final class LocalSeedLoader {
         for (index, title) in themes.enumerated() {
             try store.write(
                 """
-                INSERT OR IGNORE INTO theme_catalog (title, sort_order)
-                VALUES (?, ?);
+                INSERT OR IGNORE INTO theme_catalog (id, title, sort_order)
+                VALUES (?, ?, ?);
                 """,
-                bindings: [.text(title), .int(index)]
+                bindings: [.int(1000 + index), .text(title), .int(index)]
             )
         }
     }
@@ -285,13 +285,13 @@ final class LocalSeedLoader {
 
     private func seedWorkThemes() throws {
         let links: [(String, [Int])] = [
-            ("work-local-victoria", [1, 5]),
-            ("work-local-sophia", [1]),
-            ("work-local-chloe", [5]),
-            ("work-local-amelia", [5]),
-            ("work-local-rowan", [4, 5]),
-            ("work-local-jasper", [1]),
-            ("work-local-liam", [5])
+            ("work-local-victoria", [1000, 1004]),
+            ("work-local-sophia", [1000]),
+            ("work-local-chloe", [1004]),
+            ("work-local-amelia", [1004]),
+            ("work-local-rowan", [1003, 1004]),
+            ("work-local-jasper", [1000]),
+            ("work-local-liam", [1004])
         ]
         for (workKey, themeIds) in links {
             for themeId in themeIds {

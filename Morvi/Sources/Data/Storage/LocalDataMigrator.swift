@@ -28,6 +28,11 @@ final class LocalDataMigrator {
         if version < 4 {
             try createLocalIdentitySchema()
             try store.execute("PRAGMA user_version = 4;")
+            version = 4
+        }
+        if version < 5 {
+            try enforceIdentifierFloors()
+            try store.execute("PRAGMA user_version = 5;")
         }
     }
 
@@ -45,6 +50,56 @@ final class LocalDataMigrator {
 
     private func createLocalIdentitySchema() throws {
         try store.execute(Self.localIdentitySchema)
+    }
+
+    private func enforceIdentifierFloors() throws {
+        let standardTables = [
+            "local_session",
+            "account_relation",
+            "creative_work",
+            "theme_catalog",
+            "work_reaction",
+            "work_reply",
+            "mood_entry",
+            "restricted_relation",
+            "report_record",
+            "credit_activity",
+            "agreement_acceptance",
+            "dialogue_thread",
+            "dialogue_entry",
+            "permission_copy"
+        ]
+
+        try store.transaction {
+            try store.write("UPDATE account_profile SET id = id + 9999;", bindings: [])
+            try store.write("UPDATE work_theme_link SET theme_id = theme_id + 999;", bindings: [])
+            for table in standardTables {
+                try store.write("UPDATE \(table) SET id = id + 999;", bindings: [])
+            }
+
+            try setSequenceFloor(for: "account_profile", minimum: 9999)
+            for table in standardTables {
+                try setSequenceFloor(for: table, minimum: 999)
+            }
+        }
+    }
+
+    private func setSequenceFloor(for table: String, minimum: Int) throws {
+        let maximumID = try store.readInt("SELECT COALESCE(MAX(id), 0) FROM \(table);")
+        let sequence = max(minimum, maximumID)
+        try store.write(
+            "UPDATE sqlite_sequence SET seq = ? WHERE name = ?;",
+            bindings: [.int(sequence), .text(table)]
+        )
+        guard try store.readInt(
+            "SELECT COUNT(*) FROM sqlite_sequence WHERE name = '\(table)';"
+        ) == 0 else {
+            return
+        }
+        try store.write(
+            "INSERT INTO sqlite_sequence (name, seq) VALUES (?, ?);",
+            bindings: [.text(table), .int(sequence)]
+        )
     }
 }
 
