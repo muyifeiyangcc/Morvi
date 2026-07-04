@@ -31,6 +31,8 @@ The data layer is initialized from `AppDelegate` through `LocalDataStack.prepare
 - `agreement_acceptance`: EULA and privacy acceptance state.
 - `dialogue_thread`: ordinary dialogue and AI dialogue list rows.
 - `dialogue_entry`: text, image, audio, and AI intro entries.
+- `permission_copy`: system permission copy from the built-in information sheet.
+- `local_seed_state`: seed batch markers.
 
 ## Notes
 
@@ -38,4 +40,6 @@ The data layer is initialized from `AppDelegate` through `LocalDataStack.prepare
 - Timeline display text is computed in UI code, not stored in SQLite.
 - Dialogue avatar grouping is computed from side, account key, and timeline grouping.
 - Media assets are referenced by asset names and dimension metadata so waterfall layouts can calculate cell height.
+- Built-in profile images are stored in `Assets.xcassets` with `builtin_avatar_*` names.
+- Built-in video files are stored in `Morvi/Media` with `builtin_*.mp4` names and copied into the app bundle.
 - The current setup uses the system SQLite C library to avoid network dependency. The repository protocols keep the page layer insulated if this is later replaced by a higher-level SQLite wrapper.

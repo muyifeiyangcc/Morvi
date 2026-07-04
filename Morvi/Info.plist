@@ -25,6 +25,12 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Morvi needs camera access to shoot photos and videos for sharing or profile updates.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Morvi needs microphone access to send voice messages in chats and record video audio.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Morvi needs album access to let you choose photos and videos to share or set as avatars.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SourceHanSansSC-ExtraLight.otf</string>

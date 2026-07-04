@@ -9,15 +9,24 @@ final class LocalDataMigrator {
 
     func run() throws {
         try store.prepare()
-        let version = try store.readInt("PRAGMA user_version;")
+        var version = try store.readInt("PRAGMA user_version;")
         if version < 1 {
             try createInitialSchema()
             try store.execute("PRAGMA user_version = 1;")
+            version = 1
+        }
+        if version < 2 {
+            try createBuiltInContentSchema()
+            try store.execute("PRAGMA user_version = 2;")
         }
     }
 
     private func createInitialSchema() throws {
         try store.execute(Self.initialSchema)
+    }
+
+    private func createBuiltInContentSchema() throws {
+        try store.execute(Self.builtInContentSchema)
     }
 }
 
@@ -198,5 +207,22 @@ private extension LocalDataMigrator {
     CREATE INDEX IF NOT EXISTS idx_mood_entry_account ON mood_entry(account_key, recorded_at);
     CREATE INDEX IF NOT EXISTS idx_dialogue_thread_latest ON dialogue_thread(latest_entry_at);
     CREATE INDEX IF NOT EXISTS idx_dialogue_entry_thread ON dialogue_entry(thread_key, sequence_number);
+    """
+
+    static let builtInContentSchema = """
+    CREATE TABLE IF NOT EXISTS permission_copy (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        stable_key TEXT NOT NULL UNIQUE,
+        permission_kind INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        body_text TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS local_seed_state (
+        stable_key TEXT PRIMARY KEY,
+        created_at TEXT NOT NULL
+    );
     """
 }
