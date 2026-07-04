@@ -68,16 +68,7 @@ enum RouteFactory {
         case .uploadFilled:
             return ReferencePageController(page: .uploadFilled)
         case .directDialogue:
-            return ReferencePageController(page: .directDialogue) { scene in
-                [
-                    HitArea(frame: CGRect(x: 294, y: 60, width: 70, height: 70)) {
-                        scene.showOverlay(
-                            .restrictPanel,
-                            restrictionSubjectKey: RouteContextStore.currentTargetAccountKey() ?? "acct-local-victoria"
-                        )
-                    }
-                ]
-            }
+            return ReferencePageController(page: .directDialogue)
         case .assistantDialogue:
             return ReferencePageController(page: .assistantDialogue)
         case .wallet:
