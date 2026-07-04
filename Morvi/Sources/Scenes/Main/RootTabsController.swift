@@ -182,10 +182,20 @@ final class RootTabsController: UIViewController {
     }
 
     private func show(_ page: ScenePage) {
+        if AccountSessionCenter.shared.requiresSignedInGate(for: page),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showOverlay(.accessGate)
+            return
+        }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
     private func showOverlay(_ page: ScenePage) {
+        if AccountSessionCenter.shared.requiresSignedInGate(for: page),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showOverlay(.accessGate)
+            return
+        }
         let overlayView = ReferenceCanvasView(page: page, selectedMoodIndex: selectedMoodIndex)
         overlayView.tag = 9102
         view.viewWithTag(9102)?.removeFromSuperview()

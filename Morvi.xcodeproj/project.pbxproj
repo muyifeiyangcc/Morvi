@@ -56,6 +56,7 @@
 		100000000000000000000147 /* RestrictedRosterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000060 /* RestrictedRosterListView.swift */; };
 		100000000000000000000148 /* CancelFriendlyTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000061 /* CancelFriendlyTableView.swift */; };
 		100000000000000000000149 /* CancelFriendlyCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000062 /* CancelFriendlyCollectionView.swift */; };
+		100000000000000000000150 /* AccountSessionCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000063 /* AccountSessionCenter.swift */; };
 		100000000000000000000201 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000021 /* Assets.xcassets */; };
 		100000000000000000000202 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* LaunchScreen.storyboard */; };
 		100000000000000000000203 /* SourceHanSansSC-ExtraLight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000030 /* SourceHanSansSC-ExtraLight.otf */; };
@@ -88,6 +89,8 @@
 		300000000000000000000119 /* LocalSeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000019 /* LocalSeedLoader.swift */; };
 		300000000000000000000120 /* PermissionCopyRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000020 /* PermissionCopyRecord.swift */; };
 		300000000000000000000121 /* PermissionCopyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000021 /* PermissionCopyRepository.swift */; };
+		300000000000000000000122 /* AccountSessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000022 /* AccountSessionRecord.swift */; };
+		300000000000000000000123 /* AccountSessionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000023 /* AccountSessionRepository.swift */; };
 		400000000000000000000201 /* builtin_victoria.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000001 /* builtin_victoria.mp4 */; };
 		400000000000000000000202 /* builtin_sophia.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000002 /* builtin_sophia.mp4 */; };
 		400000000000000000000203 /* builtin_chloe.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000003 /* builtin_chloe.mp4 */; };
@@ -152,6 +155,7 @@
 		100000000000000000000050 /* NotchedPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchedPanelView.swift; sourceTree = "<group>"; };
 		100000000000000000000051 /* FadeUnderlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadeUnderlineView.swift; sourceTree = "<group>"; };
 		100000000000000000000052 /* IntroCopyPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroCopyPanelView.swift; sourceTree = "<group>"; };
+		100000000000000000000063 /* AccountSessionCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionCenter.swift; sourceTree = "<group>"; };
 		100000000000000000000030 /* SourceHanSansSC-ExtraLight.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-ExtraLight.otf"; sourceTree = "<group>"; };
 		100000000000000000000031 /* SourceHanSansSC-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-Light.otf"; sourceTree = "<group>"; };
 		100000000000000000000032 /* SourceHanSansSC-Normal.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-Normal.otf"; sourceTree = "<group>"; };
@@ -181,6 +185,8 @@
 		300000000000000000000019 /* LocalSeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSeedLoader.swift; sourceTree = "<group>"; };
 		300000000000000000000020 /* PermissionCopyRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionCopyRecord.swift; sourceTree = "<group>"; };
 		300000000000000000000021 /* PermissionCopyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionCopyRepository.swift; sourceTree = "<group>"; };
+		300000000000000000000022 /* AccountSessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionRecord.swift; sourceTree = "<group>"; };
+		300000000000000000000023 /* AccountSessionRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionRepository.swift; sourceTree = "<group>"; };
 		400000000000000000000001 /* builtin_victoria.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_victoria.mp4; sourceTree = "<group>"; };
 		400000000000000000000002 /* builtin_sophia.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_sophia.mp4; sourceTree = "<group>"; };
 		400000000000000000000003 /* builtin_chloe.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_chloe.mp4; sourceTree = "<group>"; };
@@ -240,6 +246,7 @@
 			children = (
 				100000000000000000000001 /* AppDelegate.swift */,
 				100000000000000000000002 /* SceneDelegate.swift */,
+				100000000000000000000063 /* AccountSessionCenter.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -411,6 +418,7 @@
 			isa = PBXGroup;
 			children = (
 				300000000000000000000007 /* AccountProfileRecord.swift */,
+				300000000000000000000022 /* AccountSessionRecord.swift */,
 				300000000000000000000008 /* CreativeWorkRecord.swift */,
 				300000000000000000000009 /* MoodEntryRecord.swift */,
 				300000000000000000000010 /* DialogueThreadRecord.swift */,
@@ -426,6 +434,7 @@
 			isa = PBXGroup;
 			children = (
 				300000000000000000000014 /* AccountProfileRepository.swift */,
+				300000000000000000000023 /* AccountSessionRepository.swift */,
 				300000000000000000000015 /* CreativeWorkRepository.swift */,
 				300000000000000000000016 /* MoodEntryRepository.swift */,
 				300000000000000000000017 /* DialogueRepository.swift */,
@@ -600,6 +609,7 @@
 				100000000000000000000147 /* RestrictedRosterListView.swift in Sources */,
 				100000000000000000000148 /* CancelFriendlyTableView.swift in Sources */,
 				100000000000000000000149 /* CancelFriendlyCollectionView.swift in Sources */,
+				100000000000000000000150 /* AccountSessionCenter.swift in Sources */,
 				300000000000000000000101 /* LocalStoreError.swift in Sources */,
 				300000000000000000000102 /* LocalStore.swift in Sources */,
 				300000000000000000000103 /* LocalStoreValue.swift in Sources */,
@@ -607,6 +617,7 @@
 				300000000000000000000105 /* LocalDataStack.swift in Sources */,
 				300000000000000000000106 /* LocalDateText.swift in Sources */,
 				300000000000000000000107 /* AccountProfileRecord.swift in Sources */,
+				300000000000000000000122 /* AccountSessionRecord.swift in Sources */,
 				300000000000000000000108 /* CreativeWorkRecord.swift in Sources */,
 				300000000000000000000109 /* MoodEntryRecord.swift in Sources */,
 				300000000000000000000110 /* DialogueThreadRecord.swift in Sources */,
@@ -614,6 +625,7 @@
 				300000000000000000000112 /* WalletRecord.swift in Sources */,
 				300000000000000000000113 /* LocalCatalogRecord.swift in Sources */,
 				300000000000000000000114 /* AccountProfileRepository.swift in Sources */,
+				300000000000000000000123 /* AccountSessionRepository.swift in Sources */,
 				300000000000000000000115 /* CreativeWorkRepository.swift in Sources */,
 				300000000000000000000116 /* MoodEntryRepository.swift in Sources */,
 				300000000000000000000117 /* DialogueRepository.swift in Sources */,

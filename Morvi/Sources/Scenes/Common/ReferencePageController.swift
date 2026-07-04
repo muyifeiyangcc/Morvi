@@ -34,10 +34,20 @@ class ReferencePageController: BaseSceneController {
     }
 
     func push(_ page: ScenePage) {
+        if AccountSessionCenter.shared.requiresSignedInGate(for: page),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showOverlay(.accessGate)
+            return
+        }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
     func showOverlay(_ page: ScenePage) {
+        if AccountSessionCenter.shared.requiresSignedInGate(for: page),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showOverlay(.accessGate)
+            return
+        }
         let overlayView = ReferenceCanvasView(page: page)
         overlayView.tag = 9102
         view.viewWithTag(9102)?.removeFromSuperview()
@@ -65,6 +75,7 @@ class ReferencePageController: BaseSceneController {
     }
 
     func enterMainFlow() {
+        AccountSessionCenter.shared.activateLocalAccount()
         if navigationController?.presentingViewController != nil {
             navigationController?.dismiss(animated: true)
             return

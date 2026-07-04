@@ -2440,6 +2440,8 @@ final class ReferenceCanvasView: UIView {
             confirmButton.addTarget(self, action: #selector(showCreditShortagePopup), for: .touchUpInside)
         } else if page == .creditShortage {
             confirmButton.addTarget(self, action: #selector(openWalletFromPopup), for: .touchUpInside)
+        } else if page == .signOutConfirm {
+            confirmButton.addTarget(self, action: #selector(confirmSignOut), for: .touchUpInside)
         }
     }
 
@@ -2464,6 +2466,11 @@ final class ReferenceCanvasView: UIView {
         let controller = owningController()
         removeFromSuperview()
         controller?.navigationController?.pushViewController(RouteFactory.controller(for: .wallet), animated: true)
+    }
+
+    @objc private func confirmSignOut() {
+        AccountSessionCenter.shared.clearActiveSession()
+        removeFromSuperview()
     }
 
     private func owningController() -> UIViewController? {

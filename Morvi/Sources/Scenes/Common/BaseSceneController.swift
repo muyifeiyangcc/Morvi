@@ -22,6 +22,11 @@ class BaseSceneController: UIViewController {
         view.backgroundColor = .white
         let canvasView = ReferenceCanvasView(page: page)
         canvasView.didRequestPage = { [weak self] targetPage in
+            if AccountSessionCenter.shared.requiresSignedInGate(for: targetPage),
+               AccountSessionCenter.shared.isSignedIn == false {
+                self?.showCanvasOverlay(.accessGate)
+                return
+            }
             self?.navigationController?.pushViewController(RouteFactory.controller(for: targetPage), animated: true)
         }
         canvasView.didRequestOverlayPage = { [weak self] targetPage in
@@ -204,6 +209,11 @@ class BaseSceneController: UIViewController {
     }
 
     private func showCanvasOverlay(_ page: ScenePage) {
+        if AccountSessionCenter.shared.requiresSignedInGate(for: page),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showCanvasOverlay(.accessGate)
+            return
+        }
         let overlayView = ReferenceCanvasView(page: page)
         overlayView.tag = 9102
         view.viewWithTag(9102)?.removeFromSuperview()
