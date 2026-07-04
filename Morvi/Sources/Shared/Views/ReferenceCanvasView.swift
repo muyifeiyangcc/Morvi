@@ -2108,6 +2108,13 @@ final class ReferenceCanvasView: UIView {
             didRequestOverlayPage?(.accessGate)
             return
         }
+        guard AccountSessionCenter.shared.usesGuestAccess == false else {
+            MorviToastView.show(
+                "Please choose another login method to make a purchase.",
+                in: self
+            )
+            return
+        }
 
         showProgressOverlay()
         Task { [weak self] in

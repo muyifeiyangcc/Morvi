@@ -32,6 +32,10 @@ final class AccountSessionCenter {
         try? repository.activeAccountKey()
     }
 
+    var usesGuestAccess: Bool {
+        (try? repository.activeAccessKind()) == 1
+    }
+
     func activeHeaderContent() -> (displayName: String, avatarAsset: String?)? {
         guard let accountKey = activeAccountKey,
               let displayName = try? profileRepository.displayName(stableKey: accountKey) else {

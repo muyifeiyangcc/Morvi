@@ -3,6 +3,7 @@ import Foundation
 protocol AccountSessionRepository {
     func hasActiveSession() throws -> Bool
     func activeAccountKey() throws -> String?
+    func activeAccessKind() throws -> Int?
     func activate(_ record: AccountSessionRecord) throws
     func clearActiveSession() throws
 }
@@ -29,6 +30,19 @@ final class SQLiteAccountSessionRepository: AccountSessionRepository {
         try store.readText(
             """
             SELECT account_key
+            FROM local_session
+            WHERE is_active = 1
+                AND (expires_at IS NULL OR expires_at > datetime('now'))
+            ORDER BY id DESC
+            LIMIT 1;
+            """
+        )
+    }
+
+    func activeAccessKind() throws -> Int? {
+        try store.readInt(
+            """
+            SELECT access_kind
             FROM local_session
             WHERE is_active = 1
                 AND (expires_at IS NULL OR expires_at > datetime('now'))
