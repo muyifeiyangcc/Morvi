@@ -40,6 +40,9 @@ final class RestrictedRosterListView: UIView {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(RestrictedRosterCell.self, forCellWithReuseIdentifier: RestrictedRosterCell.reuseIdentifier)
+        if entries.isEmpty {
+            collectionView.backgroundView = EmptyStateView()
+        }
         addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([

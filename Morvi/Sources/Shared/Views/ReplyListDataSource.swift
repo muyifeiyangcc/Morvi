@@ -6,6 +6,7 @@ final class ReplyListDataSource: NSObject, UITableViewDataSource, UITableViewDel
 
     func apply(_ items: [ReplyListItem], to tableView: UITableView) {
         self.items = items
+        tableView.backgroundView = items.isEmpty ? EmptyStateView() : nil
         tableView.reloadData()
     }
 

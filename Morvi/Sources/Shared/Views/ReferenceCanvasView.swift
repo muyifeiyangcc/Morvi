@@ -617,6 +617,9 @@ final class ReferenceCanvasView: UIView {
                 shadowOpacity: 0
             )
         }
+        if workEntries.isEmpty {
+            addPersonaEmptyState(top: cellTop, in: scrollContent)
+        }
         addPersonaMediaContainerSelection(to: scrollContent)
         activeLayoutContainer = nil
     }
@@ -637,11 +640,19 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func resolvedPersonaWorks(accountKey: String) -> [DiscoveryWorkEntry] {
-        if let items = try? creativeRepository.works(ownerAccountKey: accountKey, limit: 30),
-           items.isEmpty == false {
-            return items
-        }
-        return [fallbackWorkEntry()]
+        (try? creativeRepository.works(ownerAccountKey: accountKey, limit: 30)) ?? []
+    }
+
+    private func addPersonaEmptyState(top: CGFloat, in container: UIView) {
+        let emptyStateView = EmptyStateView()
+        container.addSubview(emptyStateView)
+        emptyStateView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            emptyStateView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 20),
+            emptyStateView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -20),
+            emptyStateView.topAnchor.constraint(equalTo: container.topAnchor, constant: top),
+            emptyStateView.heightAnchor.constraint(equalToConstant: 250)
+        ])
     }
 
     private func proportionalCellHeight(for item: DiscoveryWorkEntry, width: CGFloat) -> CGFloat {
@@ -1564,6 +1575,9 @@ final class ReferenceCanvasView: UIView {
                 playIconSize: 28,
                 shadowOpacity: 0
             )
+        }
+        if workEntries.isEmpty {
+            addPersonaEmptyState(top: cellTop, in: scrollContent)
         }
         addPersonaMediaContainerSelection(to: scrollContent)
         activeLayoutContainer = nil
