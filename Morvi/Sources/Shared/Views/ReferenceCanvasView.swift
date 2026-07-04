@@ -2,6 +2,26 @@ import UIKit
 import WebKit
 import CoreImage
 import CoreImage.CIFilterBuiltins
+import AVFoundation
+
+private final class PlayerLayerHostView: UIView {
+    private let playerLayer: AVPlayerLayer
+
+    init(playerLayer: AVPlayerLayer) {
+        self.playerLayer = playerLayer
+        super.init(frame: .zero)
+        layer.addSublayer(playerLayer)
+    }
+
+    required init?(coder: NSCoder) {
+        nil
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerLayer.frame = bounds
+    }
+}
 
 final class ReferenceCanvasView: UIView {
     struct WorkUploadDraft {
@@ -191,6 +211,8 @@ final class ReferenceCanvasView: UIView {
             renderAssistantDialogue()
         case .galleryDetail:
             renderGalleryDetail()
+        case .galleryPreview:
+            renderGalleryPreview()
         case .publicPersona:
             renderPersonaDetail()
         case .personalDetail:
@@ -422,6 +444,7 @@ final class ReferenceCanvasView: UIView {
                     title: "Moments Matter",
                     bodyText: "Capturing today's happiness. Saving it for tomorrow's memories.",
                     mediaKind: 1,
+                    mediaAsset: "builtin_victoria.mp4",
                     coverAsset: "discover_feed_cover",
                     mediaWidth: nil,
                     mediaHeight: nil,
@@ -1208,6 +1231,68 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
+    private func renderGalleryPreview() {
+        backgroundColor = .black
+        let item = resolvedGalleryWork()
+        let imageView = UIImageView(image: resolveVisualAsset(item.coverAsset))
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.backgroundColor = .black
+        addSubview(imageView)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            imageView.topAnchor.constraint(equalTo: topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        guard item.mediaKind == 1,
+              let mediaURL = resolvedMediaURL(for: item.mediaAsset) else {
+            return
+        }
+
+        let player = AVPlayer(url: mediaURL)
+        let playerLayer = AVPlayerLayer(player: player)
+        playerLayer.videoGravity = .resizeAspect
+        let hostView = PlayerLayerHostView(playerLayer: playerLayer)
+        hostView.backgroundColor = .clear
+        addSubview(hostView)
+        hostView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hostView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            hostView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            hostView.topAnchor.constraint(equalTo: topAnchor),
+            hostView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        player.play()
+    }
+
+    private func resolvedMediaURL(for asset: String?) -> URL? {
+        guard let asset, asset.isEmpty == false else { return nil }
+        if asset.hasPrefix("local-work/") {
+            let prefix = "local-work/"
+            let fileName = String(asset.dropFirst(prefix.count))
+            guard fileName.isEmpty == false,
+                  let baseDirectory = try? FileManager.default.url(
+                    for: .applicationSupportDirectory,
+                    in: .userDomainMask,
+                    appropriateFor: nil,
+                    create: false
+                  ) else {
+                return nil
+            }
+            return baseDirectory
+                .appendingPathComponent("Morvi", isDirectory: true)
+                .appendingPathComponent("WorkMedia", isDirectory: true)
+                .appendingPathComponent(fileName)
+        }
+        let url = URL(fileURLWithPath: asset)
+        let resourceName = url.deletingPathExtension().lastPathComponent
+        let fileExtension = url.pathExtension.isEmpty ? "mp4" : url.pathExtension
+        return Bundle.main.url(forResource: resourceName, withExtension: fileExtension)
+    }
+
     private func addFullscreenGalleryCover(item: DiscoveryWorkEntry) {
         let coverImage = resolveVisualAsset(item.coverAsset)
         let coverContainer = UIView()
@@ -1245,6 +1330,20 @@ final class ReferenceCanvasView: UIView {
                 iconView.heightAnchor.constraint(equalToConstant: 40)
             ])
         }
+
+        let button = ClearTapButton(frame: .zero) { [weak self] in
+            RouteContextStore.setTargetWorkKey(item.stableKey)
+            RouteContextStore.setTargetAccountKey(item.accountKey)
+            self?.didRequestPage?(.galleryPreview)
+        }
+        coverContainer.addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            button.leadingAnchor.constraint(equalTo: coverContainer.leadingAnchor),
+            button.trailingAnchor.constraint(equalTo: coverContainer.trailingAnchor),
+            button.topAnchor.constraint(equalTo: coverContainer.topAnchor),
+            button.bottomAnchor.constraint(equalTo: coverContainer.bottomAnchor)
+        ])
     }
 
     private func renderPersonaDetail() {
@@ -5009,6 +5108,7 @@ final class ReferenceCanvasView: UIView {
             title: "Moments Matter",
             bodyText: "Capturing today's happiness. Saving it for tomorrow's memories.",
             mediaKind: 1,
+            mediaAsset: "builtin_victoria.mp4",
             coverAsset: "discover_feed_cover",
             mediaWidth: nil,
             mediaHeight: nil,

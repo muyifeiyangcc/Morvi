@@ -10,6 +10,7 @@ enum ScenePage: String, CaseIterable {
     case publicPersona = "他人主页"
     case creditShortage = "余额不足"
     case galleryDetail = "作品"
+    case galleryPreview = "作品预览"
     case accessGate = "去登陆"
     case feelingEditor = "发布今日感受"
     case discover = "发现"

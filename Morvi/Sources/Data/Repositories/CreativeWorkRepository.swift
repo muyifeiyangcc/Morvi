@@ -15,6 +15,7 @@ struct DiscoveryWorkEntry {
     let title: String
     let bodyText: String
     let mediaKind: Int
+    let mediaAsset: String?
     let coverAsset: String
     let mediaWidth: Double?
     let mediaHeight: Double?
@@ -172,6 +173,7 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 w.title,
                 COALESCE(w.body_text, ''),
                 w.media_kind,
+                w.media_asset,
                 COALESCE(w.cover_asset, 'discover_feed_cover'),
                 w.media_width,
                 w.media_height,
@@ -197,14 +199,14 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
         )
 
         return try rows.compactMap { row in
-            guard row.count >= 13,
+            guard row.count >= 14,
                   let stableKey = row[0].textValue,
                   let accountKey = row[1].textValue,
                   let displayName = row[2].textValue,
                   let avatarAsset = row[3].textValue,
                   let title = row[5].textValue,
                   let bodyText = row[6].textValue,
-                  let coverAsset = row[8].textValue else {
+                  let coverAsset = row[9].textValue else {
                 return nil
             }
             let themes = try themesForWork(stableKey: stableKey)
@@ -217,12 +219,13 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 title: title,
                 bodyText: bodyText,
                 mediaKind: row[7].intValue,
+                mediaAsset: row[8].textValue,
                 coverAsset: coverAsset,
-                mediaWidth: row[9].doubleValue,
-                mediaHeight: row[10].doubleValue,
+                mediaWidth: row[10].doubleValue,
+                mediaHeight: row[11].doubleValue,
                 themes: themes,
-                reactionCount: max(row[11].intValue, 666),
-                replyCount: max(row[12].intValue, 777)
+                reactionCount: max(row[12].intValue, 666),
+                replyCount: max(row[13].intValue, 777)
             )
         }
     }
@@ -353,6 +356,7 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 w.title,
                 COALESCE(w.body_text, ''),
                 w.media_kind,
+                w.media_asset,
                 COALESCE(w.cover_asset, 'discover_feed_cover'),
                 w.media_width,
                 w.media_height,
@@ -377,14 +381,14 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
         )
 
         return try rows.compactMap { row in
-            guard row.count >= 13,
+            guard row.count >= 14,
                   let stableKey = row[0].textValue,
                   let accountKey = row[1].textValue,
                   let displayName = row[2].textValue,
                   let avatarAsset = row[3].textValue,
                   let title = row[5].textValue,
                   let bodyText = row[6].textValue,
-                  let coverAsset = row[8].textValue else {
+                  let coverAsset = row[9].textValue else {
                 return nil
             }
             return DiscoveryWorkEntry(
@@ -396,12 +400,13 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 title: title,
                 bodyText: bodyText,
                 mediaKind: row[7].intValue,
+                mediaAsset: row[8].textValue,
                 coverAsset: coverAsset,
-                mediaWidth: row[9].doubleValue,
-                mediaHeight: row[10].doubleValue,
+                mediaWidth: row[10].doubleValue,
+                mediaHeight: row[11].doubleValue,
                 themes: try themesForWork(stableKey: stableKey),
-                reactionCount: max(row[11].intValue, 666),
-                replyCount: max(row[12].intValue, 777)
+                reactionCount: max(row[12].intValue, 666),
+                replyCount: max(row[13].intValue, 777)
             )
         }
     }
