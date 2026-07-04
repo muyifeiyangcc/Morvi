@@ -1404,8 +1404,9 @@ final class ReferenceCanvasView: UIView {
     private func renderWallet() {
         addTopTitle("Wallet")
         let balanceText = "\(AccountSessionCenter.shared.activeWalletBalanceValue())"
-        let amounts = ["400", "800", "1780", "2450", "5150", "10800", "14900", "29400", "34500", "63700"]
+        let amounts = [400, 800, 1780, 2450, 5150, 10800, 14900, 29400, 34500, 63700]
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99", "$49.99", "$69.99", "$99.99"]
+        let bundlePrefix = Bundle.main.bundleIdentifier ?? "com.morvi.app"
         let listTop: CGFloat = 188
         let rowStep: CGFloat = 80
         let rowHeight: CGFloat = 68
@@ -1444,10 +1445,57 @@ final class ReferenceCanvasView: UIView {
         addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56, amountText: balanceText)
         for index in amounts.indices {
             let top = listTop + CGFloat(index) * rowStep
-            addWalletListRow(parent: scrollContent, top: top, amount: amounts[index], price: prices[index])
+            let pack = CreditPack(
+                value: amounts[index],
+                storeIdentifier: "\(bundlePrefix).credit.\(amounts[index])"
+            )
+            addWalletListRow(parent: scrollContent, top: top, amount: "\(amounts[index])", price: prices[index]) { [weak self] in
+                self?.startCreditAcquisition(pack)
+            }
         }
         addGem(assetName: "balance_gem_mark", top: -4, left: 144, width: 180, height: 182)
         activeLayoutContainer = nil
+    }
+
+    private func startCreditAcquisition(_ pack: CreditPack) {
+        guard AccountSessionCenter.shared.isSignedIn else {
+            didRequestOverlayPage?(.accessGate)
+            return
+        }
+
+        showProgressOverlay()
+        Task { [weak self] in
+            let outcome = await StorefrontCreditBroker.shared.acquire(pack)
+            await MainActor.run {
+                self?.hideProgressOverlay {
+                    self?.resolveCreditAcquisition(outcome)
+                }
+            }
+        }
+    }
+
+    private func resolveCreditAcquisition(_ outcome: CreditAcquisitionOutcome) {
+        switch outcome {
+        case .completed(let value):
+            do {
+                guard try AccountSessionCenter.shared.addActiveWalletBalanceValue(amount: value) else {
+                    MorviToastView.show("Please log in first", in: self)
+                    return
+                }
+                render()
+                MorviToastView.show("Purchase successful", in: self)
+            } catch {
+                MorviToastView.show("Purchase failed", in: self)
+            }
+        case .cancelled:
+            MorviToastView.show("Purchase canceled", in: self)
+        case .pending:
+            MorviToastView.show("Purchase pending", in: self)
+        case .unavailable:
+            MorviToastView.show("Purchase unavailable", in: self)
+        case .failed:
+            MorviToastView.show("Purchase failed", in: self)
+        }
     }
 
     private func addNotchedPanel(top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat) {

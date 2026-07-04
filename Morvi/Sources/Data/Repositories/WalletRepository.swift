@@ -3,6 +3,7 @@ import Foundation
 protocol WalletRepository {
     func save(_ record: WalletRecord) throws
     func balanceValue(accountKey: String) throws -> Int
+    func addBalanceValue(accountKey: String, amount: Int) throws
     func consumeBalanceValue(accountKey: String, amount: Int) throws -> Bool
 }
 
@@ -35,6 +36,27 @@ final class SQLiteWalletRepository: WalletRepository {
             "SELECT balance_value FROM credit_account WHERE account_key = ? LIMIT 1;",
             bindings: [.text(accountKey)]
         )
+    }
+
+    func addBalanceValue(accountKey: String, amount: Int) throws {
+        try store.transaction {
+            let currentValue = try balanceValue(accountKey: accountKey)
+            try store.write(
+                """
+                INSERT INTO credit_account (account_key, balance_value, updated_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(account_key) DO UPDATE SET
+                    balance_value = ?,
+                    updated_at = excluded.updated_at;
+                """,
+                bindings: [
+                    .text(accountKey),
+                    .int(currentValue + amount),
+                    .text(LocalDateText.now()),
+                    .int(currentValue + amount)
+                ]
+            )
+        }
     }
 
     func consumeBalanceValue(accountKey: String, amount: Int) throws -> Bool {
