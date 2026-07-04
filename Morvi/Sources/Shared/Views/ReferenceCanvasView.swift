@@ -55,6 +55,7 @@ final class ReferenceCanvasView: UIView {
     private weak var uploadThemeFlowView: UploadThemeFlowView?
     private weak var uploadMediaPreviewImageView: UIImageView?
     private weak var uploadMediaIconView: UIImageView?
+    private weak var uploadMediaPlayIconView: UIImageView?
     private var uploadMediaAsset: String?
     private var uploadCoverAsset: String?
     private var uploadMediaSize: CGSize?
@@ -4172,6 +4173,19 @@ final class ReferenceCanvasView: UIView {
         ])
         uploadMediaPreviewImageView = previewView
 
+        let playIcon = UIImageView(image: UIImage(named: "persona_media_play_icon"))
+        playIcon.contentMode = .scaleAspectFit
+        playIcon.isHidden = true
+        box.addSubview(playIcon)
+        playIcon.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            playIcon.centerXAnchor.constraint(equalTo: box.centerXAnchor),
+            playIcon.centerYAnchor.constraint(equalTo: box.centerYAnchor),
+            playIcon.widthAnchor.constraint(equalToConstant: 28),
+            playIcon.heightAnchor.constraint(equalToConstant: 28)
+        ])
+        uploadMediaPlayIconView = playIcon
+
         let icon = UIImageView(image: UIImage(named: "upload_media_icon"))
         icon.contentMode = .scaleAspectFit
         box.addSubview(icon)
@@ -5266,6 +5280,7 @@ final class ReferenceCanvasView: UIView {
         uploadMediaPreviewImageView?.image = previewImage
         uploadMediaPreviewImageView?.isHidden = false
         uploadMediaIconView?.isHidden = true
+        uploadMediaPlayIconView?.isHidden = mediaKind != 1
     }
 
     func reloadRenderedContent() {
@@ -5282,6 +5297,7 @@ final class ReferenceCanvasView: UIView {
         uploadThemeFlowView = nil
         uploadMediaPreviewImageView = nil
         uploadMediaIconView = nil
+        uploadMediaPlayIconView = nil
         uploadMediaAsset = nil
         uploadCoverAsset = nil
         uploadMediaSize = nil

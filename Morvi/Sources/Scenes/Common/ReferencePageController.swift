@@ -794,7 +794,7 @@ class ReferencePageController: BaseSceneController {
         let asset = AVAsset(url: videoURL)
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
-        let imageRef = try generator.copyCGImage(at: CMTime(seconds: 0.1, preferredTimescale: 600), actualTime: nil)
+        let imageRef = try generator.copyCGImage(at: .zero, actualTime: nil)
         return UIImage(cgImage: imageRef)
     }
 
