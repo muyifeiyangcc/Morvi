@@ -54,6 +54,17 @@ final class AccountSessionCenter {
         try profileRepository.register(profile, secretText: secretText)
     }
 
+    func signInLocalAccount(email: String, secretText: String) throws -> Bool {
+        guard let accountKey = try profileRepository.accountKey(
+            email: email,
+            secretText: secretText
+        ) else {
+            return false
+        }
+        try activateSession(accountKey: accountKey)
+        return true
+    }
+
     private func genderCode(from text: String) -> Int? {
         let normalizedText = text.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if normalizedText.isEmpty {

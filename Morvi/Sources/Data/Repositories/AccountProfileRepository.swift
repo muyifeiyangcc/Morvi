@@ -3,6 +3,7 @@ import Foundation
 protocol AccountProfileRepository {
     func save(_ record: AccountProfileRecord) throws
     func register(_ record: AccountProfileRecord, secretText: String) throws
+    func accountKey(email: String, secretText: String) throws -> String?
     func count() throws -> Int
 }
 
@@ -69,6 +70,22 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
                 ]
             )
         }
+    }
+
+    func accountKey(email: String, secretText: String) throws -> String? {
+        try store.readText(
+            """
+            SELECT account_key
+            FROM account_secret
+            WHERE lower(email) = lower(?)
+                AND secret_text = ?
+            LIMIT 1;
+            """,
+            bindings: [
+                .text(email),
+                .text(secretText)
+            ]
+        )
     }
 
     func count() throws -> Int {

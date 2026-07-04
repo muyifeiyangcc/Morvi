@@ -102,6 +102,63 @@ class ReferencePageController: BaseSceneController {
         push(.personalDetail)
     }
 
+    func submitSignIn() {
+        let entries = textFields(in: view)
+            .map { field -> (field: UITextField, frame: CGRect) in
+                (field, field.convert(field.bounds, to: view))
+            }
+            .sorted { $0.frame.minY < $1.frame.minY }
+            .map(\.field)
+
+        guard entries.count >= 2 else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+
+        let emailText = trimmedText(entries[0])
+        let secretText = trimmedText(entries[1])
+
+        guard emailText.isEmpty == false else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+        guard secretText.isEmpty == false else {
+            MorviToastView.show("Please enter password", in: view)
+            return
+        }
+
+        view.endEditing(true)
+        showProgressOverlay()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let didPass: Bool
+            do {
+                didPass = try AccountSessionCenter.shared.signInLocalAccount(
+                    email: emailText,
+                    secretText: secretText
+                )
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let view = self?.view else { return }
+                        MorviToastView.show("Login failed", in: view)
+                    }
+                }
+                return
+            }
+
+            DispatchQueue.main.async {
+                self?.hideProgressOverlay {
+                    guard didPass else {
+                        guard let view = self?.view else { return }
+                        MorviToastView.show("Invalid email or password", in: view)
+                        return
+                    }
+                    self?.finishAuthFlow()
+                }
+            }
+        }
+    }
+
     func chooseRegistrationAvatar() {
         view.endEditing(true)
         showProgressOverlay()
@@ -211,6 +268,10 @@ class ReferencePageController: BaseSceneController {
 
     func enterMainFlow() {
         AccountSessionCenter.shared.activateLocalAccount()
+        finishAuthFlow()
+    }
+
+    private func finishAuthFlow() {
         if navigationController?.presentingViewController != nil {
             navigationController?.dismiss(animated: true)
             return

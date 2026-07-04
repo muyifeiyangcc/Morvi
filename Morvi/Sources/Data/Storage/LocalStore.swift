@@ -81,6 +81,21 @@ final class LocalStore {
         }
     }
 
+    func readText(_ sql: String, bindings: [LocalStoreValue]) throws -> String? {
+        try access {
+            guard let handle else { throw LocalStoreError.missingDatabase }
+            var statement: OpaquePointer?
+            guard sqlite3_prepare_v2(handle, sql, -1, &statement, nil) == SQLITE_OK else {
+                throw LocalStoreError.statementFailed(lastError)
+            }
+            defer { sqlite3_finalize(statement) }
+            try bind(bindings, to: statement)
+            guard sqlite3_step(statement) == SQLITE_ROW else { return nil }
+            guard let text = sqlite3_column_text(statement, 0) else { return nil }
+            return String(cString: text)
+        }
+    }
+
     func write(_ sql: String, bindings: [LocalStoreValue]) throws {
         try access {
             guard let handle else { throw LocalStoreError.missingDatabase }
