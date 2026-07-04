@@ -307,6 +307,9 @@ class ReferencePageController: BaseSceneController {
         overlayView.didCompleteSignOut = { [weak self] in
             self?.navigationController?.setViewControllers([RootTabsController()], animated: false)
         }
+        overlayView.didCompleteAccountRemoval = { [weak self] in
+            self?.navigationController?.setViewControllers([RootTabsController()], animated: false)
+        }
     }
 
     func enterMainFlow() {

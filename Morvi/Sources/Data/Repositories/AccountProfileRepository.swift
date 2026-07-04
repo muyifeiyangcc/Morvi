@@ -5,6 +5,7 @@ protocol AccountProfileRepository {
     func register(_ record: AccountProfileRecord, secretText: String) throws
     func accountKey(email: String) throws -> String?
     func secretText(email: String) throws -> String?
+    func remove(stableKey: String) throws -> String?
     func count() throws -> Int
 }
 
@@ -99,6 +100,85 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
                 .text(email)
             ]
         )
+    }
+
+    func remove(stableKey: String) throws -> String? {
+        let binding = [LocalStoreValue.text(stableKey)]
+        let avatarAsset = try store.readText(
+            "SELECT avatar_asset FROM account_profile WHERE stable_key = ? LIMIT 1;",
+            bindings: binding
+        )
+
+        try store.transaction {
+            try store.write(
+                """
+                DELETE FROM dialogue_entry
+                WHERE thread_key IN (
+                    SELECT stable_key FROM dialogue_thread WHERE counterpart_account_key = ?
+                );
+                """,
+                bindings: binding
+            )
+            try store.write(
+                "DELETE FROM dialogue_thread WHERE counterpart_account_key = ?;",
+                bindings: binding
+            )
+            try store.write(
+                "DELETE FROM dialogue_entry WHERE author_account_key = ?;",
+                bindings: binding
+            )
+            try store.write(
+                """
+                DELETE FROM work_theme_link
+                WHERE work_key IN (
+                    SELECT stable_key FROM creative_work WHERE owner_account_key = ?
+                );
+                """,
+                bindings: binding
+            )
+            try store.write(
+                """
+                DELETE FROM work_reaction
+                WHERE account_key = ?
+                    OR work_key IN (
+                        SELECT stable_key FROM creative_work WHERE owner_account_key = ?
+                    );
+                """,
+                bindings: binding + binding
+            )
+            try store.write(
+                """
+                DELETE FROM work_reply
+                WHERE author_account_key = ?
+                    OR work_key IN (
+                        SELECT stable_key FROM creative_work WHERE owner_account_key = ?
+                    );
+                """,
+                bindings: binding + binding
+            )
+            try store.write("DELETE FROM creative_work WHERE owner_account_key = ?;", bindings: binding)
+            try store.write(
+                "DELETE FROM account_relation WHERE origin_account_key = ? OR target_account_key = ?;",
+                bindings: binding + binding
+            )
+            try store.write("DELETE FROM mood_entry WHERE account_key = ?;", bindings: binding)
+            try store.write(
+                "DELETE FROM restricted_relation WHERE owner_account_key = ? OR target_account_key = ?;",
+                bindings: binding + binding
+            )
+            try store.write(
+                "DELETE FROM report_record WHERE source_account_key = ? OR target_key = ?;",
+                bindings: binding + binding
+            )
+            try store.write("DELETE FROM credit_activity WHERE account_key = ?;", bindings: binding)
+            try store.write("DELETE FROM credit_account WHERE account_key = ?;", bindings: binding)
+            try store.write("DELETE FROM agreement_acceptance WHERE account_key = ?;", bindings: binding)
+            try store.write("DELETE FROM local_session WHERE account_key = ?;", bindings: binding)
+            try store.write("DELETE FROM account_secret WHERE account_key = ?;", bindings: binding)
+            try store.write("DELETE FROM account_profile WHERE stable_key = ?;", bindings: binding)
+        }
+
+        return avatarAsset
     }
 
     func count() throws -> Int {

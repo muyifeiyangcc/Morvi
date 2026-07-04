@@ -101,6 +101,37 @@ final class AccountSessionCenter {
         try? repository.clearActiveSession()
     }
 
+    func removeActiveAccount() throws -> Bool {
+        guard let accountKey = try repository.activeAccountKey() else {
+            return false
+        }
+        let avatarAsset = try profileRepository.remove(stableKey: accountKey)
+        removeLocalAvatarIfNeeded(avatarAsset)
+        return true
+    }
+
+    private func removeLocalAvatarIfNeeded(_ avatarAsset: String?) {
+        guard let avatarAsset,
+              avatarAsset.hasPrefix("local-avatar/") else {
+            return
+        }
+        let fileName = String(avatarAsset.dropFirst("local-avatar/".count))
+        guard fileName.isEmpty == false,
+              let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+              ) else {
+            return
+        }
+        let fileURL = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("Avatars", isDirectory: true)
+            .appendingPathComponent(fileName)
+        try? FileManager.default.removeItem(at: fileURL)
+    }
+
     func requiresSignedInGate(for page: ScenePage) -> Bool {
         switch page {
         case .wallet,

@@ -242,6 +242,9 @@ class BaseSceneController: UIViewController {
         overlayView.didCompleteSignOut = { [weak self] in
             self?.completeSignOutFlow()
         }
+        overlayView.didCompleteAccountRemoval = { [weak self] in
+            self?.completeSignOutFlow()
+        }
     }
 
     private func dismissCanvasOverlay() {

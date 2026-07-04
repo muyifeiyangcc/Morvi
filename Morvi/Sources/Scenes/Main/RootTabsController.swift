@@ -243,6 +243,9 @@ final class RootTabsController: UIViewController {
         overlayView.didCompleteSignOut = { [weak self] in
             self?.resetAfterSignOut()
         }
+        overlayView.didCompleteAccountRemoval = { [weak self] in
+            self?.resetAfterSignOut()
+        }
     }
 
     private func dismissActiveOverlay() {

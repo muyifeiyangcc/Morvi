@@ -15,6 +15,7 @@ final class ReferenceCanvasView: UIView {
     var didRequestOverlayPage: ((ScenePage) -> Void)?
     var didChooseMood: ((Int) -> Void)?
     var didCompleteSignOut: (() -> Void)?
+    var didCompleteAccountRemoval: (() -> Void)?
     private weak var activeLayoutContainer: UIView?
     private weak var keyboardAwareScrollView: UIScrollView?
     private weak var keyboardAvoidanceInputView: UIView?
@@ -1986,8 +1987,14 @@ final class ReferenceCanvasView: UIView {
         overlay.show(in: self)
     }
 
-    private func hideProgressOverlay() {
-        progressOverlayView?.dismiss()
+    private func hideProgressOverlay(completion: (() -> Void)? = nil) {
+        guard let overlay = progressOverlayView else {
+            completion?()
+            return
+        }
+        overlay.dismiss {
+            completion?()
+        }
         progressOverlayView = nil
     }
 
@@ -2454,6 +2461,8 @@ final class ReferenceCanvasView: UIView {
             confirmButton.addTarget(self, action: #selector(openWalletFromPopup), for: .touchUpInside)
         } else if page == .signOutConfirm {
             confirmButton.addTarget(self, action: #selector(confirmSignOut), for: .touchUpInside)
+        } else if page == .exitConfirm {
+            confirmButton.addTarget(self, action: #selector(confirmAccountRemoval), for: .touchUpInside)
         }
     }
 
@@ -2484,6 +2493,36 @@ final class ReferenceCanvasView: UIView {
         AccountSessionCenter.shared.clearActiveSession()
         didCompleteSignOut?()
         removeFromSuperview()
+    }
+
+    @objc private func confirmAccountRemoval() {
+        showProgressOverlay()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                let didRemove = try AccountSessionCenter.shared.removeActiveAccount()
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let self else { return }
+                        guard didRemove else {
+                            MorviToastView.show("Account deletion failed", in: self)
+                            return
+                        }
+                        self.removeFromSuperview()
+                        self.didCompleteAccountRemoval?()
+                        DispatchQueue.main.async {
+                            MorviToastView.show("Account deleted")
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.hideProgressOverlay {
+                        guard let self else { return }
+                        MorviToastView.show("Account deletion failed", in: self)
+                    }
+                }
+            }
+        }
     }
 
     private func owningController() -> UIViewController? {
