@@ -526,7 +526,7 @@ final class ReferenceCanvasView: UIView {
         var columnBottoms = [cellTop, cellTop]
         let columnLefts: [CGFloat] = [20, waterfallLayout.secondLeft]
         let cellPlacements = workEntries.enumerated().map { index, item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, item: DiscoveryWorkEntry, tint: MediaTint) in
-            let columnIndex = columnBottoms[0] <= columnBottoms[1] ? 0 : 1
+            let columnIndex = waterfallColumnIndex(for: columnBottoms)
             let left = columnLefts[columnIndex]
             let width = cellWidth
             let height = proportionalCellHeight(for: item, width: width)
@@ -634,6 +634,14 @@ final class ReferenceCanvasView: UIView {
         }
         let imageSize = resolveVisualAsset(item.coverAsset)?.size ?? .zero
         return imageSize.width > 0 ? ceil(width * imageSize.height / imageSize.width) : width
+    }
+
+    private func waterfallColumnIndex(for bottomEdges: [CGFloat]) -> Int {
+        guard bottomEdges.count >= 2 else { return 0 }
+        if abs(bottomEdges[0] - bottomEdges[1]) <= 0.5 {
+            return 0
+        }
+        return bottomEdges[0] < bottomEdges[1] ? 0 : 1
     }
 
     private func renderConversation(title: String, mode: ConversationMode) {
@@ -1464,7 +1472,7 @@ final class ReferenceCanvasView: UIView {
         let columnLefts: [CGFloat] = [20, waterfallLayout.secondLeft]
         var columnBottoms = [cellTop, cellTop]
         let cellPlacements = workEntries.enumerated().map { index, item -> (top: CGFloat, left: CGFloat, width: CGFloat, height: CGFloat, item: DiscoveryWorkEntry, tint: MediaTint) in
-            let columnIndex = columnBottoms[0] <= columnBottoms[1] ? 0 : 1
+            let columnIndex = waterfallColumnIndex(for: columnBottoms)
             let height = proportionalCellHeight(for: item, width: cellWidth)
             let placement = (
                 top: columnBottoms[columnIndex],
