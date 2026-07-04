@@ -34,7 +34,9 @@ enum RouteFactory {
         case .directDialogue:
             return ReferencePageController(page: .directDialogue) { scene in
                 [
-                    HitArea(frame: CGRect(x: 294, y: 60, width: 70, height: 70)) { scene.push(.restrictPanel) }
+                    HitArea(frame: CGRect(x: 294, y: 60, width: 70, height: 70)) {
+                        scene.showOverlay(.restrictPanel, restrictionSubjectKey: "acct-local-victoria")
+                    }
                 ]
             }
         case .assistantDialogue:

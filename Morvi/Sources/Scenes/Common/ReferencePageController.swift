@@ -75,6 +75,9 @@ class ReferencePageController: BaseSceneController {
         canvasView?.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
             self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
+        canvasView?.didRequestSubjectPage = { [weak self] targetPage, subjectKey in
+            self?.pushPage(targetPage, restrictionSubjectKey: subjectKey)
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -524,6 +527,9 @@ class ReferencePageController: BaseSceneController {
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
         }
+        overlayView.didRequestSubjectPage = { [weak self] targetPage, subjectKey in
+            self?.pushPage(targetPage, restrictionSubjectKey: subjectKey)
+        }
         overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
             self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
@@ -539,6 +545,21 @@ class ReferencePageController: BaseSceneController {
         overlayView.didCompleteAccountRemoval = { [weak self] in
             self?.navigationController?.setViewControllers([RootTabsController()], animated: false)
         }
+    }
+
+    private func pushPage(_ page: ScenePage, restrictionSubjectKey: String?) {
+        if AccountSessionCenter.shared.requiresSignedInGate(for: page),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showOverlay(.accessGate)
+            return
+        }
+        if page == .publicPersona,
+           let restrictionSubjectKey,
+           AccountSessionCenter.shared.canOpenPublicPersona(accountKey: restrictionSubjectKey) == false {
+            MorviToastView.show("This profile is unavailable.", in: view)
+            return
+        }
+        navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
     private func chooseWorkCover() {

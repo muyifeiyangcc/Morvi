@@ -2,7 +2,7 @@ import UIKit
 
 final class ReplyListDataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
     private var items: [ReplyListItem] = []
-    var didTapMore: (() -> Void)?
+    var didTapMore: ((String) -> Void)?
 
     func apply(_ items: [ReplyListItem], to tableView: UITableView) {
         self.items = items
@@ -19,9 +19,10 @@ final class ReplyListDataSource: NSObject, UITableViewDataSource, UITableViewDel
             return cell
         }
         let isLastItem = indexPath.row == items.count - 1
-        replyCell.configure(with: items[indexPath.row], showsDivider: !isLastItem)
+        let item = items[indexPath.row]
+        replyCell.configure(with: item, showsDivider: !isLastItem)
         replyCell.didTapMore = { [weak self] in
-            self?.didTapMore?()
+            self?.didTapMore?(item.accountKey)
         }
         return replyCell
     }

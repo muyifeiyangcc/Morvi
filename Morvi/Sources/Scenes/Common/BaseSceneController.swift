@@ -31,6 +31,9 @@ class BaseSceneController: UIViewController {
             }
             self?.navigationController?.pushViewController(RouteFactory.controller(for: targetPage), animated: true)
         }
+        canvasView.didRequestSubjectPage = { [weak self] targetPage, subjectKey in
+            self?.pushCanvasPage(targetPage, restrictionSubjectKey: subjectKey)
+        }
         canvasView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showCanvasOverlay(targetPage)
         }
@@ -207,10 +210,25 @@ class BaseSceneController: UIViewController {
     @objc private func handleTrailingNavigationTap() {
         switch page {
         case .galleryDetail, .publicPersona, .directDialogue, .voiceDialogue:
-            showCanvasOverlay(.restrictPanel)
+            showCanvasOverlay(.restrictPanel, restrictionSubjectKey: "acct-local-victoria")
         default:
             break
         }
+    }
+
+    private func pushCanvasPage(_ page: ScenePage, restrictionSubjectKey: String?) {
+        if AccountSessionCenter.shared.requiresSignedInGate(for: page),
+           AccountSessionCenter.shared.isSignedIn == false {
+            showCanvasOverlay(.accessGate)
+            return
+        }
+        if page == .publicPersona,
+           let restrictionSubjectKey,
+           AccountSessionCenter.shared.canOpenPublicPersona(accountKey: restrictionSubjectKey) == false {
+            MorviToastView.show("This profile is unavailable.", in: view)
+            return
+        }
+        navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
     private func showCanvasOverlay(_ page: ScenePage, restrictionSubjectKey: String? = nil) {
@@ -241,6 +259,9 @@ class BaseSceneController: UIViewController {
         }
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showCanvasOverlay(targetPage)
+        }
+        overlayView.didRequestSubjectPage = { [weak self] targetPage, subjectKey in
+            self?.pushCanvasPage(targetPage, restrictionSubjectKey: subjectKey)
         }
         overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
             self?.showCanvasOverlay(targetPage, restrictionSubjectKey: subjectKey)

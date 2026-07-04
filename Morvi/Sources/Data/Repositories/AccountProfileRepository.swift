@@ -1,5 +1,11 @@
 import Foundation
 
+struct SafetyProfileRecord {
+    let stableKey: String
+    let displayName: String
+    let avatarAsset: String?
+}
+
 protocol AccountProfileRepository {
     func save(_ record: AccountProfileRecord) throws
     func register(_ record: AccountProfileRecord, secretText: String) throws
@@ -8,6 +14,10 @@ protocol AccountProfileRepository {
     func updateSecret(email: String, secretText: String) throws -> Bool
     func displayName(stableKey: String) throws -> String?
     func avatarAsset(stableKey: String) throws -> String?
+    func safetyProfile(stableKey: String) throws -> SafetyProfileRecord?
+    func addRestriction(originKey: String, subjectKey: String) throws
+    func addSafetyNotice(originKey: String, subjectKey: String, reasonCode: Int, detailText: String?) throws
+    func hasSafetyBarrier(originKey: String, subjectKey: String) throws -> Bool
     func remove(stableKey: String) throws -> String?
     func count() throws -> Int
 }
@@ -141,6 +151,87 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
         )
     }
 
+    func safetyProfile(stableKey: String) throws -> SafetyProfileRecord? {
+        let rows = try store.readRows(
+            """
+            SELECT stable_key, display_name, avatar_asset
+            FROM account_profile
+            WHERE stable_key = ?
+            LIMIT 1;
+            """,
+            bindings: [.text(stableKey)]
+        )
+        guard let row = rows.first,
+              row.count >= 3,
+              let key = row[0].textValue,
+              let name = row[1].textValue else {
+            return nil
+        }
+        return SafetyProfileRecord(
+            stableKey: key,
+            displayName: name,
+            avatarAsset: row[2].textValue
+        )
+    }
+
+    func addRestriction(originKey: String, subjectKey: String) throws {
+        try store.write(
+            """
+            INSERT OR IGNORE INTO restricted_relation (
+                owner_account_key, target_account_key, created_at
+            ) VALUES (?, ?, ?);
+            """,
+            bindings: [
+                .text(originKey),
+                .text(subjectKey),
+                .text(LocalDateText.now())
+            ]
+        )
+    }
+
+    func addSafetyNotice(originKey: String, subjectKey: String, reasonCode: Int, detailText: String?) throws {
+        try store.write(
+            """
+            INSERT INTO report_record (
+                source_account_key, target_kind, target_key, reason_code, detail_text, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?);
+            """,
+            bindings: [
+                .text(originKey),
+                .int(0),
+                .text(subjectKey),
+                .int(reasonCode),
+                detailText.map(LocalStoreValue.text) ?? .null,
+                .text(LocalDateText.now())
+            ]
+        )
+    }
+
+    func hasSafetyBarrier(originKey: String, subjectKey: String) throws -> Bool {
+        let restrictionCount = try store.readInt(
+            """
+            SELECT COUNT(*)
+            FROM restricted_relation
+            WHERE owner_account_key = ?
+                AND target_account_key = ?;
+            """,
+            bindings: [.text(originKey), .text(subjectKey)]
+        )
+        if restrictionCount > 0 {
+            return true
+        }
+        return try store.readInt(
+            """
+            SELECT COUNT(*)
+            FROM report_record
+            WHERE source_account_key = ?
+                AND target_kind = 0
+                AND target_key = ?;
+            """,
+            bindings: [.text(originKey), .text(subjectKey)]
+        ) > 0
+    }
+
     func remove(stableKey: String) throws -> String? {
         let binding = [LocalStoreValue.text(stableKey)]
         let avatarAsset = try store.readText(
@@ -234,5 +325,14 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
 
     func count() throws -> Int {
         try store.readInt("SELECT COUNT(*) FROM account_profile;")
+    }
+}
+
+private extension LocalStoreValue {
+    var textValue: String? {
+        if case let .text(value) = self {
+            return value
+        }
+        return nil
     }
 }

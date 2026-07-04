@@ -48,6 +48,46 @@ final class AccountSessionCenter {
         return (try? walletRepository.balanceValue(accountKey: accountKey)) ?? 0
     }
 
+    func safetyProfile(accountKey: String) -> SafetyProfileRecord? {
+        try? profileRepository.safetyProfile(stableKey: accountKey)
+    }
+
+    func canOpenPublicPersona(accountKey: String) -> Bool {
+        guard let activeKey = activeAccountKey else {
+            return true
+        }
+        guard activeKey != accountKey else {
+            return true
+        }
+        return ((try? profileRepository.hasSafetyBarrier(
+            originKey: activeKey,
+            subjectKey: accountKey
+        )) ?? false) == false
+    }
+
+    func submitSafetyNotice(subjectKey: String, reasonCode: Int, detailText: String?) throws -> Bool {
+        guard let activeKey = activeAccountKey,
+              activeKey != subjectKey else {
+            return false
+        }
+        try profileRepository.addSafetyNotice(
+            originKey: activeKey,
+            subjectKey: subjectKey,
+            reasonCode: reasonCode,
+            detailText: detailText
+        )
+        return true
+    }
+
+    func confirmRestriction(subjectKey: String) throws -> Bool {
+        guard let activeKey = activeAccountKey,
+              activeKey != subjectKey else {
+            return false
+        }
+        try profileRepository.addRestriction(originKey: activeKey, subjectKey: subjectKey)
+        return true
+    }
+
     func consumeActiveWalletBalanceValue(amount: Int) throws -> Bool {
         guard let accountKey = activeAccountKey else {
             return false

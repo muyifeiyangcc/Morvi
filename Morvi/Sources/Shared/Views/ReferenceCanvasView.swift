@@ -36,6 +36,7 @@ final class ReferenceCanvasView: UIView {
     private let selectedMoodIndex: Int
     var didTapOutsideContent: (() -> Void)?
     var didRequestPage: ((ScenePage) -> Void)?
+    var didRequestSubjectPage: ((ScenePage, String?) -> Void)?
     var didRequestOverlayPage: ((ScenePage) -> Void)?
     var didRequestSubjectOverlayPage: ((ScenePage, String?) -> Void)?
     var didRequestPrimaryAction: (() -> Void)?
@@ -87,6 +88,7 @@ final class ReferenceCanvasView: UIView {
     private var settingsTapActions: [(frame: CGRect, action: () -> Void)] = []
     private var animatedAssistantEntryKeys: Set<String> = []
     private let restrictionSubjectKey: String?
+    private var selectedSafetyReasonIndex = 0
 
     init(page: ScenePage, selectedMoodIndex: Int = 0, restrictionSubjectKey: String? = nil) {
         self.page = page
@@ -218,7 +220,14 @@ final class ReferenceCanvasView: UIView {
         case .creditShortage:
             renderConfirmCard(title: nil, text: "Unfortunately, your account\nbalance is insufficient. Please go\nto recharge.", confirm: "Recharge", portrait: false)
         case .restrictConfirm:
-            renderConfirmCard(title: "Victoria", text: "Are you sure you want to block\nthis user? After blocking, no\nrelated content will be received.", confirm: "Sure", portrait: true)
+            let profile = resolvedRestrictionProfile()
+            renderConfirmCard(
+                title: profile.displayName,
+                text: "Are you sure you want to block\nthis user? After blocking, no\nrelated content will be received.",
+                confirm: "Sure",
+                portrait: true,
+                portraitAvatarAsset: profile.avatarAsset
+            )
         case .exitConfirm:
             renderConfirmCard(title: nil, text: "Are you sure you want to delete\nthis account? All data will be\ncleared after deletion and cannot\nbe recovered.", confirm: "Sure", portrait: false)
         case .signOutConfirm:
@@ -2678,12 +2687,24 @@ final class ReferenceCanvasView: UIView {
             tableView.bottomAnchor.constraint(equalTo: voiceButton.topAnchor, constant: -15)
         ])
         replyListDataSource.apply([
-            ReplyListItem(name: "Jasper", text: "The video content is great! Keep going!The\nvideo content is great! Keep going!"),
-            ReplyListItem(name: "Rowan", text: "The video content is great! Keep going!"),
-            ReplyListItem(name: "Sophia", text: "The video content is great! Keep going!")
+            ReplyListItem(
+                accountKey: "acct-local-jasper",
+                name: "Jasper",
+                text: "The video content is great! Keep going!The\nvideo content is great! Keep going!"
+            ),
+            ReplyListItem(
+                accountKey: "acct-local-rowan",
+                name: "Rowan",
+                text: "The video content is great! Keep going!"
+            ),
+            ReplyListItem(
+                accountKey: "acct-local-sophia",
+                name: "Sophia",
+                text: "The video content is great! Keep going!"
+            )
         ], to: tableView)
-        replyListDataSource.didTapMore = { [weak self] in
-            self?.didRequestOverlayPage?(.restrictPanel)
+        replyListDataSource.didTapMore = { [weak self] accountKey in
+            self?.didRequestSubjectOverlayPage?(.restrictPanel, accountKey)
         }
         keyboardAvoidanceInputView = inputBar
         installKeyboardAvoidance()
@@ -2730,9 +2751,9 @@ final class ReferenceCanvasView: UIView {
         ]
         for index in rows.indices {
             let top = CGFloat(87 + index * 64)
-            addReportChoiceRow(rows[index], top: top, checked: index == 5)
+            addReportChoiceRow(rows[index], top: top, index: index, checked: index == selectedSafetyReasonIndex)
         }
-        addButton(
+        let uploadButton = addButton(
             "Upload",
             bottom: 29,
             trailing: 20,
@@ -2742,6 +2763,7 @@ final class ReferenceCanvasView: UIView {
             shadowOpacity: 0,
             bottomPlateHeight: 3
         )
+        uploadButton.addTarget(self, action: #selector(submitSafetyNotice), for: .touchUpInside)
         activeLayoutContainer = nil
         installBlankAreaKeyboardDismissal()
     }
@@ -2807,7 +2829,76 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
-    private func renderConfirmCard(title: String?, text: String, confirm: String, portrait: Bool, showsWordmark: Bool = false) {
+    private func requestPublicPersona(subjectKey: String?) {
+        if let didRequestSubjectPage {
+            didRequestSubjectPage(.publicPersona, subjectKey)
+        } else {
+            didRequestPage?(.publicPersona)
+        }
+    }
+
+    private func resolvedRestrictionProfile() -> (displayName: String, avatarAsset: String?) {
+        guard let restrictionSubjectKey,
+              let profile = AccountSessionCenter.shared.safetyProfile(accountKey: restrictionSubjectKey) else {
+            return ("Victoria", "profile_avatar")
+        }
+        return (profile.displayName, profile.avatarAsset ?? "profile_avatar")
+    }
+
+    @objc private func handleSafetyChoiceTap(_ sender: UIButton) {
+        selectedSafetyReasonIndex = sender.tag
+        updateSafetyChoiceIcons()
+    }
+
+    private func updateSafetyChoiceIcons() {
+        let layoutContainer = activeLayoutContainer ?? overlayContentView ?? self
+        for index in 0..<6 {
+            let icon = layoutContainer.viewWithTag(9400 + index) as? UIImageView
+            icon?.image = UIImage(
+                named: index == selectedSafetyReasonIndex
+                    ? "report_check_selected"
+                    : "report_check_unselected"
+            )
+        }
+    }
+
+    @objc private func submitSafetyNotice() {
+        guard let subjectKey = restrictionSubjectKey else {
+            MorviToastView.show("Report failed", in: self)
+            return
+        }
+        let hostView = owningController()?.view ?? superview ?? self
+        let overlay = MorviProgressOverlayView()
+        let reasonCode = selectedSafetyReasonIndex
+        overlay.show(in: hostView)
+        removeFromSuperview()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let didSubmit: Bool
+            do {
+                didSubmit = try AccountSessionCenter.shared.submitSafetyNotice(
+                    subjectKey: subjectKey,
+                    reasonCode: reasonCode,
+                    detailText: nil
+                )
+            } catch {
+                didSubmit = false
+            }
+            DispatchQueue.main.async {
+                overlay.dismiss {
+                    MorviToastView.show(didSubmit ? "Report submitted" : "Report failed", in: hostView)
+                }
+            }
+        }
+    }
+
+    private func renderConfirmCard(
+        title: String?,
+        text: String,
+        confirm: String,
+        portrait: Bool,
+        showsWordmark: Bool = false,
+        portraitAvatarAsset: String? = nil
+    ) {
         backgroundColor = UIColor(white: 0, alpha: 0.58)
         let titleTop: CGFloat = 39
         let portraitAvatarTop: CGFloat = 41
@@ -2840,7 +2931,12 @@ final class ReferenceCanvasView: UIView {
         }
         activeLayoutContainer = panel
         if portrait {
-            addRestrictPopupAvatar(top: portraitAvatarTop, left: portraitAvatarLeft, size: portraitAvatarSize)
+            addRestrictPopupAvatar(
+                top: portraitAvatarTop,
+                left: portraitAvatarLeft,
+                size: portraitAvatarSize,
+                assetName: portraitAvatarAsset
+            )
         }
         if let title {
             if portrait {
@@ -2863,6 +2959,8 @@ final class ReferenceCanvasView: UIView {
             confirmButton.addTarget(self, action: #selector(confirmSignOut), for: .touchUpInside)
         } else if page == .exitConfirm {
             confirmButton.addTarget(self, action: #selector(confirmAccountRemoval), for: .touchUpInside)
+        } else if page == .restrictConfirm {
+            confirmButton.addTarget(self, action: #selector(confirmRestrictionAction), for: .touchUpInside)
         }
         activeLayoutContainer = nil
     }
@@ -2951,6 +3049,30 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
+    @objc private func confirmRestrictionAction() {
+        guard let subjectKey = restrictionSubjectKey else {
+            MorviToastView.show("Action unavailable", in: self)
+            return
+        }
+        let hostView = owningController()?.view ?? superview ?? self
+        let overlay = MorviProgressOverlayView()
+        overlay.show(in: hostView)
+        removeFromSuperview()
+        DispatchQueue.global(qos: .userInitiated).async {
+            let didSubmit: Bool
+            do {
+                didSubmit = try AccountSessionCenter.shared.confirmRestriction(subjectKey: subjectKey)
+            } catch {
+                didSubmit = false
+            }
+            DispatchQueue.main.async {
+                overlay.dismiss {
+                    MorviToastView.show(didSubmit ? "Blocked" : "Action unavailable", in: hostView)
+                }
+            }
+        }
+    }
+
     private func owningController() -> UIViewController? {
         var responder: UIResponder? = self
         while let current = responder {
@@ -2975,7 +3097,7 @@ final class ReferenceCanvasView: UIView {
         ])
     }
 
-    private func addRestrictPopupAvatar(top: CGFloat, left: CGFloat, size: CGFloat) {
+    private func addRestrictPopupAvatar(top: CGFloat, left: CGFloat, size: CGFloat, assetName: String? = nil) {
         let layoutContainer = activeLayoutContainer ?? self
         let ringInset: CGFloat = 6
         let ringView = UIImageView(image: UIImage(named: "restrict_avatar_ring"))
@@ -2989,7 +3111,7 @@ final class ReferenceCanvasView: UIView {
             ringView.heightAnchor.constraint(equalToConstant: size + ringInset * 2)
         ])
 
-        let imageView = UIImageView(image: UIImage(named: "profile_avatar"))
+        let imageView = UIImageView(image: UIImage(named: assetName ?? "profile_avatar"))
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = size / 2
         imageView.layer.masksToBounds = true
@@ -4292,25 +4414,31 @@ final class ReferenceCanvasView: UIView {
         addPortrait(top: top - 2, left: 306, size: 44, tint: .warm)
     }
 
-    private func addReportChoiceRow(_ text: String, top: CGFloat, checked: Bool) {
+    private func addReportChoiceRow(_ text: String, top: CGFloat, index: Int, checked: Bool) {
         let layoutContainer = activeLayoutContainer ?? self
         let field = AdaptiveInputView(
             backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
         )
+        let tapButton = UIButton(type: .custom)
+        tapButton.tag = index
+        tapButton.addTarget(self, action: #selector(handleSafetyChoiceTap(_:)), for: .touchUpInside)
         let label = UILabel()
         label.text = text
         label.textAlignment = .center
         label.textColor = .darkGray
         label.font = AppFont.source(14)
         let checkIcon = UIImageView(image: UIImage(named: checked ? "report_check_selected" : "report_check_unselected"))
+        checkIcon.tag = 9400 + index
         checkIcon.contentMode = .scaleAspectFit
 
         layoutContainer.addSubview(field)
         field.addSubview(label)
         field.addSubview(checkIcon)
+        field.addSubview(tapButton)
         field.translatesAutoresizingMaskIntoConstraints = false
         label.translatesAutoresizingMaskIntoConstraints = false
         checkIcon.translatesAutoresizingMaskIntoConstraints = false
+        tapButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             field.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
             field.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
@@ -4323,7 +4451,11 @@ final class ReferenceCanvasView: UIView {
             checkIcon.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -17),
             checkIcon.centerYAnchor.constraint(equalTo: field.centerYAnchor),
             checkIcon.widthAnchor.constraint(equalToConstant: 24),
-            checkIcon.heightAnchor.constraint(equalToConstant: 24)
+            checkIcon.heightAnchor.constraint(equalToConstant: 24),
+            tapButton.leadingAnchor.constraint(equalTo: field.leadingAnchor),
+            tapButton.trailingAnchor.constraint(equalTo: field.trailingAnchor),
+            tapButton.topAnchor.constraint(equalTo: field.topAnchor),
+            tapButton.bottomAnchor.constraint(equalTo: field.bottomAnchor)
         ])
     }
 
@@ -4738,7 +4870,7 @@ final class ReferenceCanvasView: UIView {
             if index == 0 {
                 self?.didRequestOverlayPage?(.uploadEmpty)
             } else {
-                self?.didRequestPage?(.publicPersona)
+                self?.requestPublicPersona(subjectKey: entries[index].accountKey)
             }
         }
         layoutContainer.addSubview(stripView)
@@ -4780,10 +4912,10 @@ final class ReferenceCanvasView: UIView {
             self?.didRequestPage?(.galleryDetail)
         }
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 48, height: 48)) { [weak self] in
-            self?.didRequestPage?(.publicPersona)
+            self?.requestPublicPersona(subjectKey: item.accountKey)
         }
         addDiscoverActionButton(frame: CGRect(x: 68, y: top, width: 160, height: 44)) { [weak self] in
-            self?.didRequestPage?(.publicPersona)
+            self?.requestPublicPersona(subjectKey: item.accountKey)
         }
         addTrailingDiscoverActionButton(top: top, trailing: 10, width: 54, height: 44) { [weak self] in
             self?.didRequestSubjectOverlayPage?(.restrictPanel, item.accountKey)
@@ -4822,13 +4954,13 @@ final class ReferenceCanvasView: UIView {
             self?.didRequestPage?(.galleryDetail)
         }
         addDiscoverActionButton(frame: CGRect(x: 20, y: top, width: 48, height: 48)) { [weak self] in
-            self?.didRequestPage?(.publicPersona)
+            self?.requestPublicPersona(subjectKey: "acct-local-victoria")
         }
         addDiscoverActionButton(frame: CGRect(x: 68, y: top, width: 160, height: 44)) { [weak self] in
-            self?.didRequestPage?(.publicPersona)
+            self?.requestPublicPersona(subjectKey: "acct-local-victoria")
         }
         addTrailingDiscoverActionButton(top: top, trailing: 10, width: 54, height: 44) { [weak self] in
-            self?.didRequestOverlayPage?(.restrictPanel)
+            self?.didRequestSubjectOverlayPage?(.restrictPanel, "acct-local-victoria")
         }
     }
 

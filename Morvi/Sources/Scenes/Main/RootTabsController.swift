@@ -47,6 +47,9 @@ final class RootTabsController: UIViewController {
         newCanvasView.didRequestPage = { [weak self] page in
             self?.show(page)
         }
+        newCanvasView.didRequestSubjectPage = { [weak self] page, subjectKey in
+            self?.show(page, restrictionSubjectKey: subjectKey)
+        }
         newCanvasView.didRequestOverlayPage = { [weak self] page in
             self?.showOverlay(page)
         }
@@ -218,10 +221,16 @@ final class RootTabsController: UIViewController {
         }
     }
 
-    private func show(_ page: ScenePage) {
+    private func show(_ page: ScenePage, restrictionSubjectKey: String? = nil) {
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
             showOverlay(.accessGate)
+            return
+        }
+        if page == .publicPersona,
+           let restrictionSubjectKey,
+           AccountSessionCenter.shared.canOpenPublicPersona(accountKey: restrictionSubjectKey) == false {
+            MorviToastView.show("This profile is unavailable.", in: view)
             return
         }
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
@@ -261,6 +270,9 @@ final class RootTabsController: UIViewController {
         }
         overlayView.didRequestOverlayPage = { [weak self] targetPage in
             self?.showOverlay(targetPage)
+        }
+        overlayView.didRequestSubjectPage = { [weak self] targetPage, subjectKey in
+            self?.show(targetPage, restrictionSubjectKey: subjectKey)
         }
         overlayView.didRequestSubjectOverlayPage = { [weak self] targetPage, subjectKey in
             self?.showOverlay(targetPage, restrictionSubjectKey: subjectKey)
