@@ -22,7 +22,7 @@ enum RouteFactory {
             }
         case .signUp:
             return AuthSceneController(page: .signUp) { scene in
-                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.push(.personalDetail) }]
+                [HitArea(frame: CGRect(x: 20, y: 715, width: 335, height: 58)) { scene.submitSignUp() }]
             }
         case .resetAccess:
             return AuthSceneController(page: .resetAccess) { scene in

@@ -42,6 +42,44 @@ class ReferencePageController: BaseSceneController {
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
+    func submitSignUp() {
+        let entries = textFields(in: view)
+            .map { field -> (field: UITextField, frame: CGRect) in
+                (field, field.convert(field.bounds, to: view))
+            }
+            .sorted { $0.frame.minY < $1.frame.minY }
+            .map(\.field)
+
+        guard entries.count >= 3 else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+
+        let emailText = trimmedText(entries[0])
+        let passwordText = trimmedText(entries[1])
+        let repeatedPasswordText = trimmedText(entries[2])
+
+        guard emailText.isEmpty == false else {
+            MorviToastView.show("Please enter email", in: view)
+            return
+        }
+        guard passwordText.isEmpty == false else {
+            MorviToastView.show("Please enter password", in: view)
+            return
+        }
+        guard repeatedPasswordText.isEmpty == false else {
+            MorviToastView.show("Please enter the password again", in: view)
+            return
+        }
+        guard passwordText == repeatedPasswordText else {
+            MorviToastView.show("Passwords do not match", in: view)
+            return
+        }
+
+        view.endEditing(true)
+        push(.personalDetail)
+    }
+
     func showOverlay(_ page: ScenePage) {
         if AccountSessionCenter.shared.requiresSignedInGate(for: page),
            AccountSessionCenter.shared.isSignedIn == false {
@@ -81,5 +119,20 @@ class ReferencePageController: BaseSceneController {
             return
         }
         navigationController?.setViewControllers([RootTabsController()], animated: true)
+    }
+
+    private func trimmedText(_ field: UITextField) -> String {
+        (field.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func textFields(in rootView: UIView) -> [UITextField] {
+        var results: [UITextField] = []
+        if let textField = rootView as? UITextField {
+            results.append(textField)
+        }
+        rootView.subviews.forEach { childView in
+            results.append(contentsOf: textFields(in: childView))
+        }
+        return results
     }
 }
