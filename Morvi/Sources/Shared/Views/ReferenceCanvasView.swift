@@ -5200,7 +5200,12 @@ extension ReferenceCanvasView: UIGestureRecognizerDelegate {
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        gestureBelongsToScrollableArea(gestureRecognizer) || gestureBelongsToScrollableArea(otherGestureRecognizer)
+        if gestureRecognizer is UITapGestureRecognizer,
+           otherGestureRecognizer is UITapGestureRecognizer {
+            return true
+        }
+        return gestureBelongsToScrollableArea(gestureRecognizer)
+            || gestureBelongsToScrollableArea(otherGestureRecognizer)
     }
 
     private func gestureBelongsToScrollableArea(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
