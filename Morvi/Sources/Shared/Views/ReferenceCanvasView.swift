@@ -2705,10 +2705,10 @@ final class ReferenceCanvasView: UIView {
                 addText(title, size: 31, weight: .black, top: titleTop, centered: true, usesOneFont: true)
             }
         }
-        addText(text, size: 17, weight: .regular, top: textTop, left: 66)
-        let cancelButton = addPillButton("Cancel", top: buttonTop, left: 66, width: 112, dark: false, fontWeight: .medium)
+        addText(text, size: 17, weight: .regular, top: textTop, left: 36)
+        let cancelButton = addPillButton("Cancel", top: buttonTop, left: 36, width: 112, dark: false, fontWeight: .medium)
         cancelButton.addTarget(self, action: #selector(closePopupOverlay), for: .touchUpInside)
-        let confirmButton = addPillButton(confirm, top: buttonTop, left: 204, width: 112, dark: true, fontWeight: .medium)
+        let confirmButton = addPillButton(confirm, top: buttonTop, left: 174, width: 112, dark: true, fontWeight: .medium)
         if page == .accessGate {
             confirmButton.addTarget(self, action: #selector(openSignInFromPopup), for: .touchUpInside)
         } else if page == .spendConfirm {
