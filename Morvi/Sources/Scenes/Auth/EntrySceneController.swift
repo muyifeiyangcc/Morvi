@@ -4,7 +4,10 @@ final class EntrySceneController: ReferencePageController {
     init() {
         super.init(page: .entry) { scene in
             [
-                HitArea(frame: CGRect(x: 20, y: 416, width: 335, height: 56)) { scene.push(.signIn) },
+                HitArea(frame: CGRect(x: 20, y: 416, width: 335, height: 56)) {
+                    guard scene.canContinueWithAgreementConsent() else { return }
+                    scene.push(.signIn)
+                },
                 HitArea(frame: CGRect(x: 20, y: 486, width: 335, height: 56)) { scene.push(.signUp) },
                 HitArea(frame: CGRect(x: 235, y: 560, width: 70, height: 44)) { scene.push(.signUp) },
                 HitArea(frame: CGRect(x: 120, y: 600, width: 135, height: 34)) { scene.submitGuestSignIn() },

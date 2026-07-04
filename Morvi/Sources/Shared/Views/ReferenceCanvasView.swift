@@ -4,9 +4,13 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 final class ReferenceCanvasView: UIView {
-    private static var agreementConsentAccepted = false
+    private static var agreementConsentAccepted = true
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
     private static let ciContext = CIContext(options: nil)
+
+    static var hasAcceptedAgreementConsent: Bool {
+        agreementConsentAccepted
+    }
 
     private let page: ScenePage
     private let selectedMoodIndex: Int

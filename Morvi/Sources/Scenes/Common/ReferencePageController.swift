@@ -65,6 +65,14 @@ class ReferencePageController: BaseSceneController {
         navigationController?.pushViewController(RouteFactory.controller(for: page), animated: true)
     }
 
+    func canContinueWithAgreementConsent() -> Bool {
+        guard ReferenceCanvasView.hasAcceptedAgreementConsent else {
+            MorviToastView.show("Please agree to User Agreement and Privacy Policy", in: view)
+            return false
+        }
+        return true
+    }
+
     func submitSignUp() {
         let entries = textFields(in: view)
             .map { field -> (field: UITextField, frame: CGRect) in
@@ -315,6 +323,7 @@ class ReferencePageController: BaseSceneController {
     }
 
     func submitGuestSignIn() {
+        guard canContinueWithAgreementConsent() else { return }
         showProgressOverlay()
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             do {
@@ -336,6 +345,7 @@ class ReferencePageController: BaseSceneController {
     }
 
     func submitAppleSignIn() {
+        guard canContinueWithAgreementConsent() else { return }
         view.endEditing(true)
         showProgressOverlay()
         let provider = ASAuthorizationAppleIDProvider()
