@@ -87,7 +87,6 @@ final class SQLiteDialogueRepository: DialogueRepository {
     }
 
     func summaries(accountKey: String) throws -> [DialogueThreadSummaryRecord] {
-        let assistantThreadKey = "assistant-\(accountKey)"
         let rows = try store.readRows(
             """
             SELECT t.stable_key, t.thread_kind, t.counterpart_account_key, t.title, t.avatar_asset,
@@ -97,8 +96,9 @@ final class SQLiteDialogueRepository: DialogueRepository {
                 ON e.stable_key = t.latest_entry_key
                 AND e.removed_at IS NULL
             WHERE t.is_archived = 0
+                AND t.thread_kind != 2
                 AND (
-                    t.stable_key = ?
+                    t.counterpart_account_key = ?
                     OR EXISTS (
                         SELECT 1
                         FROM dialogue_entry owned_entry
@@ -110,7 +110,7 @@ final class SQLiteDialogueRepository: DialogueRepository {
             ORDER BY COALESCE(t.latest_entry_at, t.updated_at, t.created_at) DESC, t.id DESC;
             """,
             bindings: [
-                .text(assistantThreadKey),
+                .text(accountKey),
                 .text(accountKey)
             ]
         )

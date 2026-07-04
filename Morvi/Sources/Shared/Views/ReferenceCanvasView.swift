@@ -501,7 +501,7 @@ final class ReferenceCanvasView: UIView {
         listView.didSelectEntry = { [weak self] entry in
             RouteContextStore.setTargetDialogueThread(key: entry.stableKey, title: entry.name)
             RouteContextStore.setTargetAccountKey(entry.counterpartAccountKey)
-            self?.didRequestPage?(entry.threadKind == Self.assistantThreadKind ? .assistantDialogue : .directDialogue)
+            self?.didRequestPage?(.directDialogue)
         }
         addSubview(listView)
         listView.translatesAutoresizingMaskIntoConstraints = false
