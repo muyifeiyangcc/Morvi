@@ -2,6 +2,8 @@ import UIKit
 import Photos
 import PhotosUI
 import AuthenticationServices
+import AVFoundation
+import UniformTypeIdentifiers
 
 class ReferencePageController: BaseSceneController {
     private struct RegistrationDraft {
@@ -14,6 +16,11 @@ class ReferencePageController: BaseSceneController {
         case workCover
     }
 
+    private enum WorkMediaSource {
+        case album
+        case camera
+    }
+
     private static var registrationDraft: RegistrationDraft?
     private static var registrationAvatarAsset: String?
     private static var shouldShowRegistrationSuccessToast = false
@@ -23,6 +30,7 @@ class ReferencePageController: BaseSceneController {
     private weak var progressOverlayView: MorviProgressOverlayView?
     private var appleSignInController: ASAuthorizationController?
     private var photoSelectionTarget: PhotoSelectionTarget?
+    private var pendingWorkMediaSource: WorkMediaSource?
     private let creativeRepository = SQLiteCreativeWorkRepository()
 
     init(page: ScenePage, areas: ((ReferencePageController) -> [HitArea])? = nil) {
@@ -310,7 +318,12 @@ class ReferencePageController: BaseSceneController {
 
     private func presentPhotoPicker() {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
-        configuration.filter = .images
+        switch photoSelectionTarget {
+        case .workCover:
+            configuration.filter = .any(of: [.images, .videos])
+        default:
+            configuration.filter = .images
+        }
         configuration.selectionLimit = 1
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
@@ -319,10 +332,93 @@ class ReferencePageController: BaseSceneController {
         }
     }
 
+    private func handleCameraAccess(_ status: AVAuthorizationStatus) {
+        switch status {
+        case .authorized:
+            handleMicrophoneAccess(AVCaptureDevice.authorizationStatus(for: .audio))
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] isAllowed in
+                DispatchQueue.main.async {
+                    if isAllowed {
+                        self?.handleMicrophoneAccess(AVCaptureDevice.authorizationStatus(for: .audio))
+                    } else {
+                        self?.showCameraSettingsGuideAfterProgress()
+                    }
+                }
+            }
+        case .denied, .restricted:
+            showCameraSettingsGuideAfterProgress()
+        @unknown default:
+            showCameraSettingsGuideAfterProgress()
+        }
+    }
+
+    private func handleMicrophoneAccess(_ status: AVAuthorizationStatus) {
+        switch status {
+        case .authorized:
+            presentWorkCamera()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .audio) { [weak self] isAllowed in
+                DispatchQueue.main.async {
+                    if isAllowed {
+                        self?.presentWorkCamera()
+                    } else {
+                        self?.showCameraSettingsGuideAfterProgress()
+                    }
+                }
+            }
+        case .denied, .restricted:
+            showCameraSettingsGuideAfterProgress()
+        @unknown default:
+            showCameraSettingsGuideAfterProgress()
+        }
+    }
+
+    private func presentWorkCamera() {
+        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+            hideProgressOverlay { [weak self] in
+                guard let view = self?.view else { return }
+                MorviToastView.show("Camera unavailable", in: view)
+            }
+            return
+        }
+
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.delegate = self
+        let availableTypes = UIImagePickerController.availableMediaTypes(for: .camera) ?? []
+        let requestedTypes = [UTType.image.identifier, UTType.movie.identifier]
+        picker.mediaTypes = requestedTypes.filter { availableTypes.contains($0) }
+        picker.videoQuality = .typeHigh
+        present(picker, animated: true) { [weak self] in
+            self?.hideProgressOverlay {}
+        }
+    }
+
+    private func showCameraSettingsGuideAfterProgress() {
+        hideProgressOverlay { [weak self] in
+            self?.showCameraSettingsGuide()
+        }
+    }
+
     private func showPhotoLibrarySettingsGuide() {
         let alert = UIAlertController(
             title: "Photo access required",
             message: "Please allow photo access in Settings to select an image.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Open Settings", style: .default) { _ in
+            guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+            UIApplication.shared.open(settingsURL)
+        })
+        present(alert, animated: true)
+    }
+
+    private func showCameraSettingsGuide() {
+        let alert = UIAlertController(
+            title: "Camera access required",
+            message: "Please allow camera and microphone access in Settings to capture photos or videos.",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
@@ -441,9 +537,27 @@ class ReferencePageController: BaseSceneController {
 
     private func chooseWorkCover() {
         view.endEditing(true)
+        let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        sheet.addAction(UIAlertAction(title: "Album", style: .default) { [weak self] _ in
+            self?.beginWorkMediaSelection(from: .album)
+        })
+        sheet.addAction(UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
+            self?.beginWorkMediaSelection(from: .camera)
+        })
+        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(sheet, animated: true)
+    }
+
+    private func beginWorkMediaSelection(from source: WorkMediaSource) {
         photoSelectionTarget = .workCover
+        pendingWorkMediaSource = source
         showProgressOverlay()
-        handlePhotoLibraryAccess(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+        switch source {
+        case .album:
+            handlePhotoLibraryAccess(PHPhotoLibrary.authorizationStatus(for: .readWrite))
+        case .camera:
+            handleCameraAccess(AVCaptureDevice.authorizationStatus(for: .video))
+        }
     }
 
     private func submitWorkUpload(
@@ -465,12 +579,12 @@ class ReferencePageController: BaseSceneController {
                     ownerAccountKey: accountKey,
                     title: draft.titleText,
                     bodyText: draft.detailText,
-                    mediaKind: 0,
+                    mediaKind: draft.mediaKind,
                     mediaAsset: draft.mediaAsset,
-                    coverAsset: draft.mediaAsset,
+                    coverAsset: draft.coverAsset,
                     mediaWidth: Double(draft.mediaSize.width),
                     mediaHeight: Double(draft.mediaSize.height),
-                    durationSeconds: nil,
+                    durationSeconds: draft.durationSeconds,
                     visibilityCode: 0,
                     createdAt: now,
                     updatedAt: now
@@ -633,6 +747,61 @@ class ReferencePageController: BaseSceneController {
         try storeLocalImage(image, folderName: "WorkMedia", filePrefix: "work", assetPrefix: "local-work")
     }
 
+    private func storeWorkVideo(from sourceURL: URL) throws -> String {
+        let baseDirectory = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let targetDirectory = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("WorkMedia", isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: targetDirectory,
+            withIntermediateDirectories: true
+        )
+        let fileExtension = sourceURL.pathExtension.isEmpty ? "mov" : sourceURL.pathExtension
+        let fileName = "work-video-\(UUID().uuidString.lowercased()).\(fileExtension)"
+        let fileURL = targetDirectory.appendingPathComponent(fileName)
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            try FileManager.default.removeItem(at: fileURL)
+        }
+        try FileManager.default.copyItem(at: sourceURL, to: fileURL)
+        return "local-work-video/\(fileName)"
+    }
+
+    private func storedWorkVideoURL(for asset: String) -> URL? {
+        let prefix = "local-work-video/"
+        guard asset.hasPrefix(prefix) else { return nil }
+        let fileName = String(asset.dropFirst(prefix.count))
+        guard fileName.isEmpty == false,
+              let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+              ) else {
+            return nil
+        }
+        return baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("WorkMedia", isDirectory: true)
+            .appendingPathComponent(fileName)
+    }
+
+    private func makeVideoPreview(from videoURL: URL) throws -> UIImage {
+        let asset = AVAsset(url: videoURL)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        let imageRef = try generator.copyCGImage(at: CMTime(seconds: 0.1, preferredTimescale: 600), actualTime: nil)
+        return UIImage(cgImage: imageRef)
+    }
+
+    private func videoDurationSeconds(for videoURL: URL) -> TimeInterval {
+        CMTimeGetSeconds(AVAsset(url: videoURL).duration)
+    }
+
     private func storeLocalImage(
         _ image: UIImage,
         folderName: String,
@@ -665,41 +834,126 @@ class ReferencePageController: BaseSceneController {
 extension ReferencePageController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        guard let provider = results.first?.itemProvider,
-              provider.canLoadObject(ofClass: UIImage.self) else {
+        guard let provider = results.first?.itemProvider else {
             photoSelectionTarget = nil
+            pendingWorkMediaSource = nil
             return
         }
-        provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
-            guard let self,
-                  let image = object as? UIImage else { return }
-            do {
-                let target = self.photoSelectionTarget
-                let storedAsset: String
+
+        if provider.canLoadObject(ofClass: UIImage.self) {
+            provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
+                guard let self,
+                      let image = object as? UIImage else { return }
+                self.applyPickedImage(image)
+            }
+            return
+        }
+
+        if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+            provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] fileURL, _ in
+                guard let self, let fileURL else { return }
+                self.applyPickedVideo(fileURL)
+            }
+            return
+        }
+
+        photoSelectionTarget = nil
+        pendingWorkMediaSource = nil
+    }
+
+    private func applyPickedImage(_ image: UIImage) {
+        do {
+            let target = photoSelectionTarget
+            let storedAsset: String
+            switch target {
+            case .workCover:
+                storedAsset = try storeWorkImage(image)
+            default:
+                storedAsset = try storeAvatarImage(image)
+            }
+            DispatchQueue.main.async {
                 switch target {
                 case .workCover:
-                    storedAsset = try self.storeWorkImage(image)
+                    (self.view.viewWithTag(9102) as? ReferenceCanvasView)?
+                        .updateUploadMedia(
+                            previewImage: image,
+                            mediaAsset: storedAsset,
+                            coverAsset: storedAsset,
+                            mediaKind: 0
+                        )
                 default:
-                    storedAsset = try self.storeAvatarImage(image)
+                    Self.registrationAvatarAsset = storedAsset
+                    self.canvasView?.updateRegistrationAvatar(image)
                 }
-                DispatchQueue.main.async {
-                    switch target {
-                    case .workCover:
-                        (self.view.viewWithTag(9102) as? ReferenceCanvasView)?
-                            .updateUploadMedia(image: image, asset: storedAsset)
-                    default:
-                        Self.registrationAvatarAsset = storedAsset
-                        self.canvasView?.updateRegistrationAvatar(image)
-                    }
-                    self.photoSelectionTarget = nil
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.photoSelectionTarget = nil
-                    MorviToastView.show("Image save failed", in: self.view)
-                }
+                self.photoSelectionTarget = nil
+                self.pendingWorkMediaSource = nil
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.photoSelectionTarget = nil
+                self.pendingWorkMediaSource = nil
+                MorviToastView.show("Image save failed", in: self.view)
             }
         }
+    }
+
+    private func applyPickedVideo(_ fileURL: URL) {
+        do {
+            let storedMediaAsset = try storeWorkVideo(from: fileURL)
+            guard let storedVideoURL = storedWorkVideoURL(for: storedMediaAsset) else {
+                throw CocoaError(.fileNoSuchFile)
+            }
+            let previewImage = try makeVideoPreview(from: storedVideoURL)
+            let storedCoverAsset = try storeWorkImage(previewImage)
+            let duration = videoDurationSeconds(for: storedVideoURL)
+            DispatchQueue.main.async {
+                (self.view.viewWithTag(9102) as? ReferenceCanvasView)?
+                    .updateUploadMedia(
+                        previewImage: previewImage,
+                        mediaAsset: storedMediaAsset,
+                        coverAsset: storedCoverAsset,
+                        mediaKind: 1,
+                        durationSeconds: duration.isFinite ? duration : nil
+                    )
+                self.photoSelectionTarget = nil
+                self.pendingWorkMediaSource = nil
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.photoSelectionTarget = nil
+                self.pendingWorkMediaSource = nil
+                MorviToastView.show("Video save failed", in: self.view)
+            }
+        }
+    }
+}
+
+extension ReferencePageController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(
+        _ picker: UIImagePickerController,
+        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
+    ) {
+        picker.dismiss(animated: true)
+        let mediaType = info[.mediaType] as? String
+        if mediaType == UTType.movie.identifier,
+           let videoURL = info[.mediaURL] as? URL {
+            applyPickedVideo(videoURL)
+            return
+        }
+
+        if let image = info[.originalImage] as? UIImage {
+            applyPickedImage(image)
+            return
+        }
+
+        photoSelectionTarget = nil
+        pendingWorkMediaSource = nil
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+        photoSelectionTarget = nil
+        pendingWorkMediaSource = nil
     }
 }
 

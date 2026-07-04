@@ -13,6 +13,7 @@ struct DiscoveryWorkEntry {
     let avatarAsset: String
     let title: String
     let bodyText: String
+    let mediaKind: Int
     let coverAsset: String
     let themes: [String]
     let reactionCount: Int
@@ -144,6 +145,7 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 COALESCE(p.avatar_asset, 'default_avatar'),
                 w.title,
                 COALESCE(w.body_text, ''),
+                w.media_kind,
                 COALESCE(w.cover_asset, 'discover_feed_cover'),
                 (
                     SELECT COUNT(*)
@@ -167,14 +169,14 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
         )
 
         return try rows.compactMap { row in
-            guard row.count >= 9,
+            guard row.count >= 10,
                   let stableKey = row[0].textValue,
                   let accountKey = row[1].textValue,
                   let displayName = row[2].textValue,
                   let avatarAsset = row[3].textValue,
                   let title = row[4].textValue,
                   let bodyText = row[5].textValue,
-                  let coverAsset = row[6].textValue else {
+                  let coverAsset = row[7].textValue else {
                 return nil
             }
             let themes = try themesForWork(stableKey: stableKey)
@@ -185,10 +187,11 @@ final class SQLiteCreativeWorkRepository: CreativeWorkRepository {
                 avatarAsset: avatarAsset,
                 title: title,
                 bodyText: bodyText,
+                mediaKind: row[6].intValue,
                 coverAsset: coverAsset,
                 themes: themes,
-                reactionCount: max(row[7].intValue, 666),
-                replyCount: max(row[8].intValue, 777)
+                reactionCount: max(row[8].intValue, 666),
+                replyCount: max(row[9].intValue, 777)
             )
         }
     }

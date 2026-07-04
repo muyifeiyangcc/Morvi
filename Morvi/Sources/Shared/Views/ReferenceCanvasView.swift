@@ -8,8 +8,11 @@ final class ReferenceCanvasView: UIView {
         let titleText: String
         let detailText: String
         let themeTitles: [String]
+        let mediaKind: Int
         let mediaAsset: String
+        let coverAsset: String
         let mediaSize: CGSize
+        let durationSeconds: TimeInterval?
     }
 
     private static let assistantUnlockCost = 200
@@ -53,7 +56,10 @@ final class ReferenceCanvasView: UIView {
     private weak var uploadMediaPreviewImageView: UIImageView?
     private weak var uploadMediaIconView: UIImageView?
     private var uploadMediaAsset: String?
+    private var uploadCoverAsset: String?
     private var uploadMediaSize: CGSize?
+    private var uploadMediaKind = 0
+    private var uploadDurationSeconds: TimeInterval?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
     private var dialogueFlowBottomConstraint: NSLayoutConstraint?
@@ -399,6 +405,7 @@ final class ReferenceCanvasView: UIView {
                     avatarAsset: "builtin_avatar_victoria",
                     title: "Moments Matter",
                     bodyText: "Capturing today's happiness. Saving it for tomorrow's memories.",
+                    mediaKind: 1,
                     coverAsset: "discover_feed_cover",
                     themes: tagTexts,
                     reactionCount: 666,
@@ -2211,6 +2218,7 @@ final class ReferenceCanvasView: UIView {
         }
 
         guard let uploadMediaAsset,
+              let uploadCoverAsset,
               let uploadMediaSize,
               uploadMediaSize.width > 0,
               uploadMediaSize.height > 0 else {
@@ -2223,8 +2231,11 @@ final class ReferenceCanvasView: UIView {
                 titleText: titleText,
                 detailText: detailText,
                 themeTitles: themeTitles,
+                mediaKind: uploadMediaKind,
                 mediaAsset: uploadMediaAsset,
-                mediaSize: uploadMediaSize
+                coverAsset: uploadCoverAsset,
+                mediaSize: uploadMediaSize,
+                durationSeconds: uploadDurationSeconds
             )
         )
     }
@@ -4716,7 +4727,7 @@ final class ReferenceCanvasView: UIView {
             height: 360,
             title: item.title,
             tint: tint,
-            action: .play,
+            action: item.mediaKind == 1 ? .play : .none,
             imageName: item.coverAsset,
             cornerRadius: 24,
             titleSize: 16,
@@ -4742,7 +4753,7 @@ final class ReferenceCanvasView: UIView {
         addDiscoverActionButton(frame: CGRect(x: 68, y: top, width: 160, height: 44)) { [weak self] in
             self?.didRequestPage?(.publicPersona)
         }
-        addDiscoverActionButton(frame: CGRect(x: 302, y: top, width: 54, height: 44)) { [weak self] in
+        addTrailingDiscoverActionButton(top: top, trailing: 10, width: 54, height: 44) { [weak self] in
             self?.didRequestOverlayPage?(.restrictPanel)
         }
     }
@@ -4784,7 +4795,7 @@ final class ReferenceCanvasView: UIView {
         addDiscoverActionButton(frame: CGRect(x: 68, y: top, width: 160, height: 44)) { [weak self] in
             self?.didRequestPage?(.publicPersona)
         }
-        addDiscoverActionButton(frame: CGRect(x: 302, y: top, width: 54, height: 44)) { [weak self] in
+        addTrailingDiscoverActionButton(top: top, trailing: 10, width: 54, height: 44) { [weak self] in
             self?.didRequestOverlayPage?(.restrictPanel)
         }
     }
@@ -4805,6 +4816,25 @@ final class ReferenceCanvasView: UIView {
             buttonConstraints.append(button.widthAnchor.constraint(equalToConstant: frame.width))
         }
         NSLayoutConstraint.activate(buttonConstraints)
+    }
+
+    private func addTrailingDiscoverActionButton(
+        top: CGFloat,
+        trailing: CGFloat,
+        width: CGFloat,
+        height: CGFloat,
+        action: @escaping () -> Void
+    ) {
+        let layoutContainer = activeLayoutContainer ?? self
+        let button = ClearTapButton(frame: .zero, action: action)
+        layoutContainer.addSubview(button)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            button.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -trailing),
+            button.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            button.widthAnchor.constraint(equalToConstant: width),
+            button.heightAnchor.constraint(equalToConstant: height)
+        ])
     }
 
     private func addHomeActionButton(frame: CGRect, action: @escaping () -> Void) {
@@ -5221,10 +5251,19 @@ final class ReferenceCanvasView: UIView {
         registrationAvatarImageView?.image = image
     }
 
-    func updateUploadMedia(image: UIImage, asset: String) {
-        uploadMediaAsset = asset
-        uploadMediaSize = image.size
-        uploadMediaPreviewImageView?.image = image
+    func updateUploadMedia(
+        previewImage: UIImage,
+        mediaAsset: String,
+        coverAsset: String,
+        mediaKind: Int,
+        durationSeconds: TimeInterval? = nil
+    ) {
+        uploadMediaAsset = mediaAsset
+        uploadCoverAsset = coverAsset
+        uploadMediaKind = mediaKind
+        uploadDurationSeconds = durationSeconds
+        uploadMediaSize = previewImage.size
+        uploadMediaPreviewImageView?.image = previewImage
         uploadMediaPreviewImageView?.isHidden = false
         uploadMediaIconView?.isHidden = true
     }
@@ -5244,7 +5283,10 @@ final class ReferenceCanvasView: UIView {
         uploadMediaPreviewImageView = nil
         uploadMediaIconView = nil
         uploadMediaAsset = nil
+        uploadCoverAsset = nil
         uploadMediaSize = nil
+        uploadMediaKind = 0
+        uploadDurationSeconds = nil
         render()
     }
 
