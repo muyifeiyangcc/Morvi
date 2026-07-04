@@ -5,6 +5,8 @@ protocol AccountProfileRepository {
     func register(_ record: AccountProfileRecord, secretText: String) throws
     func accountKey(email: String) throws -> String?
     func secretText(email: String) throws -> String?
+    func displayName(stableKey: String) throws -> String?
+    func avatarAsset(stableKey: String) throws -> String?
     func remove(stableKey: String) throws -> String?
     func count() throws -> Int
 }
@@ -99,6 +101,20 @@ final class SQLiteAccountProfileRepository: AccountProfileRepository {
             bindings: [
                 .text(email)
             ]
+        )
+    }
+
+    func displayName(stableKey: String) throws -> String? {
+        try store.readText(
+            "SELECT display_name FROM account_profile WHERE stable_key = ? LIMIT 1;",
+            bindings: [.text(stableKey)]
+        )
+    }
+
+    func avatarAsset(stableKey: String) throws -> String? {
+        try store.readText(
+            "SELECT avatar_asset FROM account_profile WHERE stable_key = ? LIMIT 1;",
+            bindings: [.text(stableKey)]
         )
     }
 

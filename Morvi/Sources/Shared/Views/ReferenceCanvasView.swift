@@ -188,6 +188,10 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderHome() {
+        let headerContent = AccountSessionCenter.shared.activeHeaderContent()
+        let displayName = headerContent?.displayName ?? "Amelia"
+        let avatarImage = resolveAccountAvatar(headerContent?.avatarAsset)
+            ?? UIImage(named: "profile_avatar")
         let scrollView = CancelFriendlyScrollView()
         scrollView.contentInsetAdjustmentBehavior = .never
         scrollView.contentInset = .zero
@@ -221,6 +225,7 @@ final class ReferenceCanvasView: UIView {
 
         activeLayoutContainer = scrollContent
         addProfileAvatar(
+            image: avatarImage,
             top: 60,
             left: 20,
             size: 58,
@@ -229,8 +234,8 @@ final class ReferenceCanvasView: UIView {
             showsShadow: false
         )
         addText("Welcome back", size: 17, weight: .black, top: 68, left: 96)
-        addText("Amelia", size: 16, weight: .regular, top: 98, left: 96)
-        addText("Hello, Anna!\nDid everything go\nsmoothly today?", size: 30, weight: .regular, top: 146, left: 20)
+        addText(displayName, size: 16, weight: .regular, top: 98, left: 96)
+        addText("Hello, \(displayName)!\nDid everything go\nsmoothly today?", size: 30, weight: .regular, top: 146, left: 20)
         addText("Choose your mood today", size: 20, weight: .bold, top: 303, left: 20)
         addMoodRow(top: 340)
         addButton(
@@ -3092,6 +3097,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func addProfileAvatar(
+        image: UIImage? = nil,
         top: CGFloat,
         left: CGFloat,
         size: CGFloat,
@@ -3100,7 +3106,7 @@ final class ReferenceCanvasView: UIView {
         showsShadow: Bool = true
     ) {
         let layoutContainer = activeLayoutContainer ?? self
-        let imageView = UIImageView(image: UIImage(named: "profile_avatar"))
+        let imageView = UIImageView(image: image ?? UIImage(named: "profile_avatar"))
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = backgroundColor
         imageView.layer.cornerRadius = size / 2
@@ -3130,6 +3136,33 @@ final class ReferenceCanvasView: UIView {
             imageView.topAnchor.constraint(equalTo: shadowHost.topAnchor),
             imageView.bottomAnchor.constraint(equalTo: shadowHost.bottomAnchor)
         ])
+    }
+
+    private func resolveAccountAvatar(_ asset: String?) -> UIImage? {
+        guard let asset, asset.isEmpty == false else {
+            return nil
+        }
+        guard asset.hasPrefix("local-avatar/") else {
+            return UIImage(named: asset)
+        }
+        let fileName = String(asset.dropFirst("local-avatar/".count))
+        guard fileName.isEmpty == false,
+              let baseDirectory = try? FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false
+              ) else {
+            return nil
+        }
+        let fileURL = baseDirectory
+            .appendingPathComponent("Morvi", isDirectory: true)
+            .appendingPathComponent("Avatars", isDirectory: true)
+            .appendingPathComponent(fileName)
+        guard let data = try? Data(contentsOf: fileURL) else {
+            return nil
+        }
+        return UIImage(data: data)
     }
 
     private func addAvatarEditBadge(top: CGFloat, left: CGFloat) {

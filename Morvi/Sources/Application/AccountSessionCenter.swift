@@ -2,6 +2,7 @@ import Foundation
 
 final class AccountSessionCenter {
     static let shared = AccountSessionCenter()
+    static let sessionDidChangeNotification = Notification.Name("Morvi.sessionDidChange")
 
     private let repository: AccountSessionRepository
     private let profileRepository: AccountProfileRepository
@@ -23,6 +24,15 @@ final class AccountSessionCenter {
 
     var activeAccountKey: String? {
         try? repository.activeAccountKey()
+    }
+
+    func activeHeaderContent() -> (displayName: String, avatarAsset: String?)? {
+        guard let accountKey = activeAccountKey,
+              let displayName = try? profileRepository.displayName(stableKey: accountKey) else {
+            return nil
+        }
+        let avatarAsset = try? profileRepository.avatarAsset(stableKey: accountKey)
+        return (displayName, avatarAsset)
     }
 
     func signInAsGuest() throws {
@@ -94,10 +104,12 @@ final class AccountSessionCenter {
             expiresAt: nil
         )
         try repository.activate(record)
+        notifySessionChange()
     }
 
     func clearActiveSession() {
         try? repository.clearActiveSession()
+        notifySessionChange()
     }
 
     func removeActiveAccount() throws -> Bool {
@@ -106,7 +118,17 @@ final class AccountSessionCenter {
         }
         let avatarAsset = try profileRepository.remove(stableKey: accountKey)
         removeLocalAvatarIfNeeded(avatarAsset)
+        notifySessionChange()
         return true
+    }
+
+    private func notifySessionChange() {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(
+                name: Self.sessionDidChangeNotification,
+                object: nil
+            )
+        }
     }
 
     private func removeLocalAvatarIfNeeded(_ avatarAsset: String?) {

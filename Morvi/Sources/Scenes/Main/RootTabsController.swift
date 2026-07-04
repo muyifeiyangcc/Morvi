@@ -22,6 +22,21 @@ final class RootTabsController: UIViewController {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: false)
         view.backgroundColor = .white
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleSessionDidChange),
+            name: AccountSessionCenter.sessionDidChangeNotification,
+            object: nil
+        )
+        renderCurrentPage()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc private func handleSessionDidChange() {
+        guard currentPage == .home else { return }
         renderCurrentPage()
     }
 
