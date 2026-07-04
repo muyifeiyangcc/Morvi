@@ -278,10 +278,6 @@ final class ReferenceCanvasView: UIView {
             didRequestOverlayPage?(.accessGate)
             return
         }
-        guard AccountSessionCenter.shared.activeWalletBalanceValue() >= Self.assistantUnlockCost else {
-            didRequestOverlayPage?(.creditShortage)
-            return
-        }
         didRequestOverlayPage?(.spendConfirm)
     }
 
