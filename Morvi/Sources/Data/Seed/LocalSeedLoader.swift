@@ -29,23 +29,23 @@ final class LocalSeedLoader {
 
     func seedIfNeeded() throws {
         try seedEmbeddedEmailAccountIfNeeded()
-        guard try store.readInt("SELECT COUNT(*) FROM local_seed_state WHERE stable_key = 'built_in_content_v1';") == 0 else {
-            return
+        if try store.readInt("SELECT COUNT(*) FROM local_seed_state WHERE stable_key = 'built_in_content_v1';") == 0 {
+            try seedCatalog()
+            try seedAccounts()
+            try seedRelations()
+            try seedWorks()
+            try seedWorkThemes()
+            try seedReplies()
+            try seedMoodEntries()
+            try seedDialogues()
+            try seedWallet()
+            try seedPermissionCopies()
+            try store.write(
+                "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
+                bindings: [.text("built_in_content_v1"), .text(LocalDateText.now())]
+            )
         }
-        try seedCatalog()
-        try seedAccounts()
-        try seedRelations()
-        try seedWorks()
-        try seedWorkThemes()
-        try seedReplies()
-        try seedMoodEntries()
-        try seedDialogues()
-        try seedWallet()
-        try seedPermissionCopies()
-        try store.write(
-            "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
-            bindings: [.text("built_in_content_v1"), .text(LocalDateText.now())]
-        )
+        try seedEmbeddedEmailConnectionsIfNeeded()
     }
 
     private func seedEmbeddedEmailAccountIfNeeded() throws {
@@ -76,6 +76,43 @@ final class LocalSeedLoader {
             "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
             bindings: [.text(seedKey), .text(now)]
         )
+    }
+
+    private func seedEmbeddedEmailConnectionsIfNeeded() throws {
+        let seedKey = "built_in_email_connections_v1"
+        guard try store.readInt(
+            "SELECT COUNT(*) FROM local_seed_state WHERE stable_key = ?;",
+            bindings: [.text(seedKey)]
+        ) == 0 else {
+            return
+        }
+
+        let now = LocalDateText.now()
+        let originKeys = [
+            "acct-local-liam",
+            "acct-local-jasper",
+            "acct-local-chloe"
+        ]
+        try store.transaction {
+            for originKey in originKeys {
+                try store.write(
+                    """
+                    INSERT OR IGNORE INTO account_relation (
+                        origin_account_key, target_account_key, created_at
+                    ) VALUES (?, ?, ?);
+                    """,
+                    bindings: [
+                        .text(originKey),
+                        .text("acct-email-morv"),
+                        .text(now)
+                    ]
+                )
+            }
+            try store.write(
+                "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
+                bindings: [.text(seedKey), .text(now)]
+            )
+        }
     }
 
     private func seedCatalog() throws {
