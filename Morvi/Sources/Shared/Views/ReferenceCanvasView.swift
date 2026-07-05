@@ -2505,7 +2505,7 @@ final class ReferenceCanvasView: UIView {
                     MorviToastView.show("Please log in first", in: self)
                     return
                 }
-                render()
+                reloadRenderedContent()
                 MorviToastView.show("Purchase successful", in: self)
             } catch {
                 MorviToastView.show("Purchase failed", in: self)
