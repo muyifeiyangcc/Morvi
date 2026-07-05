@@ -46,6 +46,7 @@ final class LocalSeedLoader {
             )
         }
         try seedEmbeddedEmailConnectionsIfNeeded()
+        try seedEmbeddedEmailRestrictionIfNeeded()
     }
 
     private func seedEmbeddedEmailAccountIfNeeded() throws {
@@ -117,6 +118,36 @@ final class LocalSeedLoader {
                 bindings: [
                     .text("acct-email-morv"),
                     .text("acct-local-liam"),
+                    .text(now)
+                ]
+            )
+            try store.write(
+                "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
+                bindings: [.text(seedKey), .text(now)]
+            )
+        }
+    }
+
+    private func seedEmbeddedEmailRestrictionIfNeeded() throws {
+        let seedKey = "built_in_email_restriction_v1"
+        guard try store.readInt(
+            "SELECT COUNT(*) FROM local_seed_state WHERE stable_key = ?;",
+            bindings: [.text(seedKey)]
+        ) == 0 else {
+            return
+        }
+
+        let now = LocalDateText.now()
+        try store.transaction {
+            try store.write(
+                """
+                INSERT OR IGNORE INTO restricted_relation (
+                    owner_account_key, target_account_key, created_at
+                ) VALUES (?, ?, ?);
+                """,
+                bindings: [
+                    .text("acct-local-sophia"),
+                    .text("acct-email-morv"),
                     .text(now)
                 ]
             )
