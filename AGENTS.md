@@ -7,6 +7,7 @@
 - Minimum supported iOS version is 15.6.
 - App version is 1.0.0.
 - All data is local/static unless the requester explicitly changes the requirement.
+- Wallet purchase quantities and displayed prices are finalized and must remain unchanged. Future purchase-item updates may change only the StoreKit product identifiers unless the requester explicitly says otherwise.
 
 ## UI Fidelity
 
