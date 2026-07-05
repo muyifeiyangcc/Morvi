@@ -79,7 +79,7 @@ final class LocalSeedLoader {
     }
 
     private func seedEmbeddedEmailConnectionsIfNeeded() throws {
-        let seedKey = "built_in_email_connections_v1"
+        let seedKey = "built_in_email_connections_v2"
         guard try store.readInt(
             "SELECT COUNT(*) FROM local_seed_state WHERE stable_key = ?;",
             bindings: [.text(seedKey)]
@@ -108,6 +108,18 @@ final class LocalSeedLoader {
                     ]
                 )
             }
+            try store.write(
+                """
+                INSERT OR IGNORE INTO account_relation (
+                    origin_account_key, target_account_key, created_at
+                ) VALUES (?, ?, ?);
+                """,
+                bindings: [
+                    .text("acct-email-morv"),
+                    .text("acct-local-liam"),
+                    .text(now)
+                ]
+            )
             try store.write(
                 "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
                 bindings: [.text(seedKey), .text(now)]
