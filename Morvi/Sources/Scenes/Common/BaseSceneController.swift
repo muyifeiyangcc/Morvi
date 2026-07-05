@@ -319,10 +319,10 @@ class BaseSceneController: UIViewController {
             self?.showCanvasOverlay(targetPage, restrictionSubjectKey: subjectKey)
         }
         overlayView.didCompleteSignOut = { [weak self] in
-            self?.completeSignOutFlow()
+            self?.completeSignOutFlow(toastText: "Logged out successfully")
         }
         overlayView.didCompleteAccountRemoval = { [weak self] in
-            self?.completeSignOutFlow()
+            self?.completeSignOutFlow(toastText: "Account deleted successfully")
         }
     }
 
@@ -330,14 +330,17 @@ class BaseSceneController: UIViewController {
         view.viewWithTag(9102)?.removeFromSuperview()
     }
 
-    private func completeSignOutFlow() {
+    private func completeSignOutFlow(toastText: String) {
         guard let navigationController else { return }
         if let rootTabsController = navigationController.viewControllers.first as? RootTabsController {
             rootTabsController.resetAfterSignOut()
             navigationController.popToRootViewController(animated: false)
+            MorviToastView.show(toastText, in: rootTabsController.view)
             return
         }
-        navigationController.setViewControllers([RootTabsController()], animated: false)
+        let rootTabsController = RootTabsController()
+        navigationController.setViewControllers([rootTabsController], animated: false)
+        MorviToastView.show(toastText, in: rootTabsController.view)
     }
 }
 

@@ -4160,9 +4160,6 @@ final class ReferenceCanvasView: UIView {
                         }
                         self.removeFromSuperview()
                         self.didCompleteAccountRemoval?()
-                        DispatchQueue.main.async {
-                            MorviToastView.show("Account deleted")
-                        }
                     }
                 }
             } catch {

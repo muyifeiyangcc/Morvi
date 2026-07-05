@@ -348,9 +348,13 @@ final class RootTabsController: UIViewController {
         }
         overlayView.didCompleteSignOut = { [weak self] in
             self?.resetAfterSignOut()
+            guard let view = self?.view else { return }
+            MorviToastView.show("Logged out successfully", in: view)
         }
         overlayView.didCompleteAccountRemoval = { [weak self] in
             self?.resetAfterSignOut()
+            guard let view = self?.view else { return }
+            MorviToastView.show("Account deleted successfully", in: view)
         }
     }
 
