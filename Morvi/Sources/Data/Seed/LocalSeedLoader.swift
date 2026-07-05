@@ -28,6 +28,7 @@ final class LocalSeedLoader {
     }
 
     func seedIfNeeded() throws {
+        try seedEmbeddedEmailAccountIfNeeded()
         guard try store.readInt("SELECT COUNT(*) FROM local_seed_state WHERE stable_key = 'built_in_content_v1';") == 0 else {
             return
         }
@@ -44,6 +45,36 @@ final class LocalSeedLoader {
         try store.write(
             "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
             bindings: [.text("built_in_content_v1"), .text(LocalDateText.now())]
+        )
+    }
+
+    private func seedEmbeddedEmailAccountIfNeeded() throws {
+        let seedKey = "built_in_email_access_v1"
+        guard try store.readInt(
+            "SELECT COUNT(*) FROM local_seed_state WHERE stable_key = ?;",
+            bindings: [.text(seedKey)]
+        ) == 0 else {
+            return
+        }
+
+        let now = LocalDateText.now()
+        let record = AccountProfileRecord(
+            stableKey: "acct-email-morv",
+            email: "morv@gmail.com",
+            displayName: "Morv",
+            genderCode: nil,
+            birthDate: nil,
+            locationText: nil,
+            avatarAsset: "default_avatar",
+            coverAsset: "default_avatar",
+            registrationState: 1,
+            createdAt: now,
+            updatedAt: now
+        )
+        try accountRepository.register(record, secretText: "morv")
+        try store.write(
+            "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
+            bindings: [.text(seedKey), .text(now)]
         )
     }
 
