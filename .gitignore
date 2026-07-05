@@ -1,39 +1,8 @@
-# macOS
-.DS_Store
-
-# Xcode user state
-*.xcuserstate
-*.xcscmblueprint
-xcuserdata/
-
-# Build output
-build/
 DerivedData/
-*.ipa
-*.dSYM
-*.dSYM.zip
-*.xcarchive
-
-# Swift Package Manager
-.build/
-Package.resolved
-
-# CocoaPods / Carthage, if added later
-Pods/
-Carthage/Build/
-
-# Logs and temp files
-*.log
-*.tmp
+.DS_Store
+xcuserdata/
+*.xcuserstate
 *.swp
-*.lock
-
-# Local environment
-.env
-.env.*
-
-# Local CodeGraph index
+*.md
 .codegraph/
-
-# External UI references must stay outside the app bundle.
-Morvi-UI/
+.claude/
