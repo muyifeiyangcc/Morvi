@@ -2418,6 +2418,10 @@ final class ReferenceCanvasView: UIView {
         let amounts = [400, 800, 1780, 2450, 5150, 10800, 14900, 29400, 34500, 63700]
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99", "$49.99", "$69.99", "$99.99"]
         let bundlePrefix = Bundle.main.bundleIdentifier ?? "com.morvi.app"
+        let storeIdentifierOverrides = [
+            400: "lvbsvhxcgcrvesor",
+            2450: "dxismgcwewhrtezo"
+        ]
         let listTop: CGFloat = 188
         let rowStep: CGFloat = 80
         let rowHeight: CGFloat = 68
@@ -2456,11 +2460,12 @@ final class ReferenceCanvasView: UIView {
         addWalletBalanceTextGroup(parent: scrollContent, cardTop: 56, amountText: balanceText)
         for index in amounts.indices {
             let top = listTop + CGFloat(index) * rowStep
+            let amount = amounts[index]
             let pack = CreditPack(
-                value: amounts[index],
-                storeIdentifier: "\(bundlePrefix).credit.\(amounts[index])"
+                value: amount,
+                storeIdentifier: storeIdentifierOverrides[amount] ?? "\(bundlePrefix).credit.\(amount)"
             )
-            addWalletListRow(parent: scrollContent, top: top, amount: "\(amounts[index])", price: prices[index]) { [weak self] in
+            addWalletListRow(parent: scrollContent, top: top, amount: "\(amount)", price: prices[index]) { [weak self] in
                 self?.startCreditAcquisition(pack)
             }
         }
