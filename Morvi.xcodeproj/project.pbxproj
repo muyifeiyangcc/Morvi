@@ -103,6 +103,7 @@
 		400000000000000000000205 /* builtin_rowan.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000005 /* builtin_rowan.mp4 */; };
 		400000000000000000000206 /* builtin_jasper.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000006 /* builtin_jasper.mp4 */; };
 		400000000000000000000207 /* builtin_liam.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000007 /* builtin_liam.mp4 */; };
+		778F79B22FFA170600E7F38F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 778F79B12FFA170600E7F38F /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -205,6 +206,7 @@
 		400000000000000000000005 /* builtin_rowan.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_rowan.mp4; sourceTree = "<group>"; };
 		400000000000000000000006 /* builtin_jasper.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_jasper.mp4; sourceTree = "<group>"; };
 		400000000000000000000007 /* builtin_liam.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_liam.mp4; sourceTree = "<group>"; };
+		778F79B12FFA170600E7F38F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -212,6 +214,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				778F79B22FFA170600E7F38F /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				100000000000000000000402 /* Morvi */,
+				778F79B02FFA170600E7F38F /* Frameworks */,
 				100000000000000000000499 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -489,6 +493,14 @@
 				400000000000000000000007 /* builtin_liam.mp4 */,
 			);
 			path = Media;
+			sourceTree = "<group>";
+		};
+		778F79B02FFA170600E7F38F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				778F79B12FFA170600E7F38F /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
