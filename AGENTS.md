@@ -8,6 +8,7 @@
 - App version is 1.0.0.
 - All data is local/static unless the requester explicitly changes the requirement.
 - Wallet purchase quantities and displayed prices are finalized and must remain unchanged. Future purchase-item updates may change only the StoreKit product identifiers unless the requester explicitly says otherwise.
+- Project terminology: "混图" means the bulk binary processing/update of bundled image assets. This step has been completed for the current project and was committed in `0b68f82`.
 
 ## UI Fidelity
 
