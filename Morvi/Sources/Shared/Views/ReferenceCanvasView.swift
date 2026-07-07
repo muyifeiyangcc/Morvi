@@ -5243,7 +5243,7 @@ final class ReferenceCanvasView: UIView {
         }
 
         let bar = UIView()
-        bar.backgroundColor = .clear
+        bar.backgroundColor = .white
         addSubview(bar)
         bar.translatesAutoresizingMaskIntoConstraints = false
 
