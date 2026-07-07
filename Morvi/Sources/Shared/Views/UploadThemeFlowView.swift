@@ -6,7 +6,9 @@ final class UploadThemeFlowView: UIView {
     private var optionButtons: [UIButton] = []
     private let addButton = UIButton(type: .custom)
     private var borderLayers: [UIButton: CAShapeLayer] = [:]
+    private var lastContentHeight: CGFloat = 0
     var didRequestEntry: (() -> Void)?
+    var didUpdateContentHeight: ((CGFloat) -> Void)?
 
     var selectedTitles: [String] {
         values.filter { selectedValues.contains($0) }
@@ -43,6 +45,7 @@ final class UploadThemeFlowView: UIView {
         values.append(value)
         selectedValues.insert(value)
         addOptionButton(title: value, index: values.count - 1)
+        notifyContentHeightIfNeeded()
         setNeedsLayout()
     }
 
@@ -69,6 +72,7 @@ final class UploadThemeFlowView: UIView {
             origin.x += itemSize.width + horizontalSpacing
             rowHeight = max(rowHeight, itemSize.height)
         }
+        notifyContentHeightIfNeeded()
     }
 
     private func configureOptions() {
@@ -98,7 +102,7 @@ final class UploadThemeFlowView: UIView {
     private func configureAddButton() {
         addButton.setTitle("+", for: .normal)
         addButton.setTitleColor(UIColor(white: 0.45, alpha: 1), for: .normal)
-        addButton.titleLabel?.font = AppFont.source(34)
+        addButton.titleLabel?.font = AppFont.source(28)
         addButton.backgroundColor = UIColor(red: 212 / 255, green: 1, blue: 59 / 255, alpha: 0.3)
         addButton.layer.cornerRadius = 10
         addButton.layer.masksToBounds = true
@@ -121,7 +125,7 @@ final class UploadThemeFlowView: UIView {
 
     private func size(for button: UIButton) -> CGSize {
         if button === addButton {
-            return CGSize(width: 96, height: 60)
+            return CGSize(width: 80, height: 45)
         }
 
         let textWidth = ceil(
@@ -130,6 +134,34 @@ final class UploadThemeFlowView: UIView {
             ).width
         )
         return CGSize(width: textWidth + 32, height: 45)
+    }
+
+    private func contentHeight(for width: CGFloat) -> CGFloat {
+        guard width > 0 else { return 45 }
+        let horizontalSpacing: CGFloat = 8
+        let verticalSpacing: CGFloat = 8
+        var originX: CGFloat = 0
+        var totalHeight: CGFloat = 0
+        var rowHeight: CGFloat = 0
+
+        for item in optionButtons + [addButton] {
+            let itemSize = size(for: item)
+            if originX > 0, originX + itemSize.width > width {
+                totalHeight += rowHeight + verticalSpacing
+                originX = 0
+                rowHeight = 0
+            }
+            originX += itemSize.width + horizontalSpacing
+            rowHeight = max(rowHeight, itemSize.height)
+        }
+        return totalHeight + rowHeight
+    }
+
+    private func notifyContentHeightIfNeeded() {
+        let height = contentHeight(for: bounds.width)
+        guard height > 0, abs(height - lastContentHeight) > 0.5 else { return }
+        lastContentHeight = height
+        didUpdateContentHeight?(height)
     }
 
     @objc private func toggleOption(_ button: UIButton) {

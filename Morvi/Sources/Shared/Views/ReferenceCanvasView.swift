@@ -105,6 +105,8 @@ final class ReferenceCanvasView: UIView {
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
     private var uploadThemeEntryBottomConstraint: NSLayoutConstraint?
+    private var uploadThemeHeightConstraint: NSLayoutConstraint?
+    private var uploadFormHeightConstraint: NSLayoutConstraint?
     private var dialogueFlowBottomConstraint: NSLayoutConstraint?
     private var dialogueFlowBottomBaseConstant: CGFloat = 0
     private var keyboardBaseContentInset: UIEdgeInsets?
@@ -2734,8 +2736,10 @@ final class ReferenceCanvasView: UIView {
             formView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             formView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             formView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            formView.heightAnchor.constraint(equalToConstant: 586)
         ])
+        let formHeightConstraint = formView.heightAnchor.constraint(equalToConstant: 518)
+        formHeightConstraint.isActive = true
+        uploadFormHeightConstraint = formHeightConstraint
 
         activeLayoutContainer = formView
         addText("Title of work:", size: 17, weight: .regular, top: 0, left: 20)
@@ -2751,12 +2755,20 @@ final class ReferenceCanvasView: UIView {
             usesGradient: false
         )
         addText("Theme:", size: 17, weight: .regular, top: 99, left: 20)
-        addUploadThemeChoices(top: 131)
-        addText("Description:", size: 17, weight: .regular, top: 314, left: 20)
-        addLargeField("Say something", top: 346) { [weak self] textView in
+        let themeChoices = addUploadThemeChoices(top: 131)
+        let descriptionLabel = addText(
+            "Description:",
+            size: 17,
+            weight: .regular,
+            top: 0,
+            topAnchor: themeChoices.bottomAnchor,
+            topOffset: 17,
+            left: 20
+        )
+        let detailField = addLargeField("Say something", topAnchor: descriptionLabel.bottomAnchor, topOffset: 12) { [weak self] textView in
             self?.uploadDetailTextView = textView
         }
-        addUploadBox(top: 461) { [weak self] in
+        addUploadBox(top: 0, topAnchor: detailField.bottomAnchor, topOffset: 17) { [weak self] in
             self?.didRequestUploadMediaSelection?()
         }
         activeLayoutContainer = nil
@@ -4336,17 +4348,20 @@ final class ReferenceCanvasView: UIView {
         )
     }
 
+    @discardableResult
     private func addText(
         _ text: String,
         size: CGFloat,
         weight: UIFont.Weight,
         top: CGFloat,
+        topAnchor: NSLayoutYAxisAnchor? = nil,
+        topOffset: CGFloat = 0,
         left: CGFloat? = nil,
         centered: Bool = false,
         color: UIColor = .black,
         parent: UIView? = nil,
         usesOneFont: Bool = false
-    ) {
+    ) -> UILabel {
         let layoutContainer = parent ?? activeLayoutContainer ?? self
         let label = UILabel()
         label.text = text
@@ -4360,15 +4375,22 @@ final class ReferenceCanvasView: UIView {
         if centered {
             NSLayoutConstraint.activate([
                 label.centerXAnchor.constraint(equalTo: layoutContainer.centerXAnchor),
-                label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top)
+                label.topAnchor.constraint(
+                    equalTo: topAnchor ?? layoutContainer.topAnchor,
+                    constant: topAnchor == nil ? top : topOffset
+                )
             ])
         } else {
             NSLayoutConstraint.activate([
                 label.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: left ?? 20),
-                label.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+                label.topAnchor.constraint(
+                    equalTo: topAnchor ?? layoutContainer.topAnchor,
+                    constant: topAnchor == nil ? top : topOffset
+                ),
                 label.trailingAnchor.constraint(lessThanOrEqualTo: layoutContainer.trailingAnchor, constant: -20)
             ])
         }
+        return label
     }
 
     private func addEntrySignUpPrompt(top: CGFloat) {
@@ -5182,22 +5204,36 @@ final class ReferenceCanvasView: UIView {
         }
     }
 
-    private func addUploadThemeChoices(top: CGFloat) {
+    private func addUploadThemeChoices(top: CGFloat) -> UploadThemeFlowView {
         let layoutContainer = activeLayoutContainer ?? self
         let flowView = UploadThemeFlowView()
         flowView.didRequestEntry = { [weak self] in
             self?.showUploadThemeEntry()
         }
+        flowView.didUpdateContentHeight = { [weak self] height in
+            self?.updateUploadThemeHeight(height)
+        }
         uploadThemeFlowView = flowView
         layoutContainer.addSubview(flowView)
         flowView.translatesAutoresizingMaskIntoConstraints = false
 
+        let heightConstraint = flowView.heightAnchor.constraint(equalToConstant: 98)
         NSLayoutConstraint.activate([
             flowView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
             flowView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
             flowView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            flowView.heightAnchor.constraint(equalToConstant: 166)
+            heightConstraint
         ])
+        uploadThemeHeightConstraint = heightConstraint
+        return flowView
+    }
+
+    private func updateUploadThemeHeight(_ height: CGFloat) {
+        let adjustedHeight = max(45, ceil(height))
+        let heightDelta = adjustedHeight - 98
+        uploadThemeHeightConstraint?.constant = adjustedHeight
+        uploadFormHeightConstraint?.constant = 518 + max(0, heightDelta)
+        layoutIfNeeded()
     }
 
     private func showUploadThemeEntry() {
@@ -5288,6 +5324,8 @@ final class ReferenceCanvasView: UIView {
     private func addLargeField(
         _ text: String,
         top: CGFloat? = nil,
+        topAnchor: NSLayoutYAxisAnchor? = nil,
+        topOffset: CGFloat = 0,
         height: CGFloat = 98,
         horizontalMargin: CGFloat = 20,
         parent: UIView? = nil,
@@ -5313,6 +5351,8 @@ final class ReferenceCanvasView: UIView {
         ]
         if let bottomAnchor {
             fieldConstraints.append(field.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -bottomInset))
+        } else if let topAnchor {
+            fieldConstraints.append(field.topAnchor.constraint(equalTo: topAnchor, constant: topOffset))
         } else if let top {
             fieldConstraints.append(field.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top))
         }
@@ -5512,7 +5552,12 @@ final class ReferenceCanvasView: UIView {
         return bar
     }
 
-    private func addUploadBox(top: CGFloat, action: (() -> Void)? = nil) {
+    private func addUploadBox(
+        top: CGFloat,
+        topAnchor: NSLayoutYAxisAnchor? = nil,
+        topOffset: CGFloat = 0,
+        action: (() -> Void)? = nil
+    ) {
         let layoutContainer = activeLayoutContainer ?? self
         let box = AdaptiveInputView(
             backgroundColor: UIColor(red: 0.94, green: 1, blue: 0.72, alpha: 1)
@@ -5521,7 +5566,10 @@ final class ReferenceCanvasView: UIView {
         box.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             box.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
-            box.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
+            box.topAnchor.constraint(
+                equalTo: topAnchor ?? layoutContainer.topAnchor,
+                constant: topAnchor == nil ? top : topOffset
+            ),
             box.widthAnchor.constraint(equalToConstant: 92),
             box.heightAnchor.constraint(equalToConstant: 115)
         ])
@@ -6755,6 +6803,8 @@ final class ReferenceCanvasView: UIView {
         uploadThemeEntryBar = nil
         uploadThemeEntryField = nil
         uploadThemeEntryBottomConstraint = nil
+        uploadThemeHeightConstraint = nil
+        uploadFormHeightConstraint = nil
         uploadMediaPreviewImageView = nil
         uploadMediaIconView = nil
         uploadMediaPlayIconView = nil
