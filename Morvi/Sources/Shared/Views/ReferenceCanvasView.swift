@@ -2426,13 +2426,13 @@ final class ReferenceCanvasView: UIView {
         let priceIdentifierOverrides = [
             "$0.99": "bcjodszynuihipsk",
             "$1.99": "tdulbbdomajoooqr",
-            "$3.99": "qvlencrxbtusmafi",
+            "$3.99": "jfukgudeggyrveyo",
             "$4.99": "amdpfahrifiexlmv",
             "$9.99": "eufeglzkhljolhug",
             "$19.99": "drivaquowyrtjtzx",
-            "$29.99": "pkrzomdwaqtfybnl",
+            "$29.99": "kxafnnejjhdudgmq",
             "$49.99": "yrvtfaqctgexvxlr",
-            "$69.99": "xubqantvfrlepdys",
+            "$69.99": "vdjzqpsrzdfnrbwb",
             "$99.99": "dnirxqknbwivqyyc"
         ]
         let listTop: CGFloat = 188
