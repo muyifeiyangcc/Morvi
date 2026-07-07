@@ -50,6 +50,8 @@ final class ReferenceCanvasView: UIView {
     private static let assistantPendingState = 1
     private static let assistantThinkingText = "Thinking..."
     private static let floatingDockClearance: CGFloat = 114
+    private static let userAgreementURLString = "https://sites.google.com/view/morvi-web/home/morvi-user-agreement"
+    private static let privacyPolicyURLString = "https://sites.google.com/view/morvi-web/home/morvis-privacy-policy"
     private static let visualAssetCache = NSCache<NSString, UIImage>()
     private static var agreementConsentAccepted = true
     private static let agreementConsentDidChangeNotification = Notification.Name("Morvi.agreementConsentDidChange")
@@ -3244,7 +3246,7 @@ final class ReferenceCanvasView: UIView {
     }
 
     private func renderAgreement() {
-        addTopTitle("EULA")
+        addTopTitle(RouteContextStore.currentAgreementTitle() ?? "EULA")
         let bottomBar: UIView?
         if showsAgreementActionArea {
             let actionBar = UIView()
@@ -3291,7 +3293,25 @@ final class ReferenceCanvasView: UIView {
             bringSubviewToFront(bottomBar)
         }
         showProgressOverlay()
-        webView.loadHTMLString(agreementHTML(), baseURL: nil)
+        if let agreementURL = agreementURL() {
+            webView.load(URLRequest(url: agreementURL))
+        } else {
+            webView.loadHTMLString(agreementHTML(), baseURL: nil)
+        }
+    }
+
+    private func agreementURL() -> URL? {
+        let title = RouteContextStore.currentAgreementTitle()
+        let urlString: String
+        switch title {
+        case "Privacy Policy":
+            urlString = Self.privacyPolicyURLString
+        case "User Agreement":
+            urlString = Self.userAgreementURLString
+        default:
+            return nil
+        }
+        return URL(string: urlString)
     }
 
     private func agreementHTML() -> String {
@@ -3324,6 +3344,10 @@ final class ReferenceCanvasView: UIView {
         li {
             margin: 0;
         }
+        a {
+            color: #3F3F3F;
+            text-decoration: underline;
+        }
         </style>
         </head>
         <body>
@@ -3350,7 +3374,7 @@ final class ReferenceCanvasView: UIView {
         <p>3.2 Our Response</p>
         <p>We will review reported content within 24 hours and take appropriate measures (e.g., removing content, warning or banning users). Repeated violations may result in permanent account suspension.</p>
         <p class="section">4. Privacy Policy</p>
-        <p>By using the App, you acknowledge having read and agreed to our [Privacy Policy], which details how we collect, use and protect your personal information.</p>
+        <p>By using the App, you acknowledge having read and agreed to our <a href="\(Self.privacyPolicyURLString)">Privacy Policy</a>, which details how we collect, use and protect your personal information.</p>
         <p class="section">5. Termination</p>
         <p>We may terminate or suspend your access to the App at any time, with or without notice. You may stop using the App and delete your account at any time.</p>
         <p class="section">6. Modification of the Agreement</p>
@@ -6632,30 +6656,32 @@ final class ReferenceCanvasView: UIView {
         iconView.translatesAutoresizingMaskIntoConstraints = false
         agreementConsentIconView = iconView
 
-        let agreementControl = UIButton(type: .custom)
-        agreementControl.contentHorizontalAlignment = .leading
-        agreementControl.addTarget(self, action: #selector(openAgreementPage), for: .touchUpInside)
-        agreementControl.accessibilityLabel = "User Agreement and Privacy Policy"
-        let text = "Agree with  User Agreement and Privacy Policy"
-        let value = NSMutableAttributedString(
-            string: text,
-            attributes: [
-                .font: AppFont.source(12),
-                .foregroundColor: UIColor.gray
-            ]
-        )
-        let first = (text as NSString).range(of: "User Agreement")
-        let second = (text as NSString).range(of: "Privacy Policy")
-        value.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: first)
-        value.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: second)
-        value.addAttribute(.foregroundColor, value: UIColor.darkGray, range: first)
-        value.addAttribute(.foregroundColor, value: UIColor.darkGray, range: second)
-        agreementControl.setAttributedTitle(value, for: .normal)
+        let prefixLabel = UILabel()
+        prefixLabel.text = "Agree with  "
+        prefixLabel.font = AppFont.source(12)
+        prefixLabel.textColor = .gray
+        container.addSubview(prefixLabel)
+        prefixLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        let agreementControl = underlinedAgreementButton("User Agreement", action: #selector(openUserAgreementPage))
+        agreementControl.accessibilityLabel = "User Agreement"
         container.addSubview(agreementControl)
         agreementControl.translatesAutoresizingMaskIntoConstraints = false
+
+        let middleLabel = UILabel()
+        middleLabel.text = " and "
+        middleLabel.font = AppFont.source(12)
+        middleLabel.textColor = .gray
+        container.addSubview(middleLabel)
+        middleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        let privacyControl = underlinedAgreementButton("Privacy Policy", action: #selector(openPrivacyPolicyPage))
+        privacyControl.accessibilityLabel = "Privacy Policy"
+        container.addSubview(privacyControl)
+        privacyControl.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             iconControl.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 36.5),
-            iconControl.centerYAnchor.constraint(equalTo: agreementControl.centerYAnchor),
+            iconControl.centerYAnchor.constraint(equalTo: prefixLabel.centerYAnchor),
             iconControl.widthAnchor.constraint(equalToConstant: 40),
             iconControl.heightAnchor.constraint(equalToConstant: 40),
 
@@ -6664,13 +6690,48 @@ final class ReferenceCanvasView: UIView {
             iconView.widthAnchor.constraint(equalToConstant: 17),
             iconView.heightAnchor.constraint(equalToConstant: 17),
 
-            agreementControl.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 70),
-            agreementControl.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+            prefixLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 70),
+            prefixLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+
+            agreementControl.leadingAnchor.constraint(equalTo: prefixLabel.trailingAnchor),
+            agreementControl.centerYAnchor.constraint(equalTo: prefixLabel.centerYAnchor),
+            agreementControl.heightAnchor.constraint(equalToConstant: 30),
+
+            middleLabel.leadingAnchor.constraint(equalTo: agreementControl.trailingAnchor),
+            middleLabel.centerYAnchor.constraint(equalTo: prefixLabel.centerYAnchor),
+
+            privacyControl.leadingAnchor.constraint(equalTo: middleLabel.trailingAnchor),
+            privacyControl.centerYAnchor.constraint(equalTo: prefixLabel.centerYAnchor),
+            privacyControl.heightAnchor.constraint(equalToConstant: 30),
+            privacyControl.trailingAnchor.constraint(lessThanOrEqualTo: container.trailingAnchor, constant: -8)
         ])
         return container
     }
 
-    @objc private func openAgreementPage() {
+    private func underlinedAgreementButton(_ title: String, action: Selector) -> UIButton {
+        let button = UIButton(type: .custom)
+        button.setAttributedTitle(
+            NSAttributedString(
+                string: title,
+                attributes: [
+                    .font: AppFont.source(12),
+                    .foregroundColor: UIColor.darkGray,
+                    .underlineStyle: NSUnderlineStyle.single.rawValue
+                ]
+            ),
+            for: .normal
+        )
+        button.addTarget(self, action: action, for: .touchUpInside)
+        return button
+    }
+
+    @objc private func openUserAgreementPage() {
+        RouteContextStore.setAgreementTitle("User Agreement")
+        didRequestPage?(.agreement)
+    }
+
+    @objc private func openPrivacyPolicyPage() {
+        RouteContextStore.setAgreementTitle("Privacy Policy")
         didRequestPage?(.agreement)
     }
 
