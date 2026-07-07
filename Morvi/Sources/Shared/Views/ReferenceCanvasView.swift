@@ -88,6 +88,8 @@ final class ReferenceCanvasView: UIView {
     private weak var uploadTitleField: UITextField?
     private weak var uploadDetailTextView: UITextView?
     private weak var uploadThemeFlowView: UploadThemeFlowView?
+    private weak var uploadThemeEntryBar: UIView?
+    private weak var uploadThemeEntryField: UITextField?
     private weak var uploadMediaPreviewImageView: UIImageView?
     private weak var uploadMediaIconView: UIImageView?
     private weak var uploadMediaPlayIconView: UIImageView?
@@ -102,6 +104,7 @@ final class ReferenceCanvasView: UIView {
     private var profileEditAvatarAsset: String?
     private var keyboardAvoidanceBottomConstraint: NSLayoutConstraint?
     private var keyboardAvoidanceBaseBottomConstant: CGFloat = 0
+    private var uploadThemeEntryBottomConstraint: NSLayoutConstraint?
     private var dialogueFlowBottomConstraint: NSLayoutConstraint?
     private var dialogueFlowBottomBaseConstant: CGFloat = 0
     private var keyboardBaseContentInset: UIEdgeInsets?
@@ -2731,7 +2734,7 @@ final class ReferenceCanvasView: UIView {
             formView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             formView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
             formView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
-            formView.heightAnchor.constraint(equalToConstant: 518)
+            formView.heightAnchor.constraint(equalToConstant: 586)
         ])
 
         activeLayoutContainer = formView
@@ -2749,11 +2752,11 @@ final class ReferenceCanvasView: UIView {
         )
         addText("Theme:", size: 17, weight: .regular, top: 99, left: 20)
         addUploadThemeChoices(top: 131)
-        addText("Description:", size: 17, weight: .regular, top: 246, left: 20)
-        addLargeField("Say something", top: 278) { [weak self] textView in
+        addText("Description:", size: 17, weight: .regular, top: 314, left: 20)
+        addLargeField("Say something", top: 346) { [weak self] textView in
             self?.uploadDetailTextView = textView
         }
-        addUploadBox(top: 393) { [weak self] in
+        addUploadBox(top: 461) { [weak self] in
             self?.didRequestUploadMediaSelection?()
         }
         activeLayoutContainer = nil
@@ -4650,6 +4653,9 @@ final class ReferenceCanvasView: UIView {
         let keyboardFrameInView = convert(keyboardFrame, from: nil)
         let isHiding = notification.name == UIResponder.keyboardWillHideNotification
         keyboardIsVisible = !isHiding && keyboardFrameInView.minY < bounds.maxY
+        if isHiding {
+            removeUploadThemeEntryBar()
+        }
         if let scrollView = keyboardAwareScrollView {
             updateKeyboardAwareScrollView(
                 scrollView,
@@ -5179,6 +5185,9 @@ final class ReferenceCanvasView: UIView {
     private func addUploadThemeChoices(top: CGFloat) {
         let layoutContainer = activeLayoutContainer ?? self
         let flowView = UploadThemeFlowView()
+        flowView.didRequestEntry = { [weak self] in
+            self?.showUploadThemeEntry()
+        }
         uploadThemeFlowView = flowView
         layoutContainer.addSubview(flowView)
         flowView.translatesAutoresizingMaskIntoConstraints = false
@@ -5187,8 +5196,92 @@ final class ReferenceCanvasView: UIView {
             flowView.leadingAnchor.constraint(equalTo: layoutContainer.leadingAnchor, constant: 20),
             flowView.trailingAnchor.constraint(equalTo: layoutContainer.trailingAnchor, constant: -20),
             flowView.topAnchor.constraint(equalTo: layoutContainer.topAnchor, constant: top),
-            flowView.heightAnchor.constraint(equalToConstant: 98)
+            flowView.heightAnchor.constraint(equalToConstant: 166)
         ])
+    }
+
+    private func showUploadThemeEntry() {
+        if let field = uploadThemeEntryField {
+            field.becomeFirstResponder()
+            return
+        }
+
+        let bar = UIView()
+        bar.backgroundColor = .clear
+        addSubview(bar)
+        bar.translatesAutoresizingMaskIntoConstraints = false
+
+        let field = AdaptiveInputView(
+            backgroundColor: UIColor(red: 212 / 255, green: 1, blue: 59 / 255, alpha: 0.3),
+            gradientColors: nil
+        )
+        bar.addSubview(field)
+        field.translatesAutoresizingMaskIntoConstraints = false
+
+        let textField = UITextField()
+        textField.borderStyle = .none
+        textField.backgroundColor = .clear
+        textField.textColor = .black
+        textField.tintColor = .black
+        textField.font = AppFont.source(15)
+        textField.autocapitalizationType = .words
+        textField.autocorrectionType = .no
+        textField.returnKeyType = .done
+        textField.attributedPlaceholder = NSAttributedString(
+            string: "Theme",
+            attributes: [
+                .font: AppFont.source(15),
+                .foregroundColor: UIColor.gray
+            ]
+        )
+        textField.addTarget(self, action: #selector(commitUploadThemeEntry), for: .primaryActionTriggered)
+        field.addSubview(textField)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+
+        let bottomConstraint = bar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
+        NSLayoutConstraint.activate([
+            bar.leadingAnchor.constraint(equalTo: leadingAnchor),
+            bar.trailingAnchor.constraint(equalTo: trailingAnchor),
+            bottomConstraint,
+            bar.heightAnchor.constraint(equalToConstant: 62),
+
+            field.leadingAnchor.constraint(equalTo: bar.leadingAnchor, constant: 20),
+            field.trailingAnchor.constraint(equalTo: bar.trailingAnchor, constant: -20),
+            field.topAnchor.constraint(equalTo: bar.topAnchor, constant: 4),
+            field.heightAnchor.constraint(equalToConstant: 54),
+
+            textField.leadingAnchor.constraint(equalTo: field.leadingAnchor, constant: 16),
+            textField.trailingAnchor.constraint(equalTo: field.trailingAnchor, constant: -16),
+            textField.topAnchor.constraint(equalTo: field.topAnchor),
+            textField.bottomAnchor.constraint(equalTo: field.bottomAnchor)
+        ])
+
+        uploadThemeEntryBar = bar
+        uploadThemeEntryField = textField
+        uploadThemeEntryBottomConstraint = bottomConstraint
+        keyboardAvoidanceInputView = bar
+        keyboardAvoidanceBottomConstraint = bottomConstraint
+        keyboardAvoidanceBaseBottomConstant = -24
+        bringSubviewToFront(bar)
+        textField.becomeFirstResponder()
+    }
+
+    @objc private func commitUploadThemeEntry() {
+        let value = uploadThemeEntryField?.text ?? ""
+        uploadThemeFlowView?.appendTheme(value)
+        endEditing(true)
+        removeUploadThemeEntryBar()
+    }
+
+    private func removeUploadThemeEntryBar() {
+        uploadThemeEntryBar?.removeFromSuperview()
+        uploadThemeEntryBar = nil
+        uploadThemeEntryField = nil
+        uploadThemeEntryBottomConstraint = nil
+        if keyboardAvoidanceInputView == nil || keyboardAvoidanceInputView?.superview == nil {
+            keyboardAvoidanceBottomConstraint = nil
+            keyboardAvoidanceBaseBottomConstant = 0
+        }
     }
 
     @discardableResult
@@ -6659,6 +6752,9 @@ final class ReferenceCanvasView: UIView {
         uploadTitleField = nil
         uploadDetailTextView = nil
         uploadThemeFlowView = nil
+        uploadThemeEntryBar = nil
+        uploadThemeEntryField = nil
+        uploadThemeEntryBottomConstraint = nil
         uploadMediaPreviewImageView = nil
         uploadMediaIconView = nil
         uploadMediaPlayIconView = nil
