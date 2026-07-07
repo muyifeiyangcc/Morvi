@@ -47,6 +47,7 @@ final class LocalSeedLoader {
         }
         try seedEmbeddedEmailConnectionsIfNeeded()
         try seedEmbeddedEmailRestrictionIfNeeded()
+        try updateBuiltInVideoCoversIfNeeded()
     }
 
     private func seedEmbeddedEmailAccountIfNeeded() throws {
@@ -292,7 +293,7 @@ final class LocalSeedLoader {
                 bodyText: "Golden hour by the sea. ✨🌅 Just standard beautiful sunset vibes with the crashing waves.",
                 mediaKind: 1,
                 mediaAsset: "builtin_victoria.mp4",
-                coverAsset: "builtin_avatar_victoria",
+                coverAsset: "builtin_video_cover_victoria",
                 mediaWidth: 736,
                 mediaHeight: 914,
                 durationSeconds: nil,
@@ -307,7 +308,7 @@ final class LocalSeedLoader {
                 bodyText: "Chasing the last bit of light. 🌾",
                 mediaKind: 1,
                 mediaAsset: "builtin_sophia.mp4",
-                coverAsset: "builtin_avatar_sophia",
+                coverAsset: "builtin_video_cover_sophia",
                 mediaWidth: 736,
                 mediaHeight: 949,
                 durationSeconds: nil,
@@ -322,7 +323,7 @@ final class LocalSeedLoader {
                 bodyText: "Quick mirror selfie before heading out. ✨",
                 mediaKind: 1,
                 mediaAsset: "builtin_chloe.mp4",
-                coverAsset: "builtin_avatar_chloe",
+                coverAsset: "builtin_video_cover_chloe",
                 mediaWidth: 1125,
                 mediaHeight: 1116,
                 durationSeconds: nil,
@@ -337,7 +338,7 @@ final class LocalSeedLoader {
                 bodyText: "Living in this fit all weekend.",
                 mediaKind: 1,
                 mediaAsset: "builtin_amelia.mp4",
-                coverAsset: "builtin_avatar_amelia",
+                coverAsset: "builtin_video_cover_amelia",
                 mediaWidth: 900,
                 mediaHeight: 1200,
                 durationSeconds: nil,
@@ -352,7 +353,7 @@ final class LocalSeedLoader {
                 bodyText: "Quiet nights, loud mind.",
                 mediaKind: 1,
                 mediaAsset: "builtin_rowan.mp4",
-                coverAsset: "builtin_avatar_rowan",
+                coverAsset: "builtin_video_cover_rowan",
                 mediaWidth: 688,
                 mediaHeight: 1024,
                 durationSeconds: nil,
@@ -367,7 +368,7 @@ final class LocalSeedLoader {
                 bodyText: "Sun on my skin, salt in the air.",
                 mediaKind: 1,
                 mediaAsset: "builtin_jasper.mp4",
-                coverAsset: "builtin_avatar_jasper",
+                coverAsset: "builtin_video_cover_jasper",
                 mediaWidth: 585,
                 mediaHeight: 1024,
                 durationSeconds: nil,
@@ -382,7 +383,7 @@ final class LocalSeedLoader {
                 bodyText: "Balcony brews hit different. ☕",
                 mediaKind: 1,
                 mediaAsset: "builtin_liam.mp4",
-                coverAsset: "builtin_avatar_liam",
+                coverAsset: "builtin_video_cover_liam",
                 mediaWidth: 735,
                 mediaHeight: 1105,
                 durationSeconds: nil,
@@ -392,6 +393,48 @@ final class LocalSeedLoader {
             )
         ]
         try works.forEach { try workRepository.save($0) }
+    }
+
+    private func updateBuiltInVideoCoversIfNeeded() throws {
+        let seedKey = "built_in_video_covers_v1"
+        guard try store.readInt(
+            "SELECT COUNT(*) FROM local_seed_state WHERE stable_key = ?;",
+            bindings: [.text(seedKey)]
+        ) == 0 else {
+            return
+        }
+
+        let now = LocalDateText.now()
+        let covers = [
+            ("work-local-victoria", "builtin_video_cover_victoria"),
+            ("work-local-sophia", "builtin_video_cover_sophia"),
+            ("work-local-chloe", "builtin_video_cover_chloe"),
+            ("work-local-amelia", "builtin_video_cover_amelia"),
+            ("work-local-rowan", "builtin_video_cover_rowan"),
+            ("work-local-jasper", "builtin_video_cover_jasper"),
+            ("work-local-liam", "builtin_video_cover_liam")
+        ]
+        try store.transaction {
+            for (workKey, coverAsset) in covers {
+                try store.write(
+                    """
+                    UPDATE creative_work
+                    SET cover_asset = ?, updated_at = ?
+                    WHERE stable_key = ?
+                        AND media_kind = 1;
+                    """,
+                    bindings: [
+                        .text(coverAsset),
+                        .text(now),
+                        .text(workKey)
+                    ]
+                )
+            }
+            try store.write(
+                "INSERT OR REPLACE INTO local_seed_state (stable_key, created_at) VALUES (?, ?);",
+                bindings: [.text(seedKey), .text(now)]
+            )
+        }
     }
 
     private func seedWorkThemes() throws {
