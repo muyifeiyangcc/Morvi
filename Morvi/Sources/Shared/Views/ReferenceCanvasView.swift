@@ -2426,7 +2426,7 @@ final class ReferenceCanvasView: UIView {
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99", "$49.99", "$69.99", "$99.99"]
         let bundlePrefix = Bundle.main.bundleIdentifier ?? "com.morvi.app"
         let priceIdentifierOverrides = [
-            "$0.99": "vgtwkjnvczjlauxf",
+            "$0.99": "mqlravtspzbnheyc",
             "$1.99": "qmwkqadsjekmrvjl",
             "$3.99": "jfukgudeggyrveyo",
             "$4.99": "lwauthykogfgikvz",
