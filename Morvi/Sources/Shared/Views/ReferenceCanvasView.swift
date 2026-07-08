@@ -2426,16 +2426,16 @@ final class ReferenceCanvasView: UIView {
         let prices = ["$0.99", "$1.99", "$3.99", "$4.99", "$9.99", "$19.99", "$29.99", "$49.99", "$69.99", "$99.99"]
         let bundlePrefix = Bundle.main.bundleIdentifier ?? "com.morvi.app"
         let priceIdentifierOverrides = [
-            "$0.99": "bcjodszynuihipsk",
-            "$1.99": "tdulbbdomajoooqr",
+            "$0.99": "vgtwkjnvczjlauxf",
+            "$1.99": "qmwkqadsjekmrvjl",
             "$3.99": "jfukgudeggyrveyo",
-            "$4.99": "amdpfahrifiexlmv",
-            "$9.99": "eufeglzkhljolhug",
-            "$19.99": "drivaquowyrtjtzx",
+            "$4.99": "lwauthykogfgikvz",
+            "$9.99": "ekilrobkqllkbcfw",
+            "$19.99": "txictgmtylhydqow",
             "$29.99": "kxafnnejjhdudgmq",
-            "$49.99": "yrvtfaqctgexvxlr",
+            "$49.99": "czeaavhyyldqftuc",
             "$69.99": "vdjzqpsrzdfnrbwb",
-            "$99.99": "dnirxqknbwivqyyc"
+            "$99.99": "eujrdvblverymclw"
         ]
         let listTop: CGFloat = 188
         let rowStep: CGFloat = 80
