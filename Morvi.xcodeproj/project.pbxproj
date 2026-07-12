@@ -7,59 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		100000000000000000000101 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* AppDelegate.swift */; };
-		100000000000000000000102 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* SceneDelegate.swift */; };
-		100000000000000000000103 /* FlowShellController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000003 /* FlowShellController.swift */; };
-		100000000000000000000104 /* RouteFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000004 /* RouteFactory.swift */; };
-		100000000000000000000105 /* ScenePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* ScenePage.swift */; };
-		100000000000000000000106 /* EntrySceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* EntrySceneController.swift */; };
-		100000000000000000000107 /* BaseSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* BaseSceneController.swift */; };
-		100000000000000000000108 /* ReferencePageController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* ReferencePageController.swift */; };
-		100000000000000000000109 /* RootTabsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* RootTabsController.swift */; };
-		100000000000000000000110 /* ClearTapButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000010 /* ClearTapButton.swift */; };
-		100000000000000000000111 /* HitArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000011 /* HitArea.swift */; };
-		100000000000000000000112 /* UIViewControllerHitAreas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000012 /* UIViewControllerHitAreas.swift */; };
-		100000000000000000000113 /* CustomTopLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000013 /* CustomTopLayerView.swift */; };
-		100000000000000000000114 /* ReferenceCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000014 /* ReferenceCanvasView.swift */; };
-		100000000000000000000115 /* FloatingDockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* FloatingDockView.swift */; };
-		100000000000000000000116 /* DesignSurfaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000016 /* DesignSurfaceView.swift */; };
-		100000000000000000000117 /* AppFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000017 /* AppFont.swift */; };
-		100000000000000000000118 /* DecorativeGradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000018 /* DecorativeGradientView.swift */; };
-		100000000000000000000119 /* RadialGlowLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000019 /* RadialGlowLayer.swift */; };
-		100000000000000000000120 /* AuthSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000020 /* AuthSceneController.swift */; };
-		100000000000000000000121 /* MorviProgressOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000025 /* MorviProgressOverlayView.swift */; };
-		100000000000000000000122 /* DiscoverStoryStripView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000026 /* DiscoverStoryStripView.swift */; };
-		100000000000000000000123 /* AdaptiveInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000027 /* AdaptiveInputView.swift */; };
-		100000000000000000000124 /* GradientActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000028 /* GradientActionButton.swift */; };
-		100000000000000000000125 /* ReplyListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000038 /* ReplyListItem.swift */; };
-		100000000000000000000126 /* ReplyListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000039 /* ReplyListCell.swift */; };
-		100000000000000000000127 /* ReplyListDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000040 /* ReplyListDataSource.swift */; };
-		100000000000000000000128 /* ArrowBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000041 /* ArrowBubbleView.swift */; };
-		100000000000000000000129 /* DialogueMomentFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000042 /* DialogueMomentFormatter.swift */; };
-		100000000000000000000130 /* DialogueFlowEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000043 /* DialogueFlowEntry.swift */; };
-		100000000000000000000131 /* DialogueFlowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000044 /* DialogueFlowCell.swift */; };
-		100000000000000000000132 /* DialogueFlowListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000045 /* DialogueFlowListView.swift */; };
-		100000000000000000000133 /* AudioClipBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000046 /* AudioClipBubbleView.swift */; };
-		100000000000000000000134 /* GradientRingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000047 /* GradientRingView.swift */; };
-		100000000000000000000135 /* VoiceRippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000048 /* VoiceRippleView.swift */; };
-		100000000000000000000136 /* MorviToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000049 /* MorviToastView.swift */; };
-		100000000000000000000137 /* NotchedPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000050 /* NotchedPanelView.swift */; };
-		100000000000000000000138 /* FadeUnderlineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000051 /* FadeUnderlineView.swift */; };
-		100000000000000000000139 /* IntroCopyPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000052 /* IntroCopyPanelView.swift */; };
-		100000000000000000000140 /* WeeklyFeelingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000053 /* WeeklyFeelingListView.swift */; };
-		100000000000000000000141 /* WeeklyFeelingHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000054 /* WeeklyFeelingHeaderView.swift */; };
-		100000000000000000000142 /* WeeklyFeelingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000055 /* WeeklyFeelingCell.swift */; };
-		100000000000000000000143 /* DialogueCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000056 /* DialogueCardCell.swift */; };
-		100000000000000000000144 /* DialogueCardListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000057 /* DialogueCardListView.swift */; };
-		100000000000000000000145 /* CancelFriendlyScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000058 /* CancelFriendlyScrollView.swift */; };
-		100000000000000000000146 /* RestrictedRosterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000059 /* RestrictedRosterCell.swift */; };
-		100000000000000000000147 /* RestrictedRosterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000060 /* RestrictedRosterListView.swift */; };
-		100000000000000000000148 /* CancelFriendlyTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000061 /* CancelFriendlyTableView.swift */; };
-		100000000000000000000149 /* CancelFriendlyCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000062 /* CancelFriendlyCollectionView.swift */; };
-		100000000000000000000150 /* AccountSessionCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000063 /* AccountSessionCenter.swift */; };
-		100000000000000000000151 /* StorefrontCreditBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000064 /* StorefrontCreditBroker.swift */; };
-		100000000000000000000152 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000065 /* EmptyStateView.swift */; };
-		100000000000000000000153 /* MediaPreviewOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000066 /* MediaPreviewOverlayView.swift */; };
+		100000000000000000000101 /* MorviApplicationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* MorviApplicationDelegate.swift */; };
+		100000000000000000000102 /* WindowSceneBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* WindowSceneBridge.swift */; };
 		100000000000000000000201 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000021 /* Assets.xcassets */; };
 		100000000000000000000202 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* LaunchScreen.storyboard */; };
 		100000000000000000000203 /* SourceHanSansSC-ExtraLight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000030 /* SourceHanSansSC-ExtraLight.otf */; };
@@ -70,32 +19,6 @@
 		100000000000000000000208 /* SourceHanSansSC-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000035 /* SourceHanSansSC-Bold.otf */; };
 		100000000000000000000209 /* SourceHanSansSC-Heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000036 /* SourceHanSansSC-Heavy.otf */; };
 		100000000000000000000210 /* FredokaOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000037 /* FredokaOne-Regular.ttf */; };
-		200000000000000000000101 /* UploadThemeFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200000000000000000000001 /* UploadThemeFlowView.swift */; };
-		300000000000000000000101 /* LocalStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000001 /* LocalStoreError.swift */; };
-		300000000000000000000102 /* LocalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000002 /* LocalStore.swift */; };
-		300000000000000000000103 /* LocalStoreValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000003 /* LocalStoreValue.swift */; };
-		300000000000000000000104 /* LocalDataMigrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000004 /* LocalDataMigrator.swift */; };
-		300000000000000000000105 /* LocalDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000005 /* LocalDataStack.swift */; };
-		300000000000000000000106 /* LocalDateText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000006 /* LocalDateText.swift */; };
-		300000000000000000000107 /* AccountProfileRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000007 /* AccountProfileRecord.swift */; };
-		300000000000000000000108 /* CreativeWorkRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000008 /* CreativeWorkRecord.swift */; };
-		300000000000000000000109 /* MoodEntryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000009 /* MoodEntryRecord.swift */; };
-		300000000000000000000110 /* DialogueThreadRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000010 /* DialogueThreadRecord.swift */; };
-		300000000000000000000111 /* DialogueEntryRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000011 /* DialogueEntryRecord.swift */; };
-		300000000000000000000112 /* WalletRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000012 /* WalletRecord.swift */; };
-		300000000000000000000113 /* LocalCatalogRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000013 /* LocalCatalogRecord.swift */; };
-		300000000000000000000114 /* AccountProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000014 /* AccountProfileRepository.swift */; };
-		300000000000000000000115 /* CreativeWorkRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000015 /* CreativeWorkRepository.swift */; };
-		300000000000000000000116 /* MoodEntryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000016 /* MoodEntryRepository.swift */; };
-		300000000000000000000117 /* DialogueRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000017 /* DialogueRepository.swift */; };
-		300000000000000000000118 /* WalletRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000018 /* WalletRepository.swift */; };
-		300000000000000000000119 /* LocalSeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000019 /* LocalSeedLoader.swift */; };
-		300000000000000000000120 /* PermissionCopyRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000020 /* PermissionCopyRecord.swift */; };
-		300000000000000000000121 /* PermissionCopyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000021 /* PermissionCopyRepository.swift */; };
-		300000000000000000000122 /* AccountSessionRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000022 /* AccountSessionRecord.swift */; };
-		300000000000000000000123 /* AccountSessionRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000023 /* AccountSessionRepository.swift */; };
-		300000000000000000000124 /* GuestAccessRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000024 /* GuestAccessRepository.swift */; };
-		300000000000000000000125 /* AppleAccessRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000025 /* AppleAccessRepository.swift */; };
 		400000000000000000000201 /* builtin_victoria.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000001 /* builtin_victoria.mp4 */; };
 		400000000000000000000202 /* builtin_sophia.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000002 /* builtin_sophia.mp4 */; };
 		400000000000000000000203 /* builtin_chloe.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000003 /* builtin_chloe.mp4 */; };
@@ -103,38 +26,43 @@
 		400000000000000000000205 /* builtin_rowan.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000005 /* builtin_rowan.mp4 */; };
 		400000000000000000000206 /* builtin_jasper.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000006 /* builtin_jasper.mp4 */; };
 		400000000000000000000207 /* builtin_liam.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 400000000000000000000007 /* builtin_liam.mp4 */; };
+		500000000000000000000101 /* AccessSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000001 /* AccessSessionStore.swift */; };
+		500000000000000000000102 /* ExperienceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000002 /* ExperienceContainer.swift */; };
+		500000000000000000000103 /* LocalSnapshotVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000003 /* LocalSnapshotVault.swift */; };
+		500000000000000000000123 /* ThreadArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000023 /* ThreadArchive.swift */; };
+		500000000000000000000124 /* CreationArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000024 /* CreationArchive.swift */; };
+		500000000000000000000120 /* IdentityArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000020 /* IdentityArchive.swift */; };
+		500000000000000000000121 /* AppleIdentityBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000021 /* AppleIdentityBridge.swift */; };
+		500000000000000000000122 /* AvatarGalleryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000022 /* AvatarGalleryPicker.swift */; };
+		500000000000000000000126 /* StorefrontAcquisitionGateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000026 /* StorefrontAcquisitionGateway.swift */; };
+		500000000000000000000127 /* StoredValueLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000027 /* StoredValueLedger.swift */; };
+		500000000000000000000104 /* VisualLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000004 /* VisualLanguage.swift */; };
+		500000000000000000000105 /* WindowLaunchCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000005 /* WindowLaunchCoordinator.swift */; };
+		500000000000000000000106 /* ScreenTreeAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000006 /* ScreenTreeAssembler.swift */; };
+		500000000000000000000107 /* CanvasDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000007 /* CanvasDestination.swift */; };
+		500000000000000000000108 /* MorviApplicationRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000008 /* MorviApplicationRoot.swift */; };
+		500000000000000000000109 /* OverlayCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000009 /* OverlayCanvasView.swift */; };
+		500000000000000000000125 /* InputVisibilityScrollBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000025 /* InputVisibilityScrollBridge.swift */; };
+		500000000000000000000110 /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000010 /* HomeScreen.swift */; };
+		500000000000000000000111 /* FeelingsWeekScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000011 /* FeelingsWeekScreen.swift */; };
+		500000000000000000000112 /* DiscoverScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000012 /* DiscoverScreen.swift */; };
+		500000000000000000000113 /* PersonaScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000013 /* PersonaScreen.swift */; };
+		500000000000000000000114 /* DialogueListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000014 /* DialogueListScreen.swift */; };
+		500000000000000000000115 /* WalletScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000015 /* WalletScreen.swift */; };
+		500000000000000000000116 /* CreationDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000016 /* CreationDetailScreen.swift */; };
+		500000000000000000000117 /* ConversationScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000017 /* ConversationScreens.swift */; };
+		500000000000000000000118 /* SettingsAndAgreementScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000018 /* SettingsAndAgreementScreens.swift */; };
+		500000000000000000000119 /* OverlayPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000019 /* OverlayPanels.swift */; };
 		778F79B22FFA170600E7F38F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 778F79B12FFA170600E7F38F /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		100000000000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		100000000000000000000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		100000000000000000000003 /* FlowShellController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowShellController.swift; sourceTree = "<group>"; };
-		100000000000000000000004 /* RouteFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteFactory.swift; sourceTree = "<group>"; };
-		100000000000000000000005 /* ScenePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePage.swift; sourceTree = "<group>"; };
-		100000000000000000000006 /* EntrySceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntrySceneController.swift; sourceTree = "<group>"; };
-		100000000000000000000007 /* BaseSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSceneController.swift; sourceTree = "<group>"; };
-		100000000000000000000008 /* ReferencePageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferencePageController.swift; sourceTree = "<group>"; };
-		100000000000000000000009 /* RootTabsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabsController.swift; sourceTree = "<group>"; };
-		100000000000000000000010 /* ClearTapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearTapButton.swift; sourceTree = "<group>"; };
-		100000000000000000000011 /* HitArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HitArea.swift; sourceTree = "<group>"; };
-		100000000000000000000012 /* UIViewControllerHitAreas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerHitAreas.swift; sourceTree = "<group>"; };
-		100000000000000000000013 /* CustomTopLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTopLayerView.swift; sourceTree = "<group>"; };
-		100000000000000000000014 /* ReferenceCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceCanvasView.swift; sourceTree = "<group>"; };
-		100000000000000000000015 /* FloatingDockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingDockView.swift; sourceTree = "<group>"; };
-		100000000000000000000016 /* DesignSurfaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSurfaceView.swift; sourceTree = "<group>"; };
-		100000000000000000000017 /* AppFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFont.swift; sourceTree = "<group>"; };
-		100000000000000000000018 /* DecorativeGradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecorativeGradientView.swift; sourceTree = "<group>"; };
-		100000000000000000000019 /* RadialGlowLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadialGlowLayer.swift; sourceTree = "<group>"; };
-		100000000000000000000020 /* AuthSceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSceneController.swift; sourceTree = "<group>"; };
+		100000000000000000000001 /* MorviApplicationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorviApplicationDelegate.swift; sourceTree = "<group>"; };
+		100000000000000000000002 /* WindowSceneBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneBridge.swift; sourceTree = "<group>"; };
 		100000000000000000000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		100000000000000000000022 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		100000000000000000000023 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		100000000000000000000024 /* Morvi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Morvi.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		100000000000000000000025 /* MorviProgressOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorviProgressOverlayView.swift; sourceTree = "<group>"; };
-		100000000000000000000026 /* DiscoverStoryStripView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverStoryStripView.swift; sourceTree = "<group>"; };
-		100000000000000000000027 /* AdaptiveInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveInputView.swift; sourceTree = "<group>"; };
-		100000000000000000000028 /* GradientActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientActionButton.swift; sourceTree = "<group>"; };
 		100000000000000000000029 /* Morvi.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Morvi.entitlements; sourceTree = "<group>"; };
 		100000000000000000000030 /* SourceHanSansSC-ExtraLight.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-ExtraLight.otf"; sourceTree = "<group>"; };
 		100000000000000000000031 /* SourceHanSansSC-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-Light.otf"; sourceTree = "<group>"; };
@@ -144,61 +72,6 @@
 		100000000000000000000035 /* SourceHanSansSC-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-Bold.otf"; sourceTree = "<group>"; };
 		100000000000000000000036 /* SourceHanSansSC-Heavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceHanSansSC-Heavy.otf"; sourceTree = "<group>"; };
 		100000000000000000000037 /* FredokaOne-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FredokaOne-Regular.ttf"; sourceTree = "<group>"; };
-		100000000000000000000038 /* ReplyListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyListItem.swift; sourceTree = "<group>"; };
-		100000000000000000000039 /* ReplyListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyListCell.swift; sourceTree = "<group>"; };
-		100000000000000000000040 /* ReplyListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplyListDataSource.swift; sourceTree = "<group>"; };
-		100000000000000000000041 /* ArrowBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowBubbleView.swift; sourceTree = "<group>"; };
-		100000000000000000000042 /* DialogueMomentFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueMomentFormatter.swift; sourceTree = "<group>"; };
-		100000000000000000000043 /* DialogueFlowEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueFlowEntry.swift; sourceTree = "<group>"; };
-		100000000000000000000044 /* DialogueFlowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueFlowCell.swift; sourceTree = "<group>"; };
-		100000000000000000000045 /* DialogueFlowListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueFlowListView.swift; sourceTree = "<group>"; };
-		100000000000000000000046 /* AudioClipBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioClipBubbleView.swift; sourceTree = "<group>"; };
-		100000000000000000000047 /* GradientRingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientRingView.swift; sourceTree = "<group>"; };
-		100000000000000000000048 /* VoiceRippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRippleView.swift; sourceTree = "<group>"; };
-		100000000000000000000049 /* MorviToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorviToastView.swift; sourceTree = "<group>"; };
-		100000000000000000000050 /* NotchedPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchedPanelView.swift; sourceTree = "<group>"; };
-		100000000000000000000051 /* FadeUnderlineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadeUnderlineView.swift; sourceTree = "<group>"; };
-		100000000000000000000052 /* IntroCopyPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroCopyPanelView.swift; sourceTree = "<group>"; };
-		100000000000000000000053 /* WeeklyFeelingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyFeelingListView.swift; sourceTree = "<group>"; };
-		100000000000000000000054 /* WeeklyFeelingHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyFeelingHeaderView.swift; sourceTree = "<group>"; };
-		100000000000000000000055 /* WeeklyFeelingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyFeelingCell.swift; sourceTree = "<group>"; };
-		100000000000000000000056 /* DialogueCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueCardCell.swift; sourceTree = "<group>"; };
-		100000000000000000000057 /* DialogueCardListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueCardListView.swift; sourceTree = "<group>"; };
-		100000000000000000000058 /* CancelFriendlyScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelFriendlyScrollView.swift; sourceTree = "<group>"; };
-		100000000000000000000059 /* RestrictedRosterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestrictedRosterCell.swift; sourceTree = "<group>"; };
-		100000000000000000000060 /* RestrictedRosterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestrictedRosterListView.swift; sourceTree = "<group>"; };
-		100000000000000000000061 /* CancelFriendlyTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelFriendlyTableView.swift; sourceTree = "<group>"; };
-		100000000000000000000062 /* CancelFriendlyCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelFriendlyCollectionView.swift; sourceTree = "<group>"; };
-		100000000000000000000063 /* AccountSessionCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionCenter.swift; sourceTree = "<group>"; };
-		100000000000000000000064 /* StorefrontCreditBroker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontCreditBroker.swift; sourceTree = "<group>"; };
-		100000000000000000000065 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
-		100000000000000000000066 /* MediaPreviewOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPreviewOverlayView.swift; sourceTree = "<group>"; };
-		200000000000000000000001 /* UploadThemeFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadThemeFlowView.swift; sourceTree = "<group>"; };
-		300000000000000000000001 /* LocalStoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStoreError.swift; sourceTree = "<group>"; };
-		300000000000000000000002 /* LocalStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStore.swift; sourceTree = "<group>"; };
-		300000000000000000000003 /* LocalStoreValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalStoreValue.swift; sourceTree = "<group>"; };
-		300000000000000000000004 /* LocalDataMigrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDataMigrator.swift; sourceTree = "<group>"; };
-		300000000000000000000005 /* LocalDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDataStack.swift; sourceTree = "<group>"; };
-		300000000000000000000006 /* LocalDateText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDateText.swift; sourceTree = "<group>"; };
-		300000000000000000000007 /* AccountProfileRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000008 /* CreativeWorkRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreativeWorkRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000009 /* MoodEntryRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000010 /* DialogueThreadRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueThreadRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000011 /* DialogueEntryRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueEntryRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000012 /* WalletRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000013 /* LocalCatalogRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCatalogRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000014 /* AccountProfileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfileRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000015 /* CreativeWorkRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreativeWorkRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000016 /* MoodEntryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000017 /* DialogueRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000018 /* WalletRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000019 /* LocalSeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSeedLoader.swift; sourceTree = "<group>"; };
-		300000000000000000000020 /* PermissionCopyRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionCopyRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000021 /* PermissionCopyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionCopyRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000022 /* AccountSessionRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionRecord.swift; sourceTree = "<group>"; };
-		300000000000000000000023 /* AccountSessionRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000024 /* GuestAccessRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestAccessRepository.swift; sourceTree = "<group>"; };
-		300000000000000000000025 /* AppleAccessRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleAccessRepository.swift; sourceTree = "<group>"; };
 		400000000000000000000001 /* builtin_victoria.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_victoria.mp4; sourceTree = "<group>"; };
 		400000000000000000000002 /* builtin_sophia.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_sophia.mp4; sourceTree = "<group>"; };
 		400000000000000000000003 /* builtin_chloe.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_chloe.mp4; sourceTree = "<group>"; };
@@ -206,6 +79,33 @@
 		400000000000000000000005 /* builtin_rowan.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_rowan.mp4; sourceTree = "<group>"; };
 		400000000000000000000006 /* builtin_jasper.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_jasper.mp4; sourceTree = "<group>"; };
 		400000000000000000000007 /* builtin_liam.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = builtin_liam.mp4; sourceTree = "<group>"; };
+		500000000000000000000001 /* AccessSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessSessionStore.swift; sourceTree = "<group>"; };
+		500000000000000000000002 /* ExperienceContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperienceContainer.swift; sourceTree = "<group>"; };
+		500000000000000000000003 /* LocalSnapshotVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSnapshotVault.swift; sourceTree = "<group>"; };
+		500000000000000000000023 /* ThreadArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadArchive.swift; sourceTree = "<group>"; };
+		500000000000000000000024 /* CreationArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationArchive.swift; sourceTree = "<group>"; };
+		500000000000000000000020 /* IdentityArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityArchive.swift; sourceTree = "<group>"; };
+		500000000000000000000021 /* AppleIdentityBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIdentityBridge.swift; sourceTree = "<group>"; };
+		500000000000000000000022 /* AvatarGalleryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarGalleryPicker.swift; sourceTree = "<group>"; };
+		500000000000000000000026 /* StorefrontAcquisitionGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontAcquisitionGateway.swift; sourceTree = "<group>"; };
+		500000000000000000000027 /* StoredValueLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredValueLedger.swift; sourceTree = "<group>"; };
+		500000000000000000000004 /* VisualLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualLanguage.swift; sourceTree = "<group>"; };
+		500000000000000000000005 /* WindowLaunchCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLaunchCoordinator.swift; sourceTree = "<group>"; };
+		500000000000000000000006 /* ScreenTreeAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTreeAssembler.swift; sourceTree = "<group>"; };
+		500000000000000000000007 /* CanvasDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasDestination.swift; sourceTree = "<group>"; };
+		500000000000000000000008 /* MorviApplicationRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorviApplicationRoot.swift; sourceTree = "<group>"; };
+		500000000000000000000009 /* OverlayCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayCanvasView.swift; sourceTree = "<group>"; };
+		500000000000000000000025 /* InputVisibilityScrollBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputVisibilityScrollBridge.swift; sourceTree = "<group>"; };
+		500000000000000000000010 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
+		500000000000000000000011 /* FeelingsWeekScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeelingsWeekScreen.swift; sourceTree = "<group>"; };
+		500000000000000000000012 /* DiscoverScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreen.swift; sourceTree = "<group>"; };
+		500000000000000000000013 /* PersonaScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonaScreen.swift; sourceTree = "<group>"; };
+		500000000000000000000014 /* DialogueListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogueListScreen.swift; sourceTree = "<group>"; };
+		500000000000000000000015 /* WalletScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletScreen.swift; sourceTree = "<group>"; };
+		500000000000000000000016 /* CreationDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationDetailScreen.swift; sourceTree = "<group>"; };
+		500000000000000000000017 /* ConversationScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationScreens.swift; sourceTree = "<group>"; };
+		500000000000000000000018 /* SettingsAndAgreementScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAndAgreementScreens.swift; sourceTree = "<group>"; };
+		500000000000000000000019 /* OverlayPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPanels.swift; sourceTree = "<group>"; };
 		778F79B12FFA170600E7F38F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -247,151 +147,13 @@
 		100000000000000000000403 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				100000000000000000000404 /* Application */,
-				100000000000000000000405 /* Navigation */,
-				100000000000000000000406 /* Routing */,
-				100000000000000000000407 /* Scenes */,
-				300000000000000000000401 /* Data */,
-				100000000000000000000411 /* Shared */,
+				500000000000000000000401 /* RuntimeNest */,
+				500000000000000000000402 /* VisualGrammar */,
+				500000000000000000000403 /* LocalArchive */,
+				500000000000000000000404 /* CanvasPanels */,
+				500000000000000000000405 /* Pathway */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		100000000000000000000404 /* Application */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000001 /* AppDelegate.swift */,
-				100000000000000000000002 /* SceneDelegate.swift */,
-				100000000000000000000063 /* AccountSessionCenter.swift */,
-				100000000000000000000064 /* StorefrontCreditBroker.swift */,
-			);
-			path = Application;
-			sourceTree = "<group>";
-		};
-		100000000000000000000405 /* Navigation */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000003 /* FlowShellController.swift */,
-			);
-			path = Navigation;
-			sourceTree = "<group>";
-		};
-		100000000000000000000406 /* Routing */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000004 /* RouteFactory.swift */,
-				100000000000000000000005 /* ScenePage.swift */,
-			);
-			path = Routing;
-			sourceTree = "<group>";
-		};
-		100000000000000000000407 /* Scenes */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000408 /* Auth */,
-				100000000000000000000409 /* Common */,
-				100000000000000000000410 /* Main */,
-			);
-			path = Scenes;
-			sourceTree = "<group>";
-		};
-		100000000000000000000408 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000006 /* EntrySceneController.swift */,
-				100000000000000000000020 /* AuthSceneController.swift */,
-			);
-			path = Auth;
-			sourceTree = "<group>";
-		};
-		100000000000000000000409 /* Common */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000007 /* BaseSceneController.swift */,
-				100000000000000000000008 /* ReferencePageController.swift */,
-			);
-			path = Common;
-			sourceTree = "<group>";
-		};
-		100000000000000000000410 /* Main */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000009 /* RootTabsController.swift */,
-			);
-			path = Main;
-			sourceTree = "<group>";
-		};
-		100000000000000000000411 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000412 /* Interaction */,
-				100000000000000000000414 /* Style */,
-				100000000000000000000413 /* Views */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
-		100000000000000000000412 /* Interaction */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000010 /* ClearTapButton.swift */,
-				100000000000000000000011 /* HitArea.swift */,
-				100000000000000000000012 /* UIViewControllerHitAreas.swift */,
-			);
-			path = Interaction;
-			sourceTree = "<group>";
-		};
-		100000000000000000000413 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000013 /* CustomTopLayerView.swift */,
-				100000000000000000000014 /* ReferenceCanvasView.swift */,
-				100000000000000000000015 /* FloatingDockView.swift */,
-				100000000000000000000016 /* DesignSurfaceView.swift */,
-				100000000000000000000018 /* DecorativeGradientView.swift */,
-				100000000000000000000019 /* RadialGlowLayer.swift */,
-				100000000000000000000025 /* MorviProgressOverlayView.swift */,
-				100000000000000000000026 /* DiscoverStoryStripView.swift */,
-				100000000000000000000027 /* AdaptiveInputView.swift */,
-				100000000000000000000028 /* GradientActionButton.swift */,
-				200000000000000000000001 /* UploadThemeFlowView.swift */,
-				100000000000000000000038 /* ReplyListItem.swift */,
-				100000000000000000000039 /* ReplyListCell.swift */,
-				100000000000000000000040 /* ReplyListDataSource.swift */,
-				100000000000000000000041 /* ArrowBubbleView.swift */,
-				100000000000000000000046 /* AudioClipBubbleView.swift */,
-				100000000000000000000043 /* DialogueFlowEntry.swift */,
-				100000000000000000000044 /* DialogueFlowCell.swift */,
-				100000000000000000000045 /* DialogueFlowListView.swift */,
-				100000000000000000000047 /* GradientRingView.swift */,
-				100000000000000000000048 /* VoiceRippleView.swift */,
-				100000000000000000000049 /* MorviToastView.swift */,
-				100000000000000000000050 /* NotchedPanelView.swift */,
-				100000000000000000000051 /* FadeUnderlineView.swift */,
-				100000000000000000000052 /* IntroCopyPanelView.swift */,
-				100000000000000000000066 /* MediaPreviewOverlayView.swift */,
-				100000000000000000000053 /* WeeklyFeelingListView.swift */,
-				100000000000000000000054 /* WeeklyFeelingHeaderView.swift */,
-				100000000000000000000055 /* WeeklyFeelingCell.swift */,
-				100000000000000000000056 /* DialogueCardCell.swift */,
-				100000000000000000000057 /* DialogueCardListView.swift */,
-				100000000000000000000058 /* CancelFriendlyScrollView.swift */,
-				100000000000000000000061 /* CancelFriendlyTableView.swift */,
-				100000000000000000000062 /* CancelFriendlyCollectionView.swift */,
-				100000000000000000000059 /* RestrictedRosterCell.swift */,
-				100000000000000000000060 /* RestrictedRosterListView.swift */,
-				100000000000000000000065 /* EmptyStateView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		100000000000000000000414 /* Style */ = {
-			isa = PBXGroup;
-			children = (
-				100000000000000000000017 /* AppFont.swift */,
-				100000000000000000000042 /* DialogueMomentFormatter.swift */,
-			);
-			path = Style;
 			sourceTree = "<group>";
 		};
 		100000000000000000000415 /* Fonts */ = {
@@ -417,70 +179,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		300000000000000000000401 /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				300000000000000000000402 /* Storage */,
-				300000000000000000000403 /* Records */,
-				300000000000000000000404 /* Repositories */,
-				300000000000000000000405 /* Seed */,
-			);
-			path = Data;
-			sourceTree = "<group>";
-		};
-		300000000000000000000402 /* Storage */ = {
-			isa = PBXGroup;
-			children = (
-				300000000000000000000001 /* LocalStoreError.swift */,
-				300000000000000000000002 /* LocalStore.swift */,
-				300000000000000000000003 /* LocalStoreValue.swift */,
-				300000000000000000000004 /* LocalDataMigrator.swift */,
-				300000000000000000000005 /* LocalDataStack.swift */,
-				300000000000000000000006 /* LocalDateText.swift */,
-			);
-			path = Storage;
-			sourceTree = "<group>";
-		};
-		300000000000000000000403 /* Records */ = {
-			isa = PBXGroup;
-			children = (
-				300000000000000000000007 /* AccountProfileRecord.swift */,
-				300000000000000000000022 /* AccountSessionRecord.swift */,
-				300000000000000000000008 /* CreativeWorkRecord.swift */,
-				300000000000000000000009 /* MoodEntryRecord.swift */,
-				300000000000000000000010 /* DialogueThreadRecord.swift */,
-				300000000000000000000011 /* DialogueEntryRecord.swift */,
-				300000000000000000000012 /* WalletRecord.swift */,
-				300000000000000000000013 /* LocalCatalogRecord.swift */,
-				300000000000000000000020 /* PermissionCopyRecord.swift */,
-			);
-			path = Records;
-			sourceTree = "<group>";
-		};
-		300000000000000000000404 /* Repositories */ = {
-			isa = PBXGroup;
-			children = (
-				300000000000000000000014 /* AccountProfileRepository.swift */,
-				300000000000000000000023 /* AccountSessionRepository.swift */,
-				300000000000000000000024 /* GuestAccessRepository.swift */,
-				300000000000000000000025 /* AppleAccessRepository.swift */,
-				300000000000000000000015 /* CreativeWorkRepository.swift */,
-				300000000000000000000016 /* MoodEntryRepository.swift */,
-				300000000000000000000017 /* DialogueRepository.swift */,
-				300000000000000000000018 /* WalletRepository.swift */,
-				300000000000000000000021 /* PermissionCopyRepository.swift */,
-			);
-			path = Repositories;
-			sourceTree = "<group>";
-		};
-		300000000000000000000405 /* Seed */ = {
-			isa = PBXGroup;
-			children = (
-				300000000000000000000019 /* LocalSeedLoader.swift */,
-			);
-			path = Seed;
-			sourceTree = "<group>";
-		};
 		400000000000000000000401 /* Media */ = {
 			isa = PBXGroup;
 			children = (
@@ -493,6 +191,70 @@
 				400000000000000000000007 /* builtin_liam.mp4 */,
 			);
 			path = Media;
+			sourceTree = "<group>";
+		};
+		500000000000000000000401 /* RuntimeNest */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000001 /* MorviApplicationDelegate.swift */,
+				100000000000000000000002 /* WindowSceneBridge.swift */,
+				500000000000000000000001 /* AccessSessionStore.swift */,
+				500000000000000000000002 /* ExperienceContainer.swift */,
+				500000000000000000000021 /* AppleIdentityBridge.swift */,
+				500000000000000000000022 /* AvatarGalleryPicker.swift */,
+				500000000000000000000026 /* StorefrontAcquisitionGateway.swift */,
+			);
+			path = RuntimeNest;
+			sourceTree = "<group>";
+		};
+		500000000000000000000402 /* VisualGrammar */ = {
+			isa = PBXGroup;
+			children = (
+				500000000000000000000004 /* VisualLanguage.swift */,
+			);
+			path = VisualGrammar;
+			sourceTree = "<group>";
+		};
+		500000000000000000000403 /* LocalArchive */ = {
+			isa = PBXGroup;
+			children = (
+				500000000000000000000003 /* LocalSnapshotVault.swift */,
+				500000000000000000000020 /* IdentityArchive.swift */,
+				500000000000000000000023 /* ThreadArchive.swift */,
+				500000000000000000000024 /* CreationArchive.swift */,
+				500000000000000000000027 /* StoredValueLedger.swift */,
+			);
+			path = LocalArchive;
+			sourceTree = "<group>";
+		};
+		500000000000000000000404 /* CanvasPanels */ = {
+			isa = PBXGroup;
+			children = (
+				500000000000000000000010 /* HomeScreen.swift */,
+				500000000000000000000011 /* FeelingsWeekScreen.swift */,
+				500000000000000000000012 /* DiscoverScreen.swift */,
+				500000000000000000000013 /* PersonaScreen.swift */,
+				500000000000000000000014 /* DialogueListScreen.swift */,
+				500000000000000000000015 /* WalletScreen.swift */,
+				500000000000000000000016 /* CreationDetailScreen.swift */,
+				500000000000000000000017 /* ConversationScreens.swift */,
+				500000000000000000000018 /* SettingsAndAgreementScreens.swift */,
+				500000000000000000000019 /* OverlayPanels.swift */,
+			);
+			path = CanvasPanels;
+			sourceTree = "<group>";
+		};
+		500000000000000000000405 /* Pathway */ = {
+			isa = PBXGroup;
+			children = (
+				500000000000000000000005 /* WindowLaunchCoordinator.swift */,
+				500000000000000000000006 /* ScreenTreeAssembler.swift */,
+				500000000000000000000007 /* CanvasDestination.swift */,
+				500000000000000000000008 /* MorviApplicationRoot.swift */,
+				500000000000000000000009 /* OverlayCanvasView.swift */,
+				500000000000000000000025 /* InputVisibilityScrollBridge.swift */,
+			);
+			path = Pathway;
 			sourceTree = "<group>";
 		};
 		778F79B02FFA170600E7F38F /* Frameworks */ = {
@@ -588,85 +350,35 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				100000000000000000000101 /* AppDelegate.swift in Sources */,
-				100000000000000000000102 /* SceneDelegate.swift in Sources */,
-				100000000000000000000103 /* FlowShellController.swift in Sources */,
-				100000000000000000000104 /* RouteFactory.swift in Sources */,
-				100000000000000000000105 /* ScenePage.swift in Sources */,
-				100000000000000000000106 /* EntrySceneController.swift in Sources */,
-				100000000000000000000120 /* AuthSceneController.swift in Sources */,
-				100000000000000000000107 /* BaseSceneController.swift in Sources */,
-				100000000000000000000108 /* ReferencePageController.swift in Sources */,
-				100000000000000000000109 /* RootTabsController.swift in Sources */,
-				100000000000000000000110 /* ClearTapButton.swift in Sources */,
-				100000000000000000000111 /* HitArea.swift in Sources */,
-				100000000000000000000112 /* UIViewControllerHitAreas.swift in Sources */,
-				100000000000000000000113 /* CustomTopLayerView.swift in Sources */,
-				100000000000000000000114 /* ReferenceCanvasView.swift in Sources */,
-				100000000000000000000115 /* FloatingDockView.swift in Sources */,
-				100000000000000000000116 /* DesignSurfaceView.swift in Sources */,
-				100000000000000000000117 /* AppFont.swift in Sources */,
-				100000000000000000000118 /* DecorativeGradientView.swift in Sources */,
-				100000000000000000000119 /* RadialGlowLayer.swift in Sources */,
-				100000000000000000000121 /* MorviProgressOverlayView.swift in Sources */,
-				100000000000000000000122 /* DiscoverStoryStripView.swift in Sources */,
-				100000000000000000000123 /* AdaptiveInputView.swift in Sources */,
-				100000000000000000000124 /* GradientActionButton.swift in Sources */,
-				200000000000000000000101 /* UploadThemeFlowView.swift in Sources */,
-				100000000000000000000125 /* ReplyListItem.swift in Sources */,
-				100000000000000000000126 /* ReplyListCell.swift in Sources */,
-				100000000000000000000127 /* ReplyListDataSource.swift in Sources */,
-				100000000000000000000128 /* ArrowBubbleView.swift in Sources */,
-				100000000000000000000129 /* DialogueMomentFormatter.swift in Sources */,
-				100000000000000000000130 /* DialogueFlowEntry.swift in Sources */,
-				100000000000000000000131 /* DialogueFlowCell.swift in Sources */,
-				100000000000000000000132 /* DialogueFlowListView.swift in Sources */,
-				100000000000000000000133 /* AudioClipBubbleView.swift in Sources */,
-				100000000000000000000134 /* GradientRingView.swift in Sources */,
-				100000000000000000000135 /* VoiceRippleView.swift in Sources */,
-				100000000000000000000136 /* MorviToastView.swift in Sources */,
-				100000000000000000000137 /* NotchedPanelView.swift in Sources */,
-				100000000000000000000138 /* FadeUnderlineView.swift in Sources */,
-				100000000000000000000139 /* IntroCopyPanelView.swift in Sources */,
-				100000000000000000000153 /* MediaPreviewOverlayView.swift in Sources */,
-				100000000000000000000140 /* WeeklyFeelingListView.swift in Sources */,
-				100000000000000000000141 /* WeeklyFeelingHeaderView.swift in Sources */,
-				100000000000000000000142 /* WeeklyFeelingCell.swift in Sources */,
-				100000000000000000000143 /* DialogueCardCell.swift in Sources */,
-				100000000000000000000144 /* DialogueCardListView.swift in Sources */,
-				100000000000000000000145 /* CancelFriendlyScrollView.swift in Sources */,
-				100000000000000000000146 /* RestrictedRosterCell.swift in Sources */,
-				100000000000000000000147 /* RestrictedRosterListView.swift in Sources */,
-				100000000000000000000148 /* CancelFriendlyTableView.swift in Sources */,
-				100000000000000000000149 /* CancelFriendlyCollectionView.swift in Sources */,
-				100000000000000000000150 /* AccountSessionCenter.swift in Sources */,
-				100000000000000000000151 /* StorefrontCreditBroker.swift in Sources */,
-				100000000000000000000152 /* EmptyStateView.swift in Sources */,
-				300000000000000000000101 /* LocalStoreError.swift in Sources */,
-				300000000000000000000102 /* LocalStore.swift in Sources */,
-				300000000000000000000103 /* LocalStoreValue.swift in Sources */,
-				300000000000000000000104 /* LocalDataMigrator.swift in Sources */,
-				300000000000000000000105 /* LocalDataStack.swift in Sources */,
-				300000000000000000000106 /* LocalDateText.swift in Sources */,
-				300000000000000000000107 /* AccountProfileRecord.swift in Sources */,
-				300000000000000000000122 /* AccountSessionRecord.swift in Sources */,
-				300000000000000000000108 /* CreativeWorkRecord.swift in Sources */,
-				300000000000000000000109 /* MoodEntryRecord.swift in Sources */,
-				300000000000000000000110 /* DialogueThreadRecord.swift in Sources */,
-				300000000000000000000111 /* DialogueEntryRecord.swift in Sources */,
-				300000000000000000000112 /* WalletRecord.swift in Sources */,
-				300000000000000000000113 /* LocalCatalogRecord.swift in Sources */,
-				300000000000000000000114 /* AccountProfileRepository.swift in Sources */,
-				300000000000000000000123 /* AccountSessionRepository.swift in Sources */,
-				300000000000000000000124 /* GuestAccessRepository.swift in Sources */,
-				300000000000000000000125 /* AppleAccessRepository.swift in Sources */,
-				300000000000000000000115 /* CreativeWorkRepository.swift in Sources */,
-				300000000000000000000116 /* MoodEntryRepository.swift in Sources */,
-				300000000000000000000117 /* DialogueRepository.swift in Sources */,
-				300000000000000000000118 /* WalletRepository.swift in Sources */,
-				300000000000000000000119 /* LocalSeedLoader.swift in Sources */,
-				300000000000000000000120 /* PermissionCopyRecord.swift in Sources */,
-				300000000000000000000121 /* PermissionCopyRepository.swift in Sources */,
+				100000000000000000000101 /* MorviApplicationDelegate.swift in Sources */,
+				100000000000000000000102 /* WindowSceneBridge.swift in Sources */,
+				500000000000000000000101 /* AccessSessionStore.swift in Sources */,
+				500000000000000000000102 /* ExperienceContainer.swift in Sources */,
+				500000000000000000000103 /* LocalSnapshotVault.swift in Sources */,
+				500000000000000000000123 /* ThreadArchive.swift in Sources */,
+				500000000000000000000124 /* CreationArchive.swift in Sources */,
+				500000000000000000000120 /* IdentityArchive.swift in Sources */,
+				500000000000000000000121 /* AppleIdentityBridge.swift in Sources */,
+				500000000000000000000122 /* AvatarGalleryPicker.swift in Sources */,
+				500000000000000000000126 /* StorefrontAcquisitionGateway.swift in Sources */,
+				500000000000000000000127 /* StoredValueLedger.swift in Sources */,
+				500000000000000000000104 /* VisualLanguage.swift in Sources */,
+				500000000000000000000105 /* WindowLaunchCoordinator.swift in Sources */,
+				500000000000000000000106 /* ScreenTreeAssembler.swift in Sources */,
+				500000000000000000000107 /* CanvasDestination.swift in Sources */,
+				500000000000000000000108 /* MorviApplicationRoot.swift in Sources */,
+				500000000000000000000109 /* OverlayCanvasView.swift in Sources */,
+				500000000000000000000125 /* InputVisibilityScrollBridge.swift in Sources */,
+				500000000000000000000110 /* HomeScreen.swift in Sources */,
+				500000000000000000000111 /* FeelingsWeekScreen.swift in Sources */,
+				500000000000000000000112 /* DiscoverScreen.swift in Sources */,
+				500000000000000000000113 /* PersonaScreen.swift in Sources */,
+				500000000000000000000114 /* DialogueListScreen.swift in Sources */,
+				500000000000000000000115 /* WalletScreen.swift in Sources */,
+				500000000000000000000116 /* CreationDetailScreen.swift in Sources */,
+				500000000000000000000117 /* ConversationScreens.swift in Sources */,
+				500000000000000000000118 /* SettingsAndAgreementScreens.swift in Sources */,
+				500000000000000000000119 /* OverlayPanels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -794,15 +506,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Morvi/Morvi.entitlements;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6NUFR97X3A;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Morvi/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = "-lsqlite3";
-				PRODUCT_BUNDLE_IDENTIFIER = com.app.morvi;
+				PRODUCT_BUNDLE_IDENTIFIER = app.myfy.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -819,15 +532,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Morvi/Morvi.entitlements;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 6NUFR97X3A;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Morvi/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0.0;
 				OTHER_LDFLAGS = "-lsqlite3";
-				PRODUCT_BUNDLE_IDENTIFIER = com.app.morvi;
+				PRODUCT_BUNDLE_IDENTIFIER = app.myfy.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
