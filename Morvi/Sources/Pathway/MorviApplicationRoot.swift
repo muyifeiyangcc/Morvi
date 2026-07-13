@@ -226,27 +226,28 @@ private struct AccessJourneyCanvas: View {
 
     @ViewBuilder
     private var navigationControl: some View {
-        if step != .entry || showsEntryBackButton {
-            TopChromeView(
-                title: navigationTitle,
-                showsBack: true,
-                backAction: {
-                    activeInput = nil
-                    switch step {
-                    case .entry:
-                        experienceStore.showsAccessFlow = false
-                    case .mail, .enrollment:
-                        step = .entry
-                    case .details:
-                        step = .enrollment
-                    case .reset:
-                        step = .mail
-                    }
+        TopChromeView(
+            title: navigationTitle,
+            showsBack: step != .entry || showsEntryBackButton,
+            trailingTitle: step == .entry ? "EULA" : nil,
+            backAction: {
+                activeInput = nil
+                switch step {
+                case .entry:
+                    experienceStore.showsAccessFlow = false
+                case .mail, .enrollment:
+                    step = .entry
+                case .details:
+                    step = .enrollment
+                case .reset:
+                    step = .mail
                 }
-            )
-            .accessibilityLabel("Back")
-            .accessibilityHint("Returns to the previous access screen")
-        }
+            },
+            trailingAction: {
+                guard step == .entry else { return }
+                accessDocumentTitle = "EULA"
+            }
+        )
     }
 
     private var navigationTitle: String {

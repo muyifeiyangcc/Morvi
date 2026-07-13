@@ -99,6 +99,7 @@ struct TopChromeView: View {
     let title: String
     var showsBack = false
     var trailingAsset: String?
+    var trailingTitle: String?
     var backAction: (() -> Void)?
     var trailingAction: (() -> Void)?
 
@@ -120,7 +121,15 @@ struct TopChromeView: View {
                     .font(TextCraft.one(30))
                     .foregroundColor(.black)
                 Spacer()
-                if let trailingAsset {
+                if let trailingTitle {
+                    Button(action: { trailingAction?() }) {
+                        Text(trailingTitle)
+                            .font(TextCraft.source(16, weight: .medium))
+                            .foregroundColor(.black)
+                            .frame(minWidth: 58, minHeight: 58)
+                    }
+                    .buttonStyle(.plain)
+                } else if let trailingAsset {
                     Button(action: { trailingAction?() }) {
                         Image(trailingAsset)
                             .resizable()
