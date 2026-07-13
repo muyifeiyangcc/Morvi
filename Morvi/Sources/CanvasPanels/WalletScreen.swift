@@ -11,7 +11,7 @@ struct WalletScreen: View {
             ScrollView {
                 VStack(spacing: 10) {
                     balanceCard
-                        .padding(.top, 56)
+                        .padding(.top, 16)
                     ForEach(experienceStore.creditCatalog) { pack in
                         CreditPackRow(pack: pack) {
                             experienceStore.acquireStoredValue(pack, accessStore: accessStore)
