@@ -29,20 +29,12 @@
 		500000000000000000000101 /* AccessSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000001 /* AccessSessionStore.swift */; };
 		500000000000000000000102 /* ExperienceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000002 /* ExperienceContainer.swift */; };
 		500000000000000000000103 /* LocalSnapshotVault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000003 /* LocalSnapshotVault.swift */; };
-		500000000000000000000123 /* ThreadArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000023 /* ThreadArchive.swift */; };
-		500000000000000000000124 /* CreationArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000024 /* CreationArchive.swift */; };
-		500000000000000000000120 /* IdentityArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000020 /* IdentityArchive.swift */; };
-		500000000000000000000121 /* AppleIdentityBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000021 /* AppleIdentityBridge.swift */; };
-		500000000000000000000122 /* AvatarGalleryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000022 /* AvatarGalleryPicker.swift */; };
-		500000000000000000000126 /* StorefrontAcquisitionGateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000026 /* StorefrontAcquisitionGateway.swift */; };
-		500000000000000000000127 /* StoredValueLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000027 /* StoredValueLedger.swift */; };
 		500000000000000000000104 /* VisualLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000004 /* VisualLanguage.swift */; };
 		500000000000000000000105 /* WindowLaunchCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000005 /* WindowLaunchCoordinator.swift */; };
 		500000000000000000000106 /* ScreenTreeAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000006 /* ScreenTreeAssembler.swift */; };
 		500000000000000000000107 /* CanvasDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000007 /* CanvasDestination.swift */; };
 		500000000000000000000108 /* MorviApplicationRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000008 /* MorviApplicationRoot.swift */; };
 		500000000000000000000109 /* OverlayCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000009 /* OverlayCanvasView.swift */; };
-		500000000000000000000125 /* InputVisibilityScrollBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000025 /* InputVisibilityScrollBridge.swift */; };
 		500000000000000000000110 /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000010 /* HomeScreen.swift */; };
 		500000000000000000000111 /* FeelingsWeekScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000011 /* FeelingsWeekScreen.swift */; };
 		500000000000000000000112 /* DiscoverScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000012 /* DiscoverScreen.swift */; };
@@ -53,6 +45,14 @@
 		500000000000000000000117 /* ConversationScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000017 /* ConversationScreens.swift */; };
 		500000000000000000000118 /* SettingsAndAgreementScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000018 /* SettingsAndAgreementScreens.swift */; };
 		500000000000000000000119 /* OverlayPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000019 /* OverlayPanels.swift */; };
+		500000000000000000000120 /* IdentityArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000020 /* IdentityArchive.swift */; };
+		500000000000000000000121 /* AppleIdentityBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000021 /* AppleIdentityBridge.swift */; };
+		500000000000000000000122 /* AvatarGalleryPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000022 /* AvatarGalleryPicker.swift */; };
+		500000000000000000000123 /* ThreadArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000023 /* ThreadArchive.swift */; };
+		500000000000000000000124 /* CreationArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000024 /* CreationArchive.swift */; };
+		500000000000000000000125 /* InputVisibilityScrollBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000025 /* InputVisibilityScrollBridge.swift */; };
+		500000000000000000000126 /* StorefrontAcquisitionGateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000026 /* StorefrontAcquisitionGateway.swift */; };
+		500000000000000000000127 /* StoredValueLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500000000000000000000027 /* StoredValueLedger.swift */; };
 		778F79B22FFA170600E7F38F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 778F79B12FFA170600E7F38F /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -82,20 +82,12 @@
 		500000000000000000000001 /* AccessSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessSessionStore.swift; sourceTree = "<group>"; };
 		500000000000000000000002 /* ExperienceContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperienceContainer.swift; sourceTree = "<group>"; };
 		500000000000000000000003 /* LocalSnapshotVault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSnapshotVault.swift; sourceTree = "<group>"; };
-		500000000000000000000023 /* ThreadArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadArchive.swift; sourceTree = "<group>"; };
-		500000000000000000000024 /* CreationArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationArchive.swift; sourceTree = "<group>"; };
-		500000000000000000000020 /* IdentityArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityArchive.swift; sourceTree = "<group>"; };
-		500000000000000000000021 /* AppleIdentityBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIdentityBridge.swift; sourceTree = "<group>"; };
-		500000000000000000000022 /* AvatarGalleryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarGalleryPicker.swift; sourceTree = "<group>"; };
-		500000000000000000000026 /* StorefrontAcquisitionGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontAcquisitionGateway.swift; sourceTree = "<group>"; };
-		500000000000000000000027 /* StoredValueLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredValueLedger.swift; sourceTree = "<group>"; };
 		500000000000000000000004 /* VisualLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualLanguage.swift; sourceTree = "<group>"; };
 		500000000000000000000005 /* WindowLaunchCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowLaunchCoordinator.swift; sourceTree = "<group>"; };
 		500000000000000000000006 /* ScreenTreeAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTreeAssembler.swift; sourceTree = "<group>"; };
 		500000000000000000000007 /* CanvasDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasDestination.swift; sourceTree = "<group>"; };
 		500000000000000000000008 /* MorviApplicationRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorviApplicationRoot.swift; sourceTree = "<group>"; };
 		500000000000000000000009 /* OverlayCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayCanvasView.swift; sourceTree = "<group>"; };
-		500000000000000000000025 /* InputVisibilityScrollBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputVisibilityScrollBridge.swift; sourceTree = "<group>"; };
 		500000000000000000000010 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
 		500000000000000000000011 /* FeelingsWeekScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeelingsWeekScreen.swift; sourceTree = "<group>"; };
 		500000000000000000000012 /* DiscoverScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreen.swift; sourceTree = "<group>"; };
@@ -106,6 +98,14 @@
 		500000000000000000000017 /* ConversationScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationScreens.swift; sourceTree = "<group>"; };
 		500000000000000000000018 /* SettingsAndAgreementScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAndAgreementScreens.swift; sourceTree = "<group>"; };
 		500000000000000000000019 /* OverlayPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPanels.swift; sourceTree = "<group>"; };
+		500000000000000000000020 /* IdentityArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityArchive.swift; sourceTree = "<group>"; };
+		500000000000000000000021 /* AppleIdentityBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIdentityBridge.swift; sourceTree = "<group>"; };
+		500000000000000000000022 /* AvatarGalleryPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarGalleryPicker.swift; sourceTree = "<group>"; };
+		500000000000000000000023 /* ThreadArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadArchive.swift; sourceTree = "<group>"; };
+		500000000000000000000024 /* CreationArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreationArchive.swift; sourceTree = "<group>"; };
+		500000000000000000000025 /* InputVisibilityScrollBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputVisibilityScrollBridge.swift; sourceTree = "<group>"; };
+		500000000000000000000026 /* StorefrontAcquisitionGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorefrontAcquisitionGateway.swift; sourceTree = "<group>"; };
+		500000000000000000000027 /* StoredValueLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredValueLedger.swift; sourceTree = "<group>"; };
 		778F79B12FFA170600E7F38F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -508,7 +508,7 @@
 				CODE_SIGN_ENTITLEMENTS = Morvi/Morvi.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 6NUFR97X3A;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Morvi/Info.plist;
@@ -534,7 +534,7 @@
 				CODE_SIGN_ENTITLEMENTS = Morvi/Morvi.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 6NUFR97X3A;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Morvi/Info.plist;
