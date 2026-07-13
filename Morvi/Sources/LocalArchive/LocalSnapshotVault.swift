@@ -246,7 +246,7 @@ struct LocalSnapshotVault {
             FeelingOption(title: "Distressed", assetName: "home_mood_distressed")
         ],
         creditCatalog: [
-            CreditPackRecord(stableKey: "credit-400", amountText: "400", priceText: "$0.99", productKey: "haorwjpyvelqfbko"),
+            CreditPackRecord(stableKey: "credit-400", amountText: "400", priceText: "$0.99", productKey: "mqlravtspzbnheyc"),
             CreditPackRecord(stableKey: "credit-800", amountText: "800", priceText: "$1.99", productKey: "qmwkqadsjekmrvjl"),
             CreditPackRecord(stableKey: "credit-1780", amountText: "1780", priceText: "$3.99", productKey: "jfukgudeggyrveyo"),
             CreditPackRecord(stableKey: "credit-2450", amountText: "2450", priceText: "$4.99", productKey: "lwauthykogfgikvz"),
