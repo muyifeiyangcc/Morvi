@@ -124,7 +124,7 @@ struct TopChromeView: View {
                 if let trailingTitle {
                     Button(action: { trailingAction?() }) {
                         Text(trailingTitle)
-                            .font(TextCraft.source(16, weight: .medium))
+                            .font(TextCraft.one(16))
                             .foregroundColor(.black)
                             .frame(minWidth: 58, minHeight: 58)
                     }
