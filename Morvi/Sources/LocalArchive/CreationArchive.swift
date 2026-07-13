@@ -20,14 +20,13 @@ final class CreationArchive {
     }
 
     func seedIfNeeded(records: [CreationRecord], replyGroups: [String: [CreationReplyRecord]]) {
-        guard storedRecordCount == 0 else { return }
         let baseTime = Date().timeIntervalSince1970
         for (index, record) in records.enumerated() {
-            save(record, sortStamp: baseTime - Double(index))
+            insertIfMissing(record, sortStamp: baseTime - Double(index))
         }
         for (creationKey, replies) in replyGroups {
             for reply in replies {
-                save(reply, creationKey: creationKey)
+                insertIfMissing(reply, creationKey: creationKey)
             }
         }
     }
@@ -164,6 +163,50 @@ final class CreationArchive {
         return sqlite3_step(statement) == SQLITE_DONE
     }
 
+    @discardableResult
+    private func insertIfMissing(_ record: CreationRecord, sortStamp: TimeInterval) -> Bool {
+        let sql = """
+        INSERT OR IGNORE INTO creation_snapshot (
+            stable_key, title, body_text, author_key, author_name, avatar_asset, cover_asset,
+            tag_payload, media_kind, appreciation_count, reply_count, sort_stamp
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """
+        guard let statement = prepare(sql) else { return false }
+        defer { sqlite3_finalize(statement) }
+        bind(record.stableKey, at: 1, to: statement)
+        bind(record.title, at: 2, to: statement)
+        bind(record.bodyText, at: 3, to: statement)
+        bind(record.authorKey, at: 4, to: statement)
+        bind(record.authorName, at: 5, to: statement)
+        bind(record.avatarAssetName, at: 6, to: statement)
+        bind(record.coverAssetName, at: 7, to: statement)
+        bind(encodeTags(record.tags), at: 8, to: statement)
+        sqlite3_bind_int(statement, 9, record.mediaKind == .video ? 1 : 0)
+        sqlite3_bind_int(statement, 10, Int32(record.appreciationCount))
+        sqlite3_bind_int(statement, 11, Int32(record.replyCount))
+        sqlite3_bind_double(statement, 12, sortStamp)
+        return sqlite3_step(statement) == SQLITE_DONE
+    }
+
+    @discardableResult
+    private func insertIfMissing(_ reply: CreationReplyRecord, creationKey: String) -> Bool {
+        let sql = """
+        INSERT OR IGNORE INTO creation_reply (
+            creation_key, stable_key, author_key, author_name, avatar_asset, body_text, occurred_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?);
+        """
+        guard let statement = prepare(sql) else { return false }
+        defer { sqlite3_finalize(statement) }
+        bind(creationKey, at: 1, to: statement)
+        bind(reply.stableKey, at: 2, to: statement)
+        bind(reply.authorKey, at: 3, to: statement)
+        bind(reply.authorName, at: 4, to: statement)
+        bind(reply.avatarAssetName, at: 5, to: statement)
+        bind(reply.bodyText, at: 6, to: statement)
+        sqlite3_bind_double(statement, 7, reply.occurredAt.timeIntervalSince1970)
+        return sqlite3_step(statement) == SQLITE_DONE
+    }
+
     func appreciatedKeys(accountKey: String) -> Set<String> {
         let sql = "SELECT creation_key FROM creation_appreciation WHERE account_key = ?;"
         guard let statement = prepare(sql) else { return [] }
@@ -218,13 +261,6 @@ final class CreationArchive {
             return false
         }
         return commitTransaction()
-    }
-
-    private var storedRecordCount: Int {
-        guard let statement = prepare("SELECT COUNT(*) FROM creation_snapshot;") else { return 0 }
-        defer { sqlite3_finalize(statement) }
-        guard sqlite3_step(statement) == SQLITE_ROW else { return 0 }
-        return Int(sqlite3_column_int(statement, 0))
     }
 
     private var storeURL: URL {
