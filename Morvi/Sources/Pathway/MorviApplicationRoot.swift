@@ -196,7 +196,7 @@ private struct AccessJourneyCanvas: View {
                 }
                 navigationControl
                 if let accessDocumentTitle {
-                    AgreementScreen(title: accessDocumentTitle) {
+                    AgreementScreen(title: accessDocumentTitle, acceptsDocuments: $acceptsTerms) {
                         self.accessDocumentTitle = nil
                     }
                     .environmentObject(experienceStore)

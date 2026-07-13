@@ -150,14 +150,16 @@ struct AgreementScreen: View {
     @State private var webContentIsLoading = false
     @State private var webContentDidFail = false
     @State private var reloadIdentifier = 0
-    @State private var acceptsDocuments = true
+    @Binding private var acceptsDocuments: Bool
     @State private var selectedLegalTitle: String?
 
     init(
         title: String,
+        acceptsDocuments: Binding<Bool> = .constant(true),
         backAction: (() -> Void)? = nil
     ) {
         self.title = title
+        self._acceptsDocuments = acceptsDocuments
         self.backAction = backAction
         self.showsAuthenticationActions = title == "EULA" && backAction != nil
         self.cancelAction = nil
@@ -172,6 +174,7 @@ struct AgreementScreen: View {
         acceptanceAction: (() -> Void)? = nil
     ) {
         self.title = title
+        self._acceptsDocuments = .constant(true)
         self.backAction = backAction
         self.showsAuthenticationActions = showsAuthenticationActions
         self.cancelAction = cancelAction
@@ -282,7 +285,7 @@ struct AgreementScreen: View {
                 .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
 
                 Button("I agree") {
-                    guard acceptsDocuments else { return }
+                    acceptsDocuments = true
                     if let acceptanceAction {
                         acceptanceAction()
                     } else {
