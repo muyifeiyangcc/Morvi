@@ -292,6 +292,10 @@ private struct AccessJourneyCanvas: View {
                         .padding(.top, 417)
 
                         entryActionButton("I'm new", filled: true) {
+                            guard acceptsTerms else {
+                                experienceStore.showToast("Please agree to User Agreement and Privacy Policy")
+                                return
+                            }
                             step = .enrollment
                         }
                         .padding(.horizontal, 20)
@@ -301,6 +305,10 @@ private struct AccessJourneyCanvas: View {
                             Text("Don't have an account?")
                                 .font(TextCraft.source(12))
                             Button {
+                                guard acceptsTerms else {
+                                    experienceStore.showToast("Please agree to User Agreement and Privacy Policy")
+                                    return
+                                }
                                 step = .enrollment
                             } label: {
                                 Text("Sign up")
