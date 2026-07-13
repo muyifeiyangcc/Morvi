@@ -196,7 +196,7 @@ private struct AccessJourneyCanvas: View {
                 }
                 navigationControl
                 if let accessDocumentTitle {
-                    AgreementScreen(title: accessDocumentTitle) {
+                    AgreementScreen(title: accessDocumentTitle, acceptsDocuments: $acceptsTerms) {
                         self.accessDocumentTitle = nil
                     }
                     .environmentObject(experienceStore)
@@ -226,27 +226,28 @@ private struct AccessJourneyCanvas: View {
 
     @ViewBuilder
     private var navigationControl: some View {
-        if step != .entry || showsEntryBackButton {
-            TopChromeView(
-                title: navigationTitle,
-                showsBack: true,
-                backAction: {
-                    activeInput = nil
-                    switch step {
-                    case .entry:
-                        experienceStore.showsAccessFlow = false
-                    case .mail, .enrollment:
-                        step = .entry
-                    case .details:
-                        step = .enrollment
-                    case .reset:
-                        step = .mail
-                    }
+        TopChromeView(
+            title: navigationTitle,
+            showsBack: step != .entry || showsEntryBackButton,
+            trailingTitle: step == .entry ? "EULA" : nil,
+            backAction: {
+                activeInput = nil
+                switch step {
+                case .entry:
+                    experienceStore.showsAccessFlow = false
+                case .mail, .enrollment:
+                    step = .entry
+                case .details:
+                    step = .enrollment
+                case .reset:
+                    step = .mail
                 }
-            )
-            .accessibilityLabel("Back")
-            .accessibilityHint("Returns to the previous access screen")
-        }
+            },
+            trailingAction: {
+                guard step == .entry else { return }
+                accessDocumentTitle = "EULA"
+            }
+        )
     }
 
     private var navigationTitle: String {
@@ -291,6 +292,10 @@ private struct AccessJourneyCanvas: View {
                         .padding(.top, 417)
 
                         entryActionButton("I'm new", filled: true) {
+                            guard acceptsTerms else {
+                                experienceStore.showToast("Please agree to User Agreement and Privacy Policy")
+                                return
+                            }
                             step = .enrollment
                         }
                         .padding(.horizontal, 20)
@@ -300,6 +305,10 @@ private struct AccessJourneyCanvas: View {
                             Text("Don't have an account?")
                                 .font(TextCraft.source(12))
                             Button {
+                                guard acceptsTerms else {
+                                    experienceStore.showToast("Please agree to User Agreement and Privacy Policy")
+                                    return
+                                }
                                 step = .enrollment
                             } label: {
                                 Text("Sign up")
