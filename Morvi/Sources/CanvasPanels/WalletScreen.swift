@@ -45,7 +45,7 @@ struct WalletScreen: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 180, height: 182)
-                .offset(x: -54, y: -30)
+                .offset(x: -14, y: -30)
         }
     }
 }
