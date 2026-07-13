@@ -87,9 +87,10 @@ private struct NotchedBlackShape: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let radius: CGFloat = 14
+        let notchShift: CGFloat = 40
         path.move(to: CGPoint(x: radius, y: 0))
-        path.addLine(to: CGPoint(x: rect.width * 0.48, y: 0))
-        path.addQuadCurve(to: CGPoint(x: rect.width * 0.58, y: 20), control: CGPoint(x: rect.width * 0.53, y: 0))
+        path.addLine(to: CGPoint(x: rect.width * 0.48 + notchShift, y: 0))
+        path.addQuadCurve(to: CGPoint(x: rect.width * 0.58 + notchShift, y: 20), control: CGPoint(x: rect.width * 0.53 + notchShift, y: 0))
         path.addLine(to: CGPoint(x: rect.width - radius, y: 20))
         path.addQuadCurve(to: CGPoint(x: rect.width, y: 20 + radius), control: CGPoint(x: rect.width, y: 20))
         path.addLine(to: CGPoint(x: rect.width, y: rect.height - radius))
